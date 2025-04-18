@@ -1,0 +1,689 @@
+---
+// src/components/DynamicBackground.astro
+---
+
+<div id="dynamic-background-container">
+  <svg id="dynamic-background-svg" width="100%" height="100%"></svg>
+</div>
+
+<script>
+  // TypeScript code will go here
+  console.log("DynamicBackground script loaded");
+
+  const svgNS = "http://www.w3.org/2000/svg";
+  const svgContainer = document.getElementById(
+    "dynamic-background-svg"
+  ) as SVGElement | null;
+
+  if (svgContainer) {
+    const config = {
+      numBlobs: 4,
+      baseLargeMinBlobSize: 900,
+      baseLargeMaxBlobSize: 1400,
+      baseSmallMinBlobSize: 600,
+      baseSmallMaxBlobSize: 900,
+      referenceWidth: 1440,
+      minScaleFactor: 0.5,
+      maxScaleFactor: 1.5,
+      speedMultiplier: 1,
+      mouseInfluenceRadius: 580,
+      mouseForce: -800,
+      opacity: 0.5,
+    };
+
+    interface Vector {
+      x: number;
+      y: number;
+    }
+
+    // --- HSL Color Type ---
+    interface HSLColor {
+      h: number;
+      s: number;
+      l: number;
+    }
+
+    // --- Updated BlobShape Interface ---
+    interface BlobShape {
+      id: number;
+      pathElement: SVGPathElement;
+      position: Vector;
+      velocity: Vector;
+      radius: number;
+      color: string; // Original hex
+      hsl: HSLColor; // Current HSL
+      points: Vector[];
+      angle: number;
+      angularVelocity: number;
+      baseAngles: number[]; // Base angles of defining points
+      baseRadii: number[]; // Base radii of defining points
+      deformationTime: number;
+      deformationSpeed: number;
+      deformationAmplitude: number;
+      update: (mousePos: Vector | null, allBlobs: BlobShape[]) => void;
+    }
+
+    let blobs: BlobShape[] = [];
+    let mousePos: Vector | null = null;
+    let animationFrameId: number | null = null;
+    let svgGroup: SVGGElement | null = null; // Reference to the <g> element
+    let targetOffset: Vector = { x: 0, y: 0 };
+    let currentOffset: Vector = { x: 0, y: 0 };
+    const offsetLerpFactor = 0.05; // Smoothing factor for background movement
+    const offsetScale = -0.03; // How much the background moves relative to cursor (negative for parallax)
+
+    // --- Color Categories ---
+    interface ColorCategories {
+      [key: string]: string[];
+    }
+    const colorCategories: ColorCategories = {
+      reds: ["#FF6B6B", "#FFD93D", "#F2bF47", "#F2B707", "#F28706", "#F26430"],
+      pastels: [
+        "#b3e0f2",
+        "#caD93D",
+        "#F2E109",
+        "#D9fB96",
+        "#9EfDF2",
+        "#e6f398",
+        "#a0e9c4",
+      ],
+      yellows: ["#FFD700", "#FFDB58", "#F2E109", "#F9D423", "#caD93D"],
+      greens: ["#90EE90", "#6BCB77", "#3CB371", "#32CD32", "#a0e9c4"],
+      cyans: ["#40E0D0", "#AFEEEE", "#7FFFD4", "#B3E0F2", "#9EfDF2"],
+      blues: ["#87CEEB", "#6495ED", "#4D96FF", "#3245FF", "#7299f9"],
+    };
+    const hueShiftPerFrame = 0.4; // Degrees per frame
+
+    // --- Helper Functions ---
+    function random(min: number, max: number): number {
+      return Math.random() * (max - min) + min;
+    }
+
+    // MODIFIED: createBlobPoints returns points, angles, and radii
+    interface BlobGeometry {
+      points: Vector[];
+      angles: number[];
+      radii: number[];
+    }
+    function createBlobPoints(
+      centerX: number,
+      centerY: number,
+      avgRadius: number,
+      irregularity: number,
+      spikyness: number,
+      numPoints: number
+    ): BlobGeometry {
+      const points: Vector[] = [];
+      const angles: number[] = [];
+      const radii: number[] = [];
+      const angleStep = (Math.PI * 2) / numPoints;
+
+      for (let i = 0; i < numPoints; i++) {
+        const angle = i * angleStep;
+        angles.push(angle);
+
+        let radius =
+          avgRadius + random(-irregularity, irregularity) * avgRadius;
+        radius += random(0, spikyness) * avgRadius;
+        // Ensure radius is positive
+        radius = Math.max(avgRadius * 0.2, radius); // Minimum 20% of avg radius
+        radii.push(radius);
+
+        points.push({
+          x: centerX + Math.cos(angle) * radius,
+          y: centerY + Math.sin(angle) * radius,
+        });
+      }
+      return { points, angles, radii };
+    }
+
+    // Creates the SVG path string from points (using Catmull-Rom splines for smoothness)
+    function createPathString(points: Vector[]): string {
+      if (points.length < 3) return ""; // Need at least 3 points for spline
+
+      let d = `M ${points[0].x} ${points[0].y}`;
+      const n = points.length;
+
+      // Use Catmull-Rom spline logic (simplified)
+      for (let i = 0; i < n; i++) {
+        const p0 = points[(i - 1 + n) % n];
+        const p1 = points[i];
+        const p2 = points[(i + 1) % n];
+        const p3 = points[(i + 2) % n];
+
+        // Calculate control points (simplified)
+        const cp1x = p1.x + (p2.x - p0.x) / 6;
+        const cp1y = p1.y + (p2.y - p0.y) / 6;
+        const cp2x = p2.x - (p3.x - p1.x) / 6;
+        const cp2y = p2.y - (p3.y - p1.y) / 6;
+
+        d += ` C ${cp1x} ${cp1y}, ${cp2x} ${cp2y}, ${p2.x} ${p2.y}`;
+      }
+      d += " Z"; // Close the path
+      return d;
+    }
+
+    // --- HSL Conversion and Shuffle Functions ---
+    function hexToHsl(hex: string): HSLColor | null {
+      hex = hex.replace(/^#/, "");
+      if (hex.length === 3) {
+        hex = hex[0] + hex[0] + hex[1] + hex[1] + hex[2] + hex[2];
+      }
+      if (hex.length !== 6) {
+        return null;
+      }
+      const r = parseInt(hex.substring(0, 2), 16) / 255;
+      const g = parseInt(hex.substring(2, 4), 16) / 255;
+      const b = parseInt(hex.substring(4, 6), 16) / 255;
+      const max = Math.max(r, g, b);
+      const min = Math.min(r, g, b);
+      let h = 0,
+        s = 0,
+        l = (max + min) / 2;
+      if (max === min) {
+        h = s = 0;
+      } else {
+        const d = max - min;
+        s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+        switch (max) {
+          case r:
+            h = (g - b) / d + (g < b ? 6 : 0);
+            break;
+          case g:
+            h = (b - r) / d + 2;
+            break;
+          case b:
+            h = (r - g) / d + 4;
+            break;
+        }
+        h /= 6;
+      }
+      return {
+        h: Math.round(h * 360),
+        s: Math.round(s * 100),
+        l: Math.round(l * 100),
+      };
+    }
+
+    function hslToHex(h: number, s: number, l: number): string {
+      s /= 100;
+      l /= 100;
+      let c = (1 - Math.abs(2 * l - 1)) * s;
+      let x = c * (1 - Math.abs(((h / 60) % 2) - 1));
+      let m = l - c / 2;
+      let r = 0,
+        g = 0,
+        b = 0;
+      if (0 <= h && h < 60) {
+        r = c;
+        g = x;
+        b = 0;
+      } else if (60 <= h && h < 120) {
+        r = x;
+        g = c;
+        b = 0;
+      } else if (120 <= h && h < 180) {
+        r = 0;
+        g = c;
+        b = x;
+      } else if (180 <= h && h < 240) {
+        r = 0;
+        g = x;
+        b = c;
+      } else if (240 <= h && h < 300) {
+        r = x;
+        g = 0;
+        b = c;
+      } else if (300 <= h && h < 360) {
+        r = c;
+        g = 0;
+        b = x;
+      }
+      r = Math.round((r + m) * 255);
+      g = Math.round((g + m) * 255);
+      b = Math.round((b + m) * 255);
+      const toHex = (val: number) => val.toString(16).padStart(2, "0");
+      return `#${toHex(r)}${toHex(g)}${toHex(b)}`;
+    }
+
+    function shuffleArray<T>(array: T[]): T[] {
+      for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+      }
+      return array;
+    }
+
+    // --- Blob Class Logic (within init) ---
+    function initBlobs() {
+      blobs = [];
+      svgContainer!.innerHTML = "";
+      svgGroup = document.createElementNS(svgNS, "g");
+      svgContainer!.appendChild(svgGroup);
+
+      const { width: containerWidth, height: containerHeight } =
+        svgContainer!.getBoundingClientRect();
+      const windowWidth = window.innerWidth;
+      const maxPlacementAttempts = 50;
+
+      // --- Calculate dynamic sizes based on window width ---
+      const scaleFactor = Math.max(
+        config.minScaleFactor,
+        Math.min(config.maxScaleFactor, windowWidth / config.referenceWidth)
+      );
+      const currentLargeMinSize = config.baseLargeMinBlobSize * scaleFactor;
+      const currentLargeMaxSize = config.baseLargeMaxBlobSize * scaleFactor;
+      const currentSmallMinSize = config.baseSmallMinBlobSize * scaleFactor;
+      const currentSmallMaxSize = config.baseSmallMaxBlobSize * scaleFactor;
+      // --- End Calculate dynamic sizes ---
+
+      // Declare initialBlobColorsHex here so it's accessible in both branches
+      let initialBlobColorsHex: string[] = [];
+
+      // --- Randomly select TWO different color categories ---
+      const categoryNames = Object.keys(colorCategories);
+      if (categoryNames.length < 2) {
+        console.error("Need at least two color categories defined!");
+        const fallbackCategoryName = categoryNames[0] || "default";
+        const availableColors = colorCategories[fallbackCategoryName]
+          ? [...colorCategories[fallbackCategoryName]]
+          : [];
+        if (availableColors.length < config.numBlobs) {
+          console.warn(
+            `Fallback category '${fallbackCategoryName}' has only ${availableColors.length} colors, need ${config.numBlobs}.`
+          );
+        }
+        initialBlobColorsHex = shuffleArray(availableColors).slice(
+          0,
+          config.numBlobs
+        );
+        console.log(`Fallback: Using single category: ${fallbackCategoryName}`);
+      } else {
+        let selectedCategoryName1 =
+          categoryNames[Math.floor(Math.random() * categoryNames.length)];
+        let selectedCategoryName2 =
+          categoryNames[Math.floor(Math.random() * categoryNames.length)];
+        // Ensure the two categories are different
+        while (selectedCategoryName2 === selectedCategoryName1) {
+          selectedCategoryName2 =
+            categoryNames[Math.floor(Math.random() * categoryNames.length)];
+        }
+        console.log(
+          `Using categories: ${selectedCategoryName1} & ${selectedCategoryName2}`
+        );
+
+        const colors1 = colorCategories[selectedCategoryName1]
+          ? [...colorCategories[selectedCategoryName1]]
+          : [];
+        const colors2 = colorCategories[selectedCategoryName2]
+          ? [...colorCategories[selectedCategoryName2]]
+          : [];
+
+        // Check if each category has enough colors (at least 2)
+        if (colors1.length < 2)
+          console.warn(
+            `Category '${selectedCategoryName1}' has only ${colors1.length} colors, need 2.`
+          );
+        if (colors2.length < 2)
+          console.warn(
+            `Category '${selectedCategoryName2}' has only ${colors2.length} colors, need 2.`
+          );
+
+        // Shuffle and take 2 from each (use modulo for safety if fewer than 2)
+        const selectedColors1 = shuffleArray(colors1).slice(0, 2);
+        const selectedColors2 = shuffleArray(colors2).slice(0, 2);
+
+        // Fill remaining slots if a category had fewer than 2 colors
+        while (selectedColors1.length < 2 && colors1.length > 0)
+          selectedColors1.push(colors1[0]); // Use first color if needed
+        while (selectedColors2.length < 2 && colors2.length > 0)
+          selectedColors2.push(colors2[0]);
+        // Ensure we always have 4 colors total, even if categories were empty
+        while (
+          selectedColors1.length + selectedColors2.length < config.numBlobs &&
+          categoryNames.length > 0
+        ) {
+          // Grab a random color from a random category as fallback fill
+          const randomCatName =
+            categoryNames[Math.floor(Math.random() * categoryNames.length)];
+          const randomCatColors = colorCategories[randomCatName];
+          if (randomCatColors && randomCatColors.length > 0) {
+            (selectedColors1.length < 2
+              ? selectedColors1
+              : selectedColors2
+            ).push(
+              randomCatColors[
+                Math.floor(Math.random() * randomCatColors.length)
+              ]
+            );
+          } else {
+            // Extremely unlikely fallback
+            (selectedColors1.length < 2
+              ? selectedColors1
+              : selectedColors2
+            ).push("#808080"); // Grey
+          }
+        }
+
+        initialBlobColorsHex = [...selectedColors1, ...selectedColors2];
+        shuffleArray(initialBlobColorsHex);
+      }
+      // --- End select colors ---
+
+      if (initialBlobColorsHex.length === 0) {
+        console.error("Failed to select initial colors. Using fallback grey.");
+        initialBlobColorsHex = ["#808080", "#888888", "#909090", "#989898"];
+      }
+
+      for (let i = 0; i < config.numBlobs; i++) {
+        // Determine size range using calculated current sizes
+        let minSize, maxSize;
+        if (i < config.numBlobs / 2) {
+          minSize = currentLargeMinSize;
+          maxSize = currentLargeMaxSize;
+        } else {
+          minSize = currentSmallMinSize;
+          maxSize = currentSmallMaxSize;
+        }
+        const radius = random(minSize / 2, maxSize / 2);
+
+        // Find position - REMOVED overlap check, just place randomly
+        // let position: Vector | null = null;
+        // let attempts = 0;
+        // while (position === null && attempts < maxPlacementAttempts) {
+        //    const potentialPos: Vector = { x: random(radius, containerWidth - radius), y: random(radius, containerHeight - radius) };
+        //    let overlap = false;
+        //    for (const existingBlob of blobs) { /* ... overlap check ... */ }
+        //    if (!overlap) { position = potentialPos; } else { attempts++; }
+        // }
+        // if (position === null) { /* ... warning ... */ }
+        const position: Vector = {
+          // Directly assign random position
+          x: random(radius, containerWidth - radius),
+          y: random(radius, containerHeight - radius),
+        };
+
+        // Get initial color from the combined list
+        const initialHex =
+          initialBlobColorsHex[i % initialBlobColorsHex.length];
+        const initialHsl = hexToHsl(initialHex);
+        if (!initialHsl) {
+          console.error(
+            `Invalid initial hex color: ${initialHex}. Skipping blob ${i}.`
+          );
+          continue; // Skip if color is invalid
+        }
+
+        // Create blob properties - Modified call to createBlobPoints
+        const initialGeometry = createBlobPoints(0, 0, radius, 0.3, 0.2, 8);
+        const pathData = createPathString(initialGeometry.points);
+        const velocity: Vector = {
+          x: random(-1, 1) * config.speedMultiplier,
+          y: random(-1, 1) * config.speedMultiplier,
+        };
+        const initialAngle = random(0, 360);
+        const angularVelocity = random(-0.15, 0.15);
+
+        // Create SVG element
+        const pathElement = document.createElementNS(svgNS, "path");
+        pathElement.setAttribute("d", pathData);
+        pathElement.setAttribute("fill", initialHex);
+        pathElement.setAttribute(
+          "transform",
+          `translate(${position.x}, ${position.y}) rotate(${initialAngle})`
+        );
+        pathElement.style.opacity = String(config.opacity);
+        svgGroup!.appendChild(pathElement);
+
+        // Create Blob object - Added deformation properties
+        const blob: BlobShape = {
+          id: i,
+          pathElement,
+          position: position,
+          velocity,
+          radius, // Keep average radius for collision/interaction
+          color: initialHex,
+          hsl: initialHsl,
+          points: initialGeometry.points, // Initial points for reference?
+          angle: initialAngle,
+          angularVelocity: angularVelocity,
+          baseAngles: initialGeometry.angles,
+          baseRadii: initialGeometry.radii,
+          deformationTime: 0,
+          deformationSpeed: random(0.005, 0.015), // Slower speed for subtle change
+          deformationAmplitude: radius * random(0.05, 0.15), // Amplitude relative to size
+          update: function (mousePos, allBlobs) {
+            // Increment deformation time
+            this.deformationTime += 1; // Or use a delta time if available
+
+            // --- Calculate new points based on deformation ---
+            const currentPoints: Vector[] = [];
+            const numBasePoints = this.baseAngles.length;
+            for (let j = 0; j < numBasePoints; j++) {
+              const angle = this.baseAngles[j];
+              const baseRadius = this.baseRadii[j];
+              // Calculate radius offset using sine wave based on time and angle
+              const radiusOffset =
+                Math.sin(
+                  this.deformationTime * this.deformationSpeed + angle * 3
+                ) * this.deformationAmplitude;
+              const currentRadius = Math.max(
+                baseRadius * 0.3,
+                baseRadius + radiusOffset
+              ); // Ensure min radius
+
+              // Calculate point coordinates relative to (0,0)
+              const x = Math.cos(angle) * currentRadius;
+              const y = Math.sin(angle) * currentRadius;
+              currentPoints.push({ x, y });
+            }
+            // --- End Calculate new points ---
+
+            // Update the path definition (d attribute)
+            const newPathData = createPathString(currentPoints);
+            this.pathElement.setAttribute("d", newPathData);
+
+            // --- Update position based on velocity ---
+            this.position.x += this.velocity.x;
+            this.position.y += this.velocity.y;
+
+            // --- Update angle based on angular velocity ---
+            this.angle += this.angularVelocity;
+
+            // --- Update HSL color ---
+            this.hsl.h = (this.hsl.h + hueShiftPerFrame + 360) % 360;
+            const newHexColor = hslToHex(this.hsl.h, this.hsl.s, this.hsl.l);
+            this.pathElement.setAttribute("fill", newHexColor);
+
+            // --- Mouse interaction ---
+            if (mousePos) {
+              const dx = this.position.x - mousePos.x;
+              const dy = this.position.y - mousePos.y;
+              const dist = Math.sqrt(dx * dx + dy * dy);
+
+              // Use a slightly larger radius for interaction check
+              const influenceDist =
+                config.mouseInfluenceRadius + this.radius * 1.2;
+              if (dist < influenceDist) {
+                // Modify force calculation for stronger effect when closer
+                const force = ((influenceDist - dist) / influenceDist) ** 1.5; // Added exponent
+                const angle = Math.atan2(dy, dx);
+                // Apply force gently
+                this.velocity.x +=
+                  Math.cos(angle) *
+                  force *
+                  config.mouseForce *
+                  config.speedMultiplier *
+                  5; // Scale force with speedMultiplier
+                this.velocity.y +=
+                  Math.sin(angle) *
+                  force *
+                  config.mouseForce *
+                  config.speedMultiplier *
+                  5;
+              }
+            }
+
+            // --- Apply velocity limit & damping ---
+            const speed = Math.sqrt(
+              this.velocity.x ** 2 + this.velocity.y ** 2
+            );
+            const maxSpeed = 1.5 * config.speedMultiplier; // Limit speed relative to multiplier
+            if (speed > maxSpeed) {
+              this.velocity.x *= maxSpeed / speed;
+              this.velocity.y *= maxSpeed / speed;
+            }
+            this.velocity.x *= 0.99;
+            this.velocity.y *= 0.99;
+
+            // --- Collision detection and response ---
+            const collisionPushForce = 0.01;
+            for (const otherBlob of allBlobs) {
+              if (this.id === otherBlob.id) continue;
+
+              const dx = otherBlob.position.x - this.position.x;
+              const dy = otherBlob.position.y - this.position.y;
+              const dist = Math.sqrt(dx * dx + dy * dy);
+              const minDist = (this.radius + otherBlob.radius) * 0.85; // Allow some overlap (85% of sum of radii)
+
+              if (dist < minDist) {
+                const overlap = minDist - dist;
+                const angle = Math.atan2(dy, dx);
+                // Calculate push force - stronger for more overlap
+                const pushX = Math.cos(angle) * overlap * collisionPushForce;
+                const pushY = Math.sin(angle) * overlap * collisionPushForce;
+
+                // Apply force to both blobs (pushing them apart)
+                // We apply force by adjusting velocity
+                this.velocity.x -= pushX;
+                this.velocity.y -= pushY;
+                // The other blob will calculate its own push in its update cycle
+                // For a more physically accurate simulation, you might apply half the force here
+                // and half when the other blob checks against this one, or apply full force
+                // to both but be mindful of potential instability.
+                // Let's try applying the push only to 'this' blob first, as the effect
+                // might be sufficient and simpler.
+              }
+            }
+
+            // Boundary collision
+            const { width, height } = svgContainer!.getBoundingClientRect();
+            // Use a simpler boundary check, push back gently
+            const pushForce = 0.05 * config.speedMultiplier;
+            if (this.position.x < this.radius) {
+              this.velocity.x += pushForce;
+            }
+            if (this.position.x > width - this.radius) {
+              this.velocity.x -= pushForce;
+            }
+            if (this.position.y < this.radius) {
+              this.velocity.y += pushForce;
+            }
+            if (this.position.y > height - this.radius) {
+              this.velocity.y -= pushForce;
+            }
+            // Clamp position to prevent escaping completely during fast mouse moves or collisions
+            this.position.x = Math.max(
+              this.radius / 2,
+              Math.min(width - this.radius / 2, this.position.x)
+            );
+            this.position.y = Math.max(
+              this.radius / 2,
+              Math.min(height - this.radius / 2, this.position.y)
+            );
+
+            // Update position and rotation using transform
+            this.pathElement.setAttribute(
+              "transform",
+              `translate(${this.position.x}, ${this.position.y}) rotate(${this.angle})`
+            );
+          },
+        };
+        blobs.push(blob);
+      }
+    }
+
+    // --- Animation Loop --- MODIFIED (added color update inside blob.update)
+    function animate() {
+      // Update Background Offset
+      if (svgGroup) {
+        currentOffset.x +=
+          (targetOffset.x - currentOffset.x) * offsetLerpFactor;
+        currentOffset.y +=
+          (targetOffset.y - currentOffset.y) * offsetLerpFactor;
+        svgGroup.setAttribute(
+          "transform",
+          `translate(${currentOffset.x}, ${currentOffset.y})`
+        );
+      }
+
+      // Update individual blobs (which now includes color update)
+      blobs.forEach((blob) => blob.update(mousePos, blobs));
+      animationFrameId = requestAnimationFrame(animate);
+    }
+
+    // --- Event Listeners ---
+    window.addEventListener("mousemove", (event) => {
+      const rect = svgContainer!.getBoundingClientRect();
+      const mouseX = event.clientX;
+      const mouseY = event.clientY;
+
+      // Update individual blob interaction position
+      mousePos = {
+        x: mouseX - rect.left,
+        y: mouseY - rect.top,
+      };
+
+      // Update target offset for background movement
+      const centerX = window.innerWidth / 2;
+      const centerY = window.innerHeight / 2;
+      targetOffset.x = (mouseX - centerX) * offsetScale;
+      targetOffset.y = (mouseY - centerY) * offsetScale;
+    });
+
+    window.addEventListener("mouseleave", () => {
+      // Reset individual blob interaction
+      mousePos = null;
+      // Reset target offset for background
+      targetOffset.x = 0;
+      targetOffset.y = 0;
+    });
+
+    // Handle resize - MODIFIED: Removed re-initialization
+    let resizeTimeout: number;
+    window.addEventListener("resize", () => {
+      clearTimeout(resizeTimeout);
+      // Keep animation running, blobs will adapt to new boundaries via getBoundingClientRect
+      // if(animationFrameId) cancelAnimationFrame(animationFrameId); // Optional: could still pause during resize for performance
+      resizeTimeout = setTimeout(() => {
+        console.log("Window resized, background adapts boundary.");
+        // initBlobs(); // REMOVED
+        // animate();   // REMOVED
+      }, 250); // Debounce time
+    });
+
+    // --- Start --- Initialisation and start animation ---
+    initBlobs();
+    animate();
+  } else {
+    console.error("Dynamic background SVG container not found.");
+  }
+</script>
+
+<style>
+  #dynamic-background-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+    filter: blur(200px);
+    opacity: 0.5;
+    /* Add pointer-events: none if needed to allow interaction with elements behind it */
+    /* pointer-events: none; */
+  }
+  #dynamic-background-svg {
+    display: block; /* Prevents extra space below SVG */
+  }
+</style>
