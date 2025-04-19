@@ -29,3 +29,46 @@
   }
 </style>
 
+<script>
+  // GSAP Animations specific to the About section
+  import { gsap } from "gsap";
+  import { ScrollTrigger } from "gsap/ScrollTrigger";
+
+  gsap.registerPlugin(ScrollTrigger); // Register plugin here for this component
+
+  // --- About Title Animation (De-blur -> Re-blur Scrub Timeline) ---
+  const aboutTitle = document.querySelector(".scroll-target-title");
+  if (aboutTitle) {
+    gsap.set(aboutTitle, { filter: "blur(8px)", opacity: 0 });
+    const titleTimeline = gsap.timeline({
+      scrollTrigger: {
+        trigger: aboutTitle,
+        start: "top 90%",
+        end: "bottom 0%",
+        scrub: 1,
+        // markers: true,
+      },
+    });
+    titleTimeline
+      .to(aboutTitle, { filter: "blur(0px)", opacity: 1, ease: "sine", duration: 2 })
+      .to(aboutTitle, { filter: "blur(8px)", opacity: 0, ease: "sine", duration: 1 });
+  }
+
+  // --- About Content Animation (Fade/Move In -> Fade/Move Out Scrub Timeline) ---
+  const aboutContent = document.querySelector(".scroll-target-content");
+  if (aboutContent) {
+    gsap.set(aboutContent, { opacity: 0, y: 30 });
+    const contentTimeline = gsap.timeline({
+      scrollTrigger: {
+        trigger: aboutContent,
+        start: "top 85%",
+        end: "bottom 15%",
+        scrub: 1,
+        // markers: { startColor: "green", endColor: "red", indent: 100 },
+      },
+    });
+    contentTimeline
+      .to(aboutContent, { opacity: 1, y: 0, ease: "power1.inOut", duration: 2 })
+      .to(aboutContent, { opacity: 0, y: -30, ease: "power1.inOut", duration: 1 });
+  }
+</script>

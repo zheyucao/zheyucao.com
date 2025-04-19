@@ -1,0 +1,90 @@
+---
+// Component: src/components/ScrollIndicator.astro
+---
+
+<div id="scroll-indicator" class="scroll-indicator">
+  <div class="indicator-content">
+    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path
+        d="M7 10L12 15L17 10"
+        stroke="currentColor"
+        stroke-width="1"
+        stroke-linecap="round"
+        stroke-linejoin="round"></path>
+    </svg>
+  </div>
+</div>
+
+<style>
+  @keyframes float {
+    0% {
+      transform: translateY(0px);
+    }
+    50% {
+      transform: translateY(-8px);
+    }
+    100% {
+      transform: translateY(0px);
+    }
+  }
+
+  .scroll-indicator {
+    position: fixed;
+    bottom: 50px;
+    left: 50%;
+    transform: translateX(-50%);
+    color: inherit;
+    opacity: 0;
+    cursor: pointer;
+    z-index: 10;
+    transition: opacity 0.5s ease-out;
+  }
+
+  .indicator-content {
+    display: flex;
+    align-items: center;
+    gap: 0em;
+    animation: float 3s ease-in-out infinite;
+  }
+
+  .scroll-indicator svg {
+    display: block;
+    margin-bottom: 2px;
+  }
+
+  .scroll-indicator.visible {
+    opacity: 0.6;
+  }
+</style>
+
+<script>
+  import { gsap } from "gsap";
+  import { ScrollTrigger } from "gsap/ScrollTrigger";
+
+  gsap.registerPlugin(ScrollTrigger);
+
+  const indicator = document.querySelector("#scroll-indicator");
+
+  if (indicator) {
+    // Animation 1: Delayed fade-in
+    gsap.to(indicator, {
+      opacity: 0.6,
+      duration: 0.5,
+      delay: 3,
+      ease: "power1.out",
+    });
+
+    // Animation 2: Fade-out on scroll (independent)
+    gsap.to(indicator, {
+      opacity: 0,
+      ease: "power1.in",
+      scrollTrigger: {
+        trigger: document.body,
+        start: "top top",
+        end: "+=150",
+        scrub: 0.5,
+        // markers: true
+      },
+    });
+  }
+</script>

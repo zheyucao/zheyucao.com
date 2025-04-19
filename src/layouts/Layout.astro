@@ -1,5 +1,6 @@
 ---
 import DynamicBackground from "../components/DynamicBackground.astro";
+import ScrollIndicator from "../components/ScrollIndicator.astro";
 
 // Define props interface and get the title prop
 interface Props {
@@ -35,6 +36,7 @@ const pageTitle = `${title || "Homepage"} | Zheyu Cao`;
   <body>
     <DynamicBackground />
     <slot />
+    <ScrollIndicator />
   </body>
 
   <script>
