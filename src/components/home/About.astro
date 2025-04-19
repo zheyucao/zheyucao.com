@@ -1,0 +1,31 @@
+---
+// Component: src/components/home/About.astro
+---
+
+<section class="about-section">
+  <h2 class="about-title scroll-target-title">About Me</h2>
+  <p class="about-content scroll-target-content">
+    This is some placeholder text about me. This site is still under construction!
+  </p>
+</section>
+
+<style>
+  /* Styles moved from index.astro, now scoped to About component */
+  .about-section {
+    padding: 15vh 10%;
+    min-height: 70vh;
+  }
+
+  .about-title {
+    font-size: clamp(2rem, 2rem + 2vw, 4rem);
+    font-weight: 600;
+    margin-bottom: 1em;
+  }
+
+  .about-content {
+    font-size: 1.2rem;
+    line-height: 1.6;
+    max-width: 65ch;
+  }
+</style>
+
