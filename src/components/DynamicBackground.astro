@@ -11,8 +11,14 @@
   const svgContainer = document.getElementById("dynamic-background-svg") as SVGElement | null;
 
   if (svgContainer) {
+    // --- Performance Detection Heuristic ---
+    // Simple check for likely mobile/lower-performance devices
+    const isLowerPerformanceDevice =
+      ("maxTouchPoints" in navigator && navigator.maxTouchPoints > 0) || window.innerWidth < 1024; // Consider tablets/smaller laptops potentially lower-spec too
+    console.log(`Lower performance device detected: ${isLowerPerformanceDevice}`); // Optional logging
+
     const config = {
-      numBlobs: 4,
+      numBlobs: isLowerPerformanceDevice ? 2 : 4, // Fewer blobs on lower-spec
       baseLargeMinBlobSize: 1000,
       baseLargeMaxBlobSize: 1600,
       baseSmallMinBlobSize: 600,
@@ -20,14 +26,15 @@
       referenceWidth: 1440,
       minScaleFactor: 0.5,
       maxScaleFactor: 1.5,
-      speedMultiplier: 1,
+      speedMultiplier: isLowerPerformanceDevice ? 0.5 : 1, // Slower speed on lower-spec
       mouseInfluenceRadius: 580,
       mouseForce: -800,
       opacity: 0.8,
-      enableShapeChanging: false,
-      enableCollisionDetection: true,
-      enableMouseInteraction: true,
-      enableHueShift: true,
+      enableShapeChanging: false, // Keep disabled for performance
+      // Disable collision and interaction on lower-spec devices
+      enableCollisionDetection: !isLowerPerformanceDevice,
+      enableMouseInteraction: !isLowerPerformanceDevice,
+      enableHueShift: true, // Disable color shift too
     };
 
     interface Vector {
