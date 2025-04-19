@@ -13,10 +13,10 @@
   if (svgContainer) {
     const config = {
       numBlobs: 4,
-      baseLargeMinBlobSize: 900,
-      baseLargeMaxBlobSize: 1400,
+      baseLargeMinBlobSize: 1000,
+      baseLargeMaxBlobSize: 1600,
       baseSmallMinBlobSize: 600,
-      baseSmallMaxBlobSize: 900,
+      baseSmallMaxBlobSize: 1000,
       referenceWidth: 1440,
       minScaleFactor: 0.5,
       maxScaleFactor: 1.5,
@@ -25,6 +25,9 @@
       mouseForce: -800,
       opacity: 0.8,
       enableShapeChanging: false,
+      enableCollisionDetection: true,
+      enableMouseInteraction: true,
+      enableHueShift: true,
     };
 
     interface Vector {
@@ -54,7 +57,12 @@
       deformationTime: number;
       deformationSpeed: number;
       deformationAmplitude: number;
-      update: (mousePos: Vector | null, allBlobs: BlobShape[]) => void;
+      update: (
+        mousePos: Vector | null,
+        allBlobs: BlobShape[],
+        containerWidth: number,
+        containerHeight: number
+      ) => void;
     }
 
     let blobs: BlobShape[] = [];
@@ -296,7 +304,7 @@
       // --- CHANGES END HERE --- Select ONE random color scheme ---
 
       // --- Create Blobs: Large ones first (bottom layer) ---
-      const largeBlobCount = Math.floor(config.numBlobs / 2);
+      const largeBlobCount = Math.ceil(config.numBlobs / 2);
       for (let i = 0; i < largeBlobCount; i++) {
         createSingleBlob(
           i,
@@ -390,15 +398,19 @@
         deformationTime: 0,
         deformationSpeed: random(0.005, 0.015), // Slower speed for subtle change
         deformationAmplitude: radius * random(0.05, 0.15), // Amplitude relative to size
-        update: function (mousePos, allBlobs) {
+        update: function (
+          mousePos: Vector | null,
+          allBlobs: BlobShape[],
+          containerWidth: number,
+          containerHeight: number
+        ) {
           // Increment deformation time
           this.deformationTime += 1;
 
-          // --- Calculate new points based on deformation ---
-          const currentPoints: Vector[] = [];
-          const numBasePoints = this.baseAngles.length;
-
+          // Only recalculate points and path if shape changing is enabled
           if (config.enableShapeChanging) {
+            const currentPoints: Vector[] = [];
+            const numBasePoints = this.baseAngles.length;
             for (let j = 0; j < numBasePoints; j++) {
               const angle = this.baseAngles[j];
               const baseRadius = this.baseRadii[j];
@@ -413,21 +425,13 @@
               const y = Math.sin(angle) * currentRadius;
               currentPoints.push({ x, y });
             }
-          } else {
-            // Calculate points without deformation
-            for (let j = 0; j < numBasePoints; j++) {
-              const angle = this.baseAngles[j];
-              const baseRadius = this.baseRadii[j];
-              // Use base radius directly
-              const x = Math.cos(angle) * baseRadius;
-              const y = Math.sin(angle) * baseRadius;
-              currentPoints.push({ x, y });
-            }
-          }
 
-          // Update the path definition (d attribute)
-          const newPathData = createPathString(currentPoints);
-          this.pathElement.setAttribute("d", newPathData);
+            // Update the path definition (d attribute) only when shape changes
+            const newPathData = createPathString(currentPoints);
+            this.pathElement.setAttribute("d", newPathData);
+          }
+          // If shape changing is disabled, we assume the initial 'd' attribute set during creation is sufficient
+          // and only the transform needs updating later.
 
           // --- Update position based on velocity ---
           this.position.x += this.velocity.x;
@@ -436,13 +440,15 @@
           // --- Update angle based on angular velocity ---
           this.angle += this.angularVelocity;
 
-          // --- Update HSL color ---
-          this.hsl.h = (this.hsl.h + hueShiftPerFrame + 360) % 360;
-          const newHexColor = hslToHex(this.hsl.h, this.hsl.s, this.hsl.l);
-          this.pathElement.setAttribute("fill", newHexColor);
+          // --- Conditional HSL Color Update ---
+          if (config.enableHueShift) {
+            this.hsl.h = (this.hsl.h + hueShiftPerFrame + 360) % 360;
+            const newHexColor = hslToHex(this.hsl.h, this.hsl.s, this.hsl.l);
+            this.pathElement.setAttribute("fill", newHexColor);
+          }
 
           // --- Mouse interaction ---
-          if (mousePos) {
+          if (config.enableMouseInteraction && mousePos) {
             const dx = this.position.x - mousePos.x;
             const dy = this.position.y - mousePos.y;
             const dist = Math.sqrt(dx * dx + dy * dy);
@@ -472,37 +478,40 @@
           this.velocity.y *= 0.99;
 
           // --- Collision detection and response ---
-          const collisionPushForce = 0.01;
-          for (const otherBlob of allBlobs) {
-            if (this.id === otherBlob.id) continue;
+          if (config.enableCollisionDetection) {
+            const collisionPushForce = 0.01;
+            for (const otherBlob of allBlobs) {
+              if (this.id === otherBlob.id) continue;
 
-            const dx = otherBlob.position.x - this.position.x;
-            const dy = otherBlob.position.y - this.position.y;
-            const dist = Math.sqrt(dx * dx + dy * dy);
-            const minDist = (this.radius + otherBlob.radius) * 0.5; // Allow some overlap (85% of sum of radii)
+              const dx = otherBlob.position.x - this.position.x;
+              const dy = otherBlob.position.y - this.position.y;
+              const dist = Math.sqrt(dx * dx + dy * dy);
+              const minDist = (this.radius + otherBlob.radius) * 0.5; // Allow some overlap
 
-            if (dist < minDist) {
-              const overlap = minDist - dist;
-              const angle = Math.atan2(dy, dx);
-              // Calculate push force - stronger for more overlap
-              const pushX = Math.cos(angle) * overlap * collisionPushForce;
-              const pushY = Math.sin(angle) * overlap * collisionPushForce;
+              if (dist < minDist) {
+                const overlap = minDist - dist;
+                const angle = Math.atan2(dy, dx);
+                // Calculate push force - stronger for more overlap
+                const pushX = Math.cos(angle) * overlap * collisionPushForce;
+                const pushY = Math.sin(angle) * overlap * collisionPushForce;
 
-              // Apply force to both blobs (pushing them apart)
-              // We apply force by adjusting velocity
-              this.velocity.x -= pushX;
-              this.velocity.y -= pushY;
-              // The other blob will calculate its own push in its update cycle
-              // For a more physically accurate simulation, you might apply half the force here
-              // and half when the other blob checks against this one, or apply full force
-              // to both but be mindful of potential instability.
-              // Let's try applying the push only to 'this' blob first, as the effect
-              // might be sufficient and simpler.
+                // Apply force to both blobs (pushing them apart)
+                // We apply force by adjusting velocity
+                this.velocity.x -= pushX;
+                this.velocity.y -= pushY;
+                // The other blob will calculate its own push in its update cycle
+                // For a more physically accurate simulation, you might apply half the force here
+                // and half when the other blob checks against this one, or apply full force
+                // to both but be mindful of potential instability.
+                // Let's try applying the push only to 'this' blob first, as the effect
+                // might be sufficient and simpler.
+              }
             }
           }
 
           // Boundary collision
-          const { width, height } = svgContainer!.getBoundingClientRect();
+          const width = containerWidth;
+          const height = containerHeight;
           // Use a simpler boundary check, push back gently
           const pushForce = 0.05 * config.speedMultiplier;
           if (this.position.x < this.radius) {
@@ -527,11 +536,19 @@
             Math.min(height - this.radius / 2, this.position.y)
           );
 
-          // Update position and rotation using transform
-          this.pathElement.setAttribute(
-            "transform",
-            `translate(${this.position.x}, ${this.position.y}) rotate(${this.angle})`
-          );
+          // --- Conditional Transform Update for Static Blobs ---
+          const staticThreshold = 0.01; // Adjust threshold as needed
+          const isStatic =
+            Math.abs(this.velocity.x) < staticThreshold &&
+            Math.abs(this.velocity.y) < staticThreshold &&
+            Math.abs(this.angularVelocity) < staticThreshold;
+
+          if (!isStatic) {
+            this.pathElement.setAttribute(
+              "transform",
+              `translate(${this.position.x}, ${this.position.y}) rotate(${this.angle})`
+            );
+          }
         },
       };
       blobs.push(blob); // Add blob object to the array AFTER creating the SVG element
@@ -539,6 +556,10 @@
 
     // --- Animation Loop --- MODIFIED (added color update inside blob.update)
     function animate() {
+      // Get dimensions once per frame
+      const { width: containerWidth, height: containerHeight } =
+        svgContainer!.getBoundingClientRect();
+
       // Update Background Offset
       if (svgGroup) {
         currentOffset.x += (targetOffset.x - currentOffset.x) * offsetLerpFactor;
@@ -546,28 +567,30 @@
         svgGroup.setAttribute("transform", `translate(${currentOffset.x}, ${currentOffset.y})`);
       }
 
-      // Update individual blobs (which now includes color update)
-      blobs.forEach((blob) => blob.update(mousePos, blobs));
+      // Update individual blobs, passing dimensions
+      blobs.forEach((blob) => blob.update(mousePos, blobs, containerWidth, containerHeight));
       requestAnimationFrame(animate);
     }
 
     // --- Event Listeners ---
     window.addEventListener("mousemove", (event) => {
-      const rect = svgContainer!.getBoundingClientRect();
-      const mouseX = event.clientX;
-      const mouseY = event.clientY;
+      if (config.enableMouseInteraction) {
+        const rect = svgContainer!.getBoundingClientRect();
+        const mouseX = event.clientX;
+        const mouseY = event.clientY;
 
-      // Update individual blob interaction position
-      mousePos = {
-        x: mouseX - rect.left,
-        y: mouseY - rect.top,
-      };
+        // Update individual blob interaction position
+        mousePos = {
+          x: mouseX - rect.left,
+          y: mouseY - rect.top,
+        };
 
-      // Update target offset for background movement
-      const centerX = window.innerWidth / 2;
-      const centerY = window.innerHeight / 2;
-      targetOffset.x = (mouseX - centerX) * offsetScale;
-      targetOffset.y = (mouseY - centerY) * offsetScale;
+        // Update target offset for background movement
+        const centerX = window.innerWidth / 2;
+        const centerY = window.innerHeight / 2;
+        targetOffset.x = (mouseX - centerX) * offsetScale;
+        targetOffset.y = (mouseY - centerY) * offsetScale;
+      }
     });
 
     window.addEventListener("mouseleave", () => {
@@ -594,7 +617,7 @@
     width: 100%;
     height: 100%;
     z-index: -1;
-    filter: blur(100px) saturate(1.2);
+    filter: blur(50px) saturate(1.2);
     opacity: 0.4;
   }
   #dynamic-background-svg {
