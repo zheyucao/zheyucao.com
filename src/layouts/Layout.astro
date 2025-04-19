@@ -1,5 +1,4 @@
 ---
-// import background from '../assets/background.svg';
 import DynamicBackground from "../components/DynamicBackground.astro";
 ---
 
@@ -8,31 +7,17 @@ import DynamicBackground from "../components/DynamicBackground.astro";
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="icon" type="image/png" href="/favicon.png" />
     <meta name="generator" content={Astro.generator} />
     <title>Astro Basics</title>
   </head>
   <body>
-    {
-      /* <img id="background" src={background.src} alt="" fetchpriority="high" /> */
-    }
     <DynamicBackground />
     <slot />
   </body>
 </html>
 
 <style>
-  /* Remove #background style */
-  /* #background {
-		position: fixed;
-		top: 0;
-		left: 0;
-		width: 100%;
-		height: 100%;
-		z-index: -1;
-		filter: blur(100px);
-	} */
-
   html,
   body {
     margin: 0;
