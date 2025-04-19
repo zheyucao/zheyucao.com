@@ -1,38 +1,8 @@
-# Astro Starter Kit: Basics
+# zheyucao.com - My Personal Website
 
-```sh
-yarn create astro@latest -- --template basics
-```
+This is the template for the zheyucao.com personal website, built with Astro. You can use it as a starting point to create your own website.
 
-[![Open in StackBlitz](https://developer.stackblitz.com/img/open_in_stackblitz.svg)](https://stackblitz.com/github/withastro/astro/tree/latest/examples/basics)
-[![Open with CodeSandbox](https://assets.codesandbox.io/github/button-edit-lime.svg)](https://codesandbox.io/p/sandbox/github/withastro/astro/tree/latest/examples/basics)
-[![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/withastro/astro?devcontainer_path=.devcontainer/basics/devcontainer.json)
-
-> 🧑‍🚀 **Seasoned astronaut?** Delete this file. Have fun!
-
-![just-the-basics](https://github.com/withastro/astro/assets/2244813/a0a5533c-a856-4198-8470-2d67b1d7c554)
-
-## 🚀 Project Structure
-
-Inside of your Astro project, you'll see the following folders and files:
-
-```text
-/
-├── public/
-│   └── favicon.svg
-├── src/
-│   ├── layouts/
-│   │   └── Layout.astro
-│   └── pages/
-│       └── index.astro
-└── package.json
-```
-
-To learn more about the folder structure of an Astro project, refer to [our guide on project structure](https://docs.astro.build/en/basics/project-structure/).
-
-## 🧞 Commands
-
-All commands are run from the root of the project, from a terminal:
+## Commands
 
 | Command                | Action                                           |
 | :--------------------- | :----------------------------------------------- |
@@ -43,6 +13,21 @@ All commands are run from the root of the project, from a terminal:
 | `yarn astro ...`       | Run CLI commands like `astro add`, `astro check` |
 | `yarn astro -- --help` | Get help using the Astro CLI                     |
 
-## 👀 Want to learn more?
+## Using This Project as a Template
 
-Feel free to check [our documentation](https://docs.astro.build) or jump into our [Discord server](https://astro.build/chat).
+This project is licensed under the MIT License (see `LICENSE` file). You are welcome to use this code as a template for your own personal website.
+
+**Important Usage Guidelines:**
+
+- **Replace Personal Information:** You **must** replace all personal information found in the content files (e.g., in `src/pages/`, `src/components/`, `src/data/`, etc.). This includes, but is not limited to:
+  - Your name
+  - Biography or "About Me" sections
+  - Contact information (email, social media links)
+  - Project descriptions and details specific to the original author
+  - Photographs, avatars, or other personal images
+
+**Do Not Impersonate:** Do not present your modified version in a way that suggests it is the original author's website or that you are the original author. Clearly distinguish your site and content from the original.
+
+**Keep the License:** While you should update the content, please retain the original `LICENSE` file or include the original copyright notice and permission notice in your derivative work, as required by the MIT License.
+
+Failure to replace personal content may misrepresent you and the original author. Please use this template responsibly.
