@@ -1,0 +1,1 @@
+import{g as r,S as t}from"./ScrollTrigger.CKx49QUS.js";r.registerPlugin(t);const o=document.querySelector("#scroll-indicator");o&&(r.to(o,{opacity:.6,duration:.5,delay:3,ease:"power1.out"}),r.to(o,{opacity:0,ease:"power1.in",scrollTrigger:{trigger:document.body,start:"top top",end:"+=150",scrub:.5}}));
