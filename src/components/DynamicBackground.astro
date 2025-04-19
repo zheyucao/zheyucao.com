@@ -84,7 +84,6 @@
       greens: ["#90EE90", "#6BCB77", "#3CB371", "#32CD32", "#a0e9c4"],
       cyans: ["#40E0D0", "#AFEEEE", "#7FFFD4", "#B3E0F2", "#9EfDF2"],
       blues: ["#87CEEB", "#64f5ED", "#7De6FF", "#42d5FF", "#7299f9"],
-      garden: ["#80f080", "#38d8f8", "#20e020", "#f0f808"],
     };
     const hueShiftPerFrame = 0.4; // Degrees per frame
 
@@ -274,7 +273,7 @@
       const schemeNames = Object.keys(colorScheme);
       if (schemeNames.length === 0) {
         console.error("No color Scheme defined! Using fallback.");
-        initialBlobColorsHex = ["#80f080", "#38a8f8", "#20e020", "#f0f808"];
+        initialBlobColorsHex = ["#90EE90", "#6BCB77", "#3CB371", "#32CD32", "#a0e9c4"];
       } else {
         const selectedSchemeName = schemeNames[Math.floor(Math.random() * schemeNames.length)];
         console.log(`Using scheme: ${selectedSchemeName}`);
@@ -285,7 +284,7 @@
 
         if (availableColors.length === 0) {
           console.error(`Selected scheme '${selectedSchemeName}' is empty. Using fallback.`);
-          initialBlobColorsHex = ["#80f080", "#38a8f8", "#20e020", "#f0f808"];
+          initialBlobColorsHex = ["#90EE90", "#6BCB77", "#3CB371", "#32CD32", "#a0e9c4"];
         } else {
           const shuffledColors = shuffleArray(availableColors);
           initialBlobColorsHex = [];
