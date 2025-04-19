@@ -1,5 +1,5 @@
 ---
-// src/components/DynamicBackground.astro
+
 ---
 
 <div id="dynamic-background-container">
@@ -24,6 +24,7 @@
       mouseInfluenceRadius: 580,
       mouseForce: -800,
       opacity: 0.8,
+      enableShapeChanging: false,
     };
 
     interface Vector {
@@ -142,7 +143,7 @@
 
         d += ` C ${cp1x} ${cp1y}, ${cp2x} ${cp2y}, ${p2.x} ${p2.y}`;
       }
-      d += " Z"; // Close the path
+      d += " Z";
       return d;
     }
 
@@ -396,21 +397,33 @@
           // --- Calculate new points based on deformation ---
           const currentPoints: Vector[] = [];
           const numBasePoints = this.baseAngles.length;
-          for (let j = 0; j < numBasePoints; j++) {
-            const angle = this.baseAngles[j];
-            const baseRadius = this.baseRadii[j];
-            // Calculate radius offset using sine wave based on time and angle
-            const radiusOffset =
-              Math.sin(this.deformationTime * this.deformationSpeed + angle * 3) *
-              this.deformationAmplitude;
-            const currentRadius = Math.max(baseRadius * 0.3, baseRadius + radiusOffset); // Ensure min radius
 
-            // Calculate point coordinates relative to (0,0)
-            const x = Math.cos(angle) * currentRadius;
-            const y = Math.sin(angle) * currentRadius;
-            currentPoints.push({ x, y });
+          if (config.enableShapeChanging) {
+            for (let j = 0; j < numBasePoints; j++) {
+              const angle = this.baseAngles[j];
+              const baseRadius = this.baseRadii[j];
+              // Calculate radius offset using sine wave based on time and angle
+              const radiusOffset =
+                Math.sin(this.deformationTime * this.deformationSpeed + angle * 3) *
+                this.deformationAmplitude;
+              const currentRadius = Math.max(baseRadius * 0.3, baseRadius + radiusOffset); // Ensure min radius
+
+              // Calculate point coordinates relative to (0,0)
+              const x = Math.cos(angle) * currentRadius;
+              const y = Math.sin(angle) * currentRadius;
+              currentPoints.push({ x, y });
+            }
+          } else {
+            // Calculate points without deformation
+            for (let j = 0; j < numBasePoints; j++) {
+              const angle = this.baseAngles[j];
+              const baseRadius = this.baseRadii[j];
+              // Use base radius directly
+              const x = Math.cos(angle) * baseRadius;
+              const y = Math.sin(angle) * baseRadius;
+              currentPoints.push({ x, y });
+            }
           }
-          // --- End Calculate new points ---
 
           // Update the path definition (d attribute)
           const newPathData = createPathString(currentPoints);

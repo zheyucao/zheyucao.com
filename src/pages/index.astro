@@ -1,10 +1,164 @@
 ---
 import Layout from "../layouts/Layout.astro";
-
-// Welcome to Astro! Wondering what to do next? Check out the Astro documentation at https://docs.astro.build
-// Don't want to use any of this? Delete everything in this file, the `assets`, `components`, and `layouts` directories, and start fresh.
 ---
 
 <Layout>
-  {/* Add your content here */}
+  <main>
+    <section class="hero-section">
+      <div class="hero-text">
+        <div class="greeting">Hello, I'm</div>
+        <div class="hero-name">Zheyu Cao</div>
+      </div>
+    </section>
+
+    <section class="about-section">
+      <h2 class="about-title scroll-target-title">About Me</h2>
+      <p class="about-content scroll-target-content">
+        This is some placeholder text about me. Replace this with your actual content. As you
+        scroll, the title above should become clearer based on your scroll position. This content
+        paragraph appears once the title scrolls up.
+      </p>
+    </section>
+
+    <div style="height: 100vh;"></div>
+  </main>
+  {/* Add your other content here if needed */}
 </Layout>
+
+<style>
+  @keyframes unblurFadeIn {
+    0% {
+      filter: blur(32px);
+      opacity: 0;
+    }
+    10% {
+      filter: blur(28px);
+      opacity: 0.1;
+    }
+    50% {
+      filter: blur(4px);
+      opacity: 0.9;
+    }
+    100% {
+      filter: blur(0px);
+      opacity: 0.9;
+    }
+  }
+
+  main {
+    position: relative;
+    width: 100%;
+  }
+
+  .hero-section {
+    min-height: 100vh;
+    display: flex;
+    align-items: flex-start;
+    padding-left: 10%;
+    padding-top: 35vh;
+    box-sizing: border-box;
+  }
+
+  .hero-text {
+    max-width: 80%;
+  }
+
+  .greeting {
+    font-size: clamp(1.5rem, 1.5rem + 2vw, 4rem); /* Responsive font size */
+    font-style: italic;
+    color: #3c3c3c;
+    margin-bottom: 10px;
+    line-height: 1;
+    opacity: 0;
+    margin-left: 10px;
+    animation: unblurFadeIn 2s ease-out forwards;
+  }
+
+  .hero-name {
+    font-size: clamp(3rem, 4rem + 4vw, 8rem); /* Responsive font size */
+    font-weight: 400;
+    line-height: 1;
+    opacity: 0;
+    animation: unblurFadeIn 2s ease-out 0.5s forwards;
+  }
+
+  .about-section {
+    padding: 15vh 10%;
+    min-height: 70vh;
+  }
+
+  .about-title {
+    font-size: clamp(2rem, 2rem + 2vw, 4rem);
+    font-weight: 600;
+    margin-bottom: 1em;
+  }
+
+  .about-content {
+    font-size: 1.2rem;
+    line-height: 1.6;
+    max-width: 65ch;
+  }
+</style>
+
+<script>
+  import { gsap } from "gsap";
+  import { ScrollTrigger } from "gsap/ScrollTrigger";
+
+  gsap.registerPlugin(ScrollTrigger);
+
+  const aboutTitle = document.querySelector(".scroll-target-title");
+  if (aboutTitle) {
+    gsap.set(aboutTitle, { filter: "blur(8px)", opacity: 0 });
+
+    const titleTimeline = gsap.timeline({
+      scrollTrigger: {
+        trigger: aboutTitle,
+        start: "top 85%",
+        end: "bottom 0%",
+        scrub: 1,
+      },
+    });
+
+    titleTimeline
+      .to(aboutTitle, {
+        filter: "blur(0px)",
+        opacity: 0.9,
+        ease: "none",
+        duration: 2,
+      })
+      .to(aboutTitle, {
+        filter: "blur(8px)",
+        opacity: 0,
+        ease: "none",
+        duration: 1,
+      });
+  }
+
+  const aboutContent = document.querySelector(".scroll-target-content");
+  if (aboutContent) {
+    gsap.set(aboutContent, { opacity: 0, y: 30 });
+
+    const contentTimeline = gsap.timeline({
+      scrollTrigger: {
+        trigger: aboutContent,
+        start: "top 85%",
+        end: "bottom 15%",
+        scrub: 1,
+      },
+    });
+
+    contentTimeline
+      .to(aboutContent, {
+        opacity: 1,
+        y: 0,
+        ease: "power1.inOut",
+        duration: 2,
+      })
+      .to(aboutContent, {
+        opacity: 0,
+        y: -30,
+        ease: "power1.inOut",
+        duration: 1,
+      });
+  }
+</script>

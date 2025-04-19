@@ -27,12 +27,35 @@ import DynamicBackground from "../components/DynamicBackground.astro";
     <DynamicBackground />
     <slot />
   </body>
+
+  <script>
+    const observerOptions = {
+      root: null,
+      rootMargin: "0px",
+      threshold: 0.1,
+    };
+
+    const observerCallback = (entries, observer) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add("visible");
+          observer.unobserve(entry.target);
+        }
+      });
+    };
+
+    const observer = new IntersectionObserver(observerCallback, observerOptions);
+
+    const targets = document.querySelectorAll(".scroll-animate");
+    targets.forEach((target) => observer.observe(target));
+  </script>
 </html>
 
 <style>
   :root {
     --font-family-serif: "EB Garamond", serif;
     --font-family-sans: "Inter", sans-serif;
+    color: #2e2e2e;
   }
 
   html,
@@ -41,5 +64,21 @@ import DynamicBackground from "../components/DynamicBackground.astro";
     width: 100%;
     height: 100%;
     font-family: var(--font-family-serif);
+  }
+
+  .scroll-animate {
+    opacity: 0;
+    filter: blur(5px);
+    transform: translateY(20px);
+    transition:
+      opacity 0.8s ease-out,
+      filter 0.8s ease-out,
+      transform 0.8s ease-out;
+  }
+
+  .scroll-animate.visible {
+    opacity: 1;
+    filter: blur(0px);
+    transform: translateY(0);
   }
 </style>
