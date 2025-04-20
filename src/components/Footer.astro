@@ -38,7 +38,7 @@ const currentYear = new Date().getFullYear();
 
 <style>
   .site-footer {
-    background-color: #000000cc; /* Very dark grey */
+    background-color: #000000dd; /* Very dark grey */
     color: #ccc; /* Light grey text */
     padding: 4rem 10%; /* Generous padding */
     padding-bottom: 8rem;
@@ -130,3 +130,39 @@ const currentYear = new Date().getFullYear();
     }
   }
 </style>
+
+<script>
+  // GSAP Scroll-controlled animation for the footer
+  import { gsap } from "gsap";
+  import { ScrollTrigger } from "gsap/ScrollTrigger";
+
+  gsap.registerPlugin(ScrollTrigger);
+
+  const footerElement = document.querySelector(".site-footer");
+  const pageWrapper = document.querySelector(".page-wrapper");
+
+  if (footerElement && pageWrapper) {
+    gsap.fromTo(
+      footerElement,
+      {
+        // From state (start hidden/blurred/slightly down)
+        opacity: 0,
+        y: 15, // Slightly less vertical movement
+      },
+      {
+        // To state (fully visible/sharp/at position)
+        opacity: 1,
+        y: 0,
+        ease: "power1.in", // Gentle ease
+        scrollTrigger: {
+          trigger: footerElement,
+          scroller: pageWrapper,
+          start: "top 95%", // Start when top of footer is 95% down the viewport
+          end: "top 40%", // End when top of footer is 70% down the viewport
+          scrub: 1, // Smooth scrubbing (value 1 for a slight delay)
+          // markers: true, // Uncomment for debugging
+        },
+      }
+    );
+  }
+</script>
