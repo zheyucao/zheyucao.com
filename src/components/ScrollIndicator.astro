@@ -67,51 +67,67 @@
   const pageWrapper = document.querySelector(".page-wrapper");
 
   if (indicator && pageWrapper) {
-    let fadeInTimeout: number | null = null; // Variable to hold the timeout ID
+    let fadeInTimeout: number | null = null;
+    let isVisible = false; // Track the intended visibility state
 
-    // Function to schedule the fade-in
-    const scheduleFadeIn = () => {
-      // Clear any existing timeout first
-      if (fadeInTimeout) clearTimeout(fadeInTimeout);
-
+    const showIndicator = (delay = 0) => {
+      if (isVisible) return; // Already visible or scheduled to be
+      // Clear previous timeout (check for null)
+      if (fadeInTimeout !== null) {
+        clearTimeout(fadeInTimeout);
+      }
       fadeInTimeout = setTimeout(() => {
-        // Only fade in if still at the very top
-        if (pageWrapper.scrollTop < 10) {
-          gsap.to(indicator, { opacity: 0.6, duration: 0.5, overwrite: true });
-        }
-        fadeInTimeout = null;
-      }, 3000); // 3-second delay
+        gsap.to(indicator, { opacity: 0.6, duration: 0.5, overwrite: true });
+        isVisible = true;
+      }, delay);
     };
 
-    // Initial setup
-    gsap.set(indicator, { opacity: 0 }); // Ensure start hidden
-    scheduleFadeIn(); // Schedule the first fade-in attempt
+    const hideIndicator = () => {
+      // Cancel any pending show (check for null)
+      if (fadeInTimeout !== null) {
+        clearTimeout(fadeInTimeout);
+      }
+      gsap.to(indicator, { opacity: 0, duration: 0.3, overwrite: true });
+      isVisible = false;
+    };
 
-    // Scroll-based fade-out using ScrollTrigger
+    // Initial Setup
+    gsap.set(indicator, { opacity: 0 }); // Start hidden
+    isVisible = false;
+
+    // Check initial scroll position
+    if (pageWrapper.scrollTop < 10) {
+      showIndicator(3000); // If at top, schedule delayed show
+    }
+
+    // ScrollTrigger to manage visibility based on scroll
     ScrollTrigger.create({
       trigger: pageWrapper,
       scroller: pageWrapper,
-      start: "top top",
-      end: "+=150", // Fade out over 150px
-      animation: gsap.fromTo(
-        indicator,
-        { opacity: 0.6 }, // State to animate from (when active)
-        { opacity: 0, immediateRender: false } // State to animate to
-      ),
-      scrub: 0.5, // Smooth scrubbing
+      start: "10px top", // Trigger 10px away from the top
+      end: "bottom bottom", // Keep trigger active until bottom
+      // When scrolling DOWN past the start point
       onEnter: () => {
-        // User started scrolling down, cancel any pending fade-in
-        if (fadeInTimeout) {
-          clearTimeout(fadeInTimeout);
-          fadeInTimeout = null;
+        console.log("Scrolled away from top: Hiding indicator");
+        hideIndicator();
+      },
+      // When scrolling UP back past the start point (to the top)
+      onLeaveBack: () => {
+        console.log("Scrolled back to top: Scheduling indicator show");
+        // Check again in case of quick scroll-back
+        if (pageWrapper.scrollTop < 10) {
+          showIndicator(3000);
         }
       },
-      onLeaveBack: () => {
-        // User scrolled back to the very top
-        gsap.set(indicator, { opacity: 0, overwrite: true }); // Hide immediately
-        // Optional: Reschedule fade-in if desired after returning to top
-        // scheduleFadeIn();
-      },
+      // Optional: Trigger on refresh if already past start point
+      // Might be needed depending on exact ScrollTrigger behavior on load
+      // onUpdate: (self) => {
+      //    if (self.isActive && pageWrapper.scrollTop >= 10 && !isVisible) {
+      // If trigger is active on load and we are scrolled down, ensure hidden
+      //       hideIndicator();
+      //    }
+      // },
+      // markers: true // For debugging
     });
   }
 </script>
