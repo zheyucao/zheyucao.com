@@ -6,12 +6,14 @@
 
 | 命令                   | 操作                                           |
 | :--------------------- | :--------------------------------------------- |
-| `yarn install`         | 安装依赖                                       |
-| `yarn dev`             | 在 `localhost:4321` 启动本地开发服务器         |
-| `yarn build`           | 构建生产站点到 `./dist/` 目录                  |
-| `yarn preview`         | 在部署前本地预览构建结果                       |
-| `yarn astro ...`       | 运行 CLI 命令，例如 `astro add`, `astro check` |
-| `yarn astro -- --help` | 获取 Astro CLI 使用帮助                        |
+| `pnpm install`         | 安装依赖                                       |
+| `pnpm dev`             | 在 `localhost:4321` 启动本地开发服务器         |
+| `pnpm build`           | 构建生产站点到 `./dist/` 目录                  |
+| `pnpm preview`         | 在部署前本地预览构建结果                       |
+| `pnpm astro ...`       | 运行 CLI 命令，例如 `astro add`, `astro check` |
+| `pnpm astro -- --help` | 获取 Astro CLI 使用帮助                        |
+
+**注意：** 本项目使用 `pnpm` 作为包管理器。请确保您已安装 `pnpm`。
 
 ## 使用此项目作为模板
 
