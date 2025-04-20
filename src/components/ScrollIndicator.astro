@@ -32,8 +32,10 @@
     position: fixed;
     bottom: 50px;
     left: 50%;
+    /* transform: translateX(-50%) translateZ(0); */ /* Remove layer promotion */
     transform: translateX(-50%);
-    color: inherit;
+    /* will-change: transform, opacity; */ /* Remove will-change */
+    color: var(--text-color);
     opacity: 0;
     cursor: pointer;
     z-index: 10;
@@ -44,7 +46,8 @@
     display: flex;
     align-items: center;
     gap: 0em;
-    animation: float 3s ease-in-out infinite;
+    /* animation: float 3s ease-in-out infinite; */ /* Temporarily disable float animation */
+    animation: float 3s ease-in-out infinite; /* Restore float animation */
   }
 
   .scroll-indicator svg {

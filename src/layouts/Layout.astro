@@ -21,6 +21,18 @@ const pageTitle = `${title || "Homepage"} | Zheyu Cao`;
     <link rel="icon" type="image/png" href="/favicon.png" />
     <meta name="generator" content={Astro.generator} />
     <title>{pageTitle}</title>
+    <!-- START Insert Theme Detection Script Here -->
+    <script is:inline>
+      // Simplified: Only check system preference
+      const isDarkMode =
+        window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches;
+      if (isDarkMode) {
+        document.documentElement.classList.add("dark");
+      } else {
+        document.documentElement.classList.remove("dark");
+      }
+    </script>
+    <!-- END Insert Theme Detection Script Here -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -72,19 +84,58 @@ const pageTitle = `${title || "Homepage"} | Zheyu Cao`;
       console.error("Page wrapper element not found for IntersectionObserver.");
     }
   </script>
+  <!-- System Theme Change Listener -->
+  <script>
+    const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
+
+    const handleChange = (e) => {
+      if (e.matches) {
+        document.documentElement.classList.add("dark");
+      } else {
+        document.documentElement.classList.remove("dark");
+      }
+    };
+
+    // Initial check is done by inline script, this only handles changes
+    mediaQuery.addEventListener("change", handleChange);
+  </script>
 </html>
 
 <style>
   :root {
+    /* Light Theme (Default) */
+    --bg-color: #ffffff;
+    --text-color: #2e2e2e;
+    --text-muted: #555555;
+    --footer-bg: #f8f9fa; /* Light footer */
+    --footer-text: #343a40;
+    --footer-heading: #212529;
+    --footer-link: #384044;
+    --footer-link-hover: #212529;
+    --footer-copyright: #6c757d;
+
     --font-family-serif: "EB Garamond", Garamond, "Times New Roman", serif;
     --font-family-sans:
       "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif,
       "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
-    color: #2e2e2e;
+  }
+
+  html.dark {
+    /* Dark Theme Overrides */
+    --bg-color: #121212; /* Slightly off-black */
+    --text-color: #e0e0e0;
+    --text-muted: #aaaaaa;
+    --footer-bg: #161616;
+    --footer-text: #cccccc;
+    --footer-heading: #eeeeee;
+    --footer-link: #cccccc;
+    --footer-link-hover: #ffffff;
+    --footer-copyright: #888888;
   }
 
   html {
     /* Ensure no overscroll rule here */
+    background-color: var(--bg-color); /* Use CSS variable */
   }
 
   html,
@@ -93,6 +144,11 @@ const pageTitle = `${title || "Homepage"} | Zheyu Cao`;
     width: 100%;
     height: 100%;
     font-family: var(--font-family-serif);
+    color: var(--text-color); /* Apply base text color */
+    /* Ensure smooth transitions for color changes */
+    transition:
+      background-color 0.3s ease,
+      color 0.3s ease;
   }
 
   .page-wrapper {
@@ -109,6 +165,9 @@ const pageTitle = `${title || "Homepage"} | Zheyu Cao`;
     opacity: 0;
     filter: blur(5px);
     transform: translateY(20px);
+    /* Promote to own layer to potentially fix Firefox glitches */
+    transform: translateZ(0);
+    will-change: opacity, filter, transform;
     transition:
       opacity 0.8s ease-out,
       filter 0.8s ease-out,
@@ -118,6 +177,6 @@ const pageTitle = `${title || "Homepage"} | Zheyu Cao`;
   .scroll-animate.visible {
     opacity: 1;
     filter: blur(0px);
-    transform: translateY(0);
+    transform: translateY(0) translateZ(0); /* Keep consistent transform */
   }
 </style>
