@@ -67,25 +67,50 @@
   const pageWrapper = document.querySelector(".page-wrapper");
 
   if (indicator && pageWrapper) {
-    // Animation 1: Delayed fade-in
-    gsap.to(indicator, {
-      opacity: 0.6,
-      duration: 0.5,
-      delay: 3,
-      ease: "power1.out",
-    });
+    let fadeInTimeout: number | null = null; // Variable to hold the timeout ID
 
-    // Animation 2: Fade-out on scroll (independent)
-    gsap.to(indicator, {
-      opacity: 0,
-      ease: "power1.in",
-      scrollTrigger: {
-        trigger: pageWrapper,
-        scroller: pageWrapper,
-        start: "top top",
-        end: "+=150",
-        scrub: 0.5,
-        // markers: true
+    // Function to schedule the fade-in
+    const scheduleFadeIn = () => {
+      // Clear any existing timeout first
+      if (fadeInTimeout) clearTimeout(fadeInTimeout);
+
+      fadeInTimeout = setTimeout(() => {
+        // Only fade in if still at the very top
+        if (pageWrapper.scrollTop < 10) {
+          gsap.to(indicator, { opacity: 0.6, duration: 0.5, overwrite: true });
+        }
+        fadeInTimeout = null;
+      }, 3000); // 3-second delay
+    };
+
+    // Initial setup
+    gsap.set(indicator, { opacity: 0 }); // Ensure start hidden
+    scheduleFadeIn(); // Schedule the first fade-in attempt
+
+    // Scroll-based fade-out using ScrollTrigger
+    ScrollTrigger.create({
+      trigger: pageWrapper,
+      scroller: pageWrapper,
+      start: "top top",
+      end: "+=150", // Fade out over 150px
+      animation: gsap.fromTo(
+        indicator,
+        { opacity: 0.6 }, // State to animate from (when active)
+        { opacity: 0, immediateRender: false } // State to animate to
+      ),
+      scrub: 0.5, // Smooth scrubbing
+      onEnter: () => {
+        // User started scrolling down, cancel any pending fade-in
+        if (fadeInTimeout) {
+          clearTimeout(fadeInTimeout);
+          fadeInTimeout = null;
+        }
+      },
+      onLeaveBack: () => {
+        // User scrolled back to the very top
+        gsap.set(indicator, { opacity: 0, overwrite: true }); // Hide immediately
+        // Optional: Reschedule fade-in if desired after returning to top
+        // scheduleFadeIn();
       },
     });
   }
