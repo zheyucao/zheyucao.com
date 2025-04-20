@@ -36,13 +36,17 @@
 
   gsap.registerPlugin(ScrollTrigger); // Register plugin here for this component
 
+  const pageWrapper = document.querySelector(".page-wrapper"); // Get the scroller
+
   // --- About Title Animation (De-blur -> Re-blur Scrub Timeline) ---
   const aboutTitle = document.querySelector(".scroll-target-title");
-  if (aboutTitle) {
+  if (aboutTitle && pageWrapper) {
+    // Check for both elements
     gsap.set(aboutTitle, { filter: "blur(8px)", opacity: 0 });
     const titleTimeline = gsap.timeline({
       scrollTrigger: {
         trigger: aboutTitle,
+        scroller: pageWrapper,
         start: "top 90%",
         end: "bottom 0%",
         scrub: 1,
@@ -56,11 +60,13 @@
 
   // --- About Content Animation (Fade/Move In -> Fade/Move Out Scrub Timeline) ---
   const aboutContent = document.querySelector(".scroll-target-content");
-  if (aboutContent) {
+  if (aboutContent && pageWrapper) {
+    // Check for both elements
     gsap.set(aboutContent, { opacity: 0, y: 30 });
     const contentTimeline = gsap.timeline({
       scrollTrigger: {
         trigger: aboutContent,
+        scroller: pageWrapper,
         start: "top 85%",
         end: "bottom 15%",
         scrub: 1,

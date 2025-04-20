@@ -64,8 +64,9 @@
   gsap.registerPlugin(ScrollTrigger);
 
   const indicator = document.querySelector("#scroll-indicator");
+  const pageWrapper = document.querySelector(".page-wrapper");
 
-  if (indicator) {
+  if (indicator && pageWrapper) {
     // Animation 1: Delayed fade-in
     gsap.to(indicator, {
       opacity: 0.6,
@@ -79,7 +80,8 @@
       opacity: 0,
       ease: "power1.in",
       scrollTrigger: {
-        trigger: document.body,
+        trigger: pageWrapper,
+        scroller: pageWrapper,
         start: "top top",
         end: "+=150",
         scrub: 0.5,

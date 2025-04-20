@@ -1,6 +1,7 @@
 ---
 import DynamicBackground from "../components/DynamicBackground.astro";
 import ScrollIndicator from "../components/ScrollIndicator.astro";
+import Footer from "../components/Footer.astro";
 
 // Define props interface and get the title prop
 interface Props {
@@ -34,20 +35,26 @@ const pageTitle = `${title || "Homepage"} | Zheyu Cao`;
     />
   </head>
   <body>
-    <DynamicBackground />
-    <slot />
-    <ScrollIndicator />
+    <div class="page-wrapper">
+      <DynamicBackground />
+      <slot />
+      <Footer />
+      <ScrollIndicator />
+    </div>
   </body>
 
   <script>
+    const pageWrapper = document.querySelector(".page-wrapper");
+
     const observerOptions = {
-      root: null,
+      root: pageWrapper, // Observe intersections within the page-wrapper
       rootMargin: "0px",
       threshold: 0.1,
     };
 
     const observerCallback = (entries, observer) => {
       entries.forEach((entry) => {
+        // console.log("Observing:", entry.target, "Is intersecting:", entry.isIntersecting); // Removed debug log
         if (entry.isIntersecting) {
           entry.target.classList.add("visible");
           observer.unobserve(entry.target);
@@ -58,7 +65,12 @@ const pageTitle = `${title || "Homepage"} | Zheyu Cao`;
     const observer = new IntersectionObserver(observerCallback, observerOptions);
 
     const targets = document.querySelectorAll(".scroll-animate");
-    targets.forEach((target) => observer.observe(target));
+    // Ensure pageWrapper exists before observing
+    if (pageWrapper) {
+      targets.forEach((target) => observer.observe(target));
+    } else {
+      console.error("Page wrapper element not found for IntersectionObserver.");
+    }
   </script>
 </html>
 
@@ -71,6 +83,10 @@ const pageTitle = `${title || "Homepage"} | Zheyu Cao`;
     color: #2e2e2e;
   }
 
+  html {
+    /* Ensure no overscroll rule here */
+  }
+
   html,
   body {
     margin: 0;
@@ -79,10 +95,23 @@ const pageTitle = `${title || "Homepage"} | Zheyu Cao`;
     font-family: var(--font-family-serif);
   }
 
+  .page-wrapper {
+    height: 100vh;
+    overflow-y: auto;
+    position: relative; /* Context for absolutely positioned children if needed */
+    overscroll-behavior-y: contain;
+  }
+
   .scroll-animate {
+    /* TEMPORARILY DISABLED for debugging About section visibility */
+    /*
     opacity: 0;
     filter: blur(5px);
     transform: translateY(20px);
+    */
+    opacity: 0; /* Restore initial state */
+    filter: blur(5px); /* Restore initial state */
+    transform: translateY(20px); /* Restore initial state */
     transition:
       opacity 0.8s ease-out,
       filter 0.8s ease-out,

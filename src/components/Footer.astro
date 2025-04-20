@@ -1,0 +1,118 @@
+---
+// Component: src/components/Footer.astro
+const currentYear = new Date().getFullYear();
+---
+
+<footer class="site-footer">
+  <div class="footer-content">
+    <div class="footer-column footer-column-1">
+      <h4>Zheyu Cao</h4>
+      <p>
+        A brief tagline or mission statement can go here. Exploring the intersection of technology
+        and creativity.
+      </p>
+      <p class="copyright">&copy; {currentYear} Zheyu Cao. All rights reserved.</p>
+    </div>
+    <div class="footer-column footer-column-2">
+      <h4>Links</h4>
+      <ul>
+        <li><a href="/">Home</a></li>
+        <li><a href="/#about-section">About</a></li>
+        <!-- Assuming you add an ID to About section -->
+        <li><a href="/projects">Projects</a></li>
+        <!-- Link to future page -->
+        <li><a href="/resume">Resume</a></li>
+        <!-- Link to future page -->
+      </ul>
+    </div>
+    <div class="footer-column footer-column-3">
+      <h4>Connect</h4>
+      <ul>
+        <li><a href="#" target="_blank" rel="noopener noreferrer">GitHub</a></li>
+        <li><a href="#" target="_blank" rel="noopener noreferrer">LinkedIn</a></li>
+        <li><a href="#" target="_blank" rel="noopener noreferrer">Email</a></li>
+      </ul>
+    </div>
+  </div>
+</footer>
+
+<style>
+  .site-footer {
+    background-color: #000000cc; /* Very dark grey */
+    color: #ccc; /* Light grey text */
+    padding: 4rem 10%; /* Generous padding */
+    min-height: 33vh; /* Approximate target height */
+    display: flex; /* Use flex to help vertical alignment if needed */
+    align-items: center;
+    position: relative; /* Keep in document flow */
+    z-index: 5; /* Above background */
+    font-family: var(--font-family-sans); /* Use sans-serif for footer text */
+  }
+
+  .footer-content {
+    display: flex;
+    flex-wrap: wrap; /* Stack columns on mobile by default */
+    gap: 2rem; /* Gap between columns when wrapped/stacked */
+    width: 100%;
+  }
+
+  .footer-column {
+    flex: 1 1 100%; /* Default: take full width on mobile */
+    margin-bottom: 1.5rem; /* Spacing when stacked */
+  }
+
+  .footer-column h4 {
+    color: #eee; /* Brighter heading color */
+    margin-bottom: 1em;
+    font-weight: 600;
+  }
+
+  .footer-column p,
+  .footer-column ul {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    font-size: 0.9rem;
+    line-height: 1.6;
+  }
+
+  .footer-column ul li {
+    margin-bottom: 0.5em;
+  }
+
+  .footer-column a {
+    color: #ccc;
+    text-decoration: none;
+    transition: color 0.2s ease;
+  }
+
+  .footer-column a:hover,
+  .footer-column a:focus {
+    color: #fff; /* Brighter on hover */
+    text-decoration: underline;
+  }
+
+  .copyright {
+    margin-top: 2em;
+    font-size: 0.8rem;
+    color: #888; /* Dimmer copyright text */
+  }
+
+  /* Desktop layout: 3 columns with 2:1:1 ratio */
+  @media (min-width: 768px) {
+    .footer-content {
+      flex-wrap: nowrap; /* Prevent wrapping on desktop */
+      gap: 3rem; /* Adjust desktop gap */
+    }
+    .footer-column {
+      margin-bottom: 0; /* Remove stacking margin */
+    }
+    .footer-column-1 {
+      flex: 2 1 0%; /* 2 parts */
+    }
+    .footer-column-2,
+    .footer-column-3 {
+      flex: 1 1 0%; /* 1 part */
+    }
+  }
+</style>
