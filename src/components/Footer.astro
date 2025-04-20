@@ -7,7 +7,7 @@ const currentYear = new Date().getFullYear();
   <div class="footer-content">
     <div class="footer-column footer-column-1">
       <h4>Zheyu Cao</h4>
-      <p>
+      <p class="footer-description">
         A brief tagline or mission statement can go here. Exploring the intersection of technology
         and creativity.
       </p>
@@ -57,8 +57,17 @@ const currentYear = new Date().getFullYear();
   }
 
   .footer-column {
-    flex: 1 1 100%; /* Default: take full width on mobile */
+    /* flex: 1 1 100%; */ /* Removed, handled by specific columns below */
     margin-bottom: 1.5rem; /* Spacing when stacked */
+  }
+
+  /* Mobile Layout: Col 1 full width, Col 2 & 3 side-by-side below */
+  .footer-column-1 {
+    flex-basis: 100%; /* Force to full width */
+  }
+  .footer-column-2,
+  .footer-column-3 {
+    flex: 1; /* Allow growing to fill the second row */
   }
 
   .footer-column h4 {
@@ -113,6 +122,10 @@ const currentYear = new Date().getFullYear();
     .footer-column-2,
     .footer-column-3 {
       flex: 1 1 0%; /* 1 part */
+    }
+
+    .footer-description {
+      width: 70%;
     }
   }
 </style>
