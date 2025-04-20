@@ -84,7 +84,9 @@
     let currentPerformanceLevel = initialLevel;
     const fpsHistory: number[] = [];
     const maxFpsHistoryLength = 60; // Average over last 60 frames
-    let lastTimestamp = performance.now();
+    let lastTimestamp = performance.now(); // For FPS monitoring
+    let lastLogicExecutionTime = performance.now(); // For throttling
+    const targetFrameInterval = 1000 / 60; // Target 60 FPS update rate
     // Define FPS thresholds for level transitions
     const level1_MaxFps = 30; // Upper bound for Level 1
     const level1_RecoveryFps = 35; // Must exceed this to move up from Level 1
@@ -563,6 +565,18 @@
 
     // --- Animation Loop ---
     function animate(timestamp: number) {
+      // Always request the next frame
+      requestAnimationFrame(animate);
+
+      // Throttle logic updates to ~60 FPS
+      const elapsedSinceLastExecution = timestamp - lastLogicExecutionTime;
+      if (elapsedSinceLastExecution < targetFrameInterval) {
+        return; // Skip logic if not enough time has passed
+      }
+      // Adjust last execution time, accounting for potential overshoot
+      lastLogicExecutionTime = timestamp - (elapsedSinceLastExecution % targetFrameInterval);
+
+      // --- Now execute the throttled logic ---
       const deltaTime = timestamp - lastTimestamp;
       lastTimestamp = timestamp;
 
@@ -617,6 +631,7 @@
               framesInCurrentRange = 0; // Reset if FPS condition for switching isn't met
             }
           }
+
           console.log(`Avg FPS: ${avgFps.toFixed(1)}, Level: ${currentPerformanceLevel}`); // Re-enabled logging
         }
       }
@@ -634,7 +649,6 @@
 
       // Update individual blobs, passing dimensions
       blobs.forEach((blob) => blob.update(mousePos, blobs, containerWidth, containerHeight));
-      requestAnimationFrame(animate);
     }
 
     // --- Event Listeners ---
@@ -668,7 +682,7 @@
 
     // --- Start --- Initialization and start animation ---
     initBlobs();
-    requestAnimationFrame(animate);
+    requestAnimationFrame(animate); // Initial call to start the loop
   } else {
     console.error("Dynamic background SVG container not found.");
   }
