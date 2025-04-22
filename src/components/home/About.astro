@@ -34,48 +34,65 @@
   import { gsap } from "gsap";
   import { ScrollTrigger } from "gsap/ScrollTrigger";
 
-  gsap.registerPlugin(ScrollTrigger); // Register plugin here for this component
+  function setupAboutAnimations() {
+    // Ensure plugin is registered (safe to call multiple times)
+    gsap.registerPlugin(ScrollTrigger);
 
-  const pageWrapper = document.querySelector(".page-wrapper"); // Get the scroller
+    const pageWrapper = document.querySelector(".page-wrapper");
+    if (!pageWrapper) {
+      console.warn("About animations setup skipped: page wrapper not found.");
+      return;
+    }
 
-  // --- About Title Animation (De-blur -> Re-blur Scrub Timeline) ---
-  const aboutTitle = document.querySelector(".scroll-target-title");
-  if (aboutTitle && pageWrapper) {
-    // Check for both elements
-    gsap.set(aboutTitle, { filter: "blur(8px)", opacity: 0 });
-    const titleTimeline = gsap.timeline({
-      scrollTrigger: {
-        trigger: aboutTitle,
-        scroller: pageWrapper,
-        start: "top 90%",
-        end: "bottom 10%",
-        scrub: 1,
-        // markers: true,
-      },
+    const aboutTitle = document.querySelector(".scroll-target-title");
+    const aboutContent = document.querySelector(".scroll-target-content");
+
+    // Kill previous triggers for these elements to prevent duplicates
+    ScrollTrigger.getAll().forEach((trigger) => {
+      if (trigger.trigger === aboutTitle || trigger.trigger === aboutContent) {
+        trigger.kill();
+        console.log("Killed previous About ScrollTrigger"); // Debug log
+      }
     });
-    titleTimeline
-      .to(aboutTitle, { filter: "blur(0px)", opacity: 1, ease: "none", duration: 2 })
-      .to(aboutTitle, { filter: "blur(0px)", opacity: 1, ease: "none", duration: 2 })
-      .to(aboutTitle, { filter: "blur(8px)", opacity: 0, ease: "none", duration: 1 });
+
+    // --- About Title Animation ---
+    if (aboutTitle) {
+      gsap.set(aboutTitle, { filter: "blur(8px)", opacity: 0 });
+      const titleTimeline = gsap.timeline({
+        scrollTrigger: {
+          trigger: aboutTitle,
+          scroller: pageWrapper,
+          start: "top 90%",
+          end: "bottom 0%",
+          scrub: 1,
+        },
+      });
+      titleTimeline
+        .to(aboutTitle, { filter: "blur(0px)", opacity: 1, ease: "sine", duration: 2 })
+        .to(aboutTitle, { filter: "blur(0px)", opacity: 1, ease: "sine", duration: 2 })
+        .to(aboutTitle, { filter: "blur(8px)", opacity: 0, ease: "sine", duration: 1 });
+      console.log("Setup About Title ScrollTrigger"); // Debug log
+    }
+
+    // --- About Content Animation ---
+    if (aboutContent) {
+      gsap.set(aboutContent, { opacity: 0, y: 30 });
+      const contentTimeline = gsap.timeline({
+        scrollTrigger: {
+          trigger: aboutContent,
+          scroller: pageWrapper,
+          start: "top 85%",
+          end: "bottom 15%",
+          scrub: 1,
+        },
+      });
+      contentTimeline
+        .to(aboutContent, { opacity: 1, y: 0, ease: "power1.inOut", duration: 2 })
+        .to(aboutContent, { opacity: 0, y: -30, ease: "power1.inOut", duration: 1 });
+      console.log("Setup About Content ScrollTrigger"); // Debug log
+    }
   }
 
-  // --- About Content Animation (Fade/Move In -> Fade/Move Out Scrub Timeline) ---
-  const aboutContent = document.querySelector(".scroll-target-content");
-  if (aboutContent && pageWrapper) {
-    // Check for both elements
-    gsap.set(aboutContent, { opacity: 0, y: 30 });
-    const contentTimeline = gsap.timeline({
-      scrollTrigger: {
-        trigger: aboutContent,
-        scroller: pageWrapper,
-        start: "top 85%",
-        end: "bottom 15%",
-        scrub: 1,
-        // markers: { startColor: "green", endColor: "red", indent: 100 },
-      },
-    });
-    contentTimeline
-      .to(aboutContent, { opacity: 1, y: 0, ease: "power1.inOut", duration: 2 })
-      .to(aboutContent, { opacity: 0, y: -30, ease: "power1.inOut", duration: 1 });
-  }
+  // Run setup on initial load and after SPA navigations
+  document.addEventListener("astro:page-load", setupAboutAnimations, { once: false });
 </script>

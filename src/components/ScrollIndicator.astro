@@ -64,64 +64,91 @@
   import { gsap } from "gsap";
   import { ScrollTrigger } from "gsap/ScrollTrigger";
 
-  gsap.registerPlugin(ScrollTrigger);
+  let indicatorScrubTrigger: ScrollTrigger | null = null;
+  let indicatorCallbackTrigger: ScrollTrigger | null = null;
 
-  const indicator = document.querySelector("#scroll-indicator");
-  const pageWrapper = document.querySelector(".page-wrapper");
+  function setupIndicatorAnimation() {
+    // Ensure plugin is registered
+    gsap.registerPlugin(ScrollTrigger);
 
-  if (indicator && pageWrapper) {
-    let fadeInTimeout: number | null = null;
-    let isVisible = false; // Track the intended visibility state
+    const indicator = document.querySelector("#scroll-indicator");
+    const pageWrapper = document.querySelector(".page-wrapper");
 
-    const showIndicator = (delay = 0) => {
-      if (isVisible) return; // Already visible or scheduled to be
-      // Clear previous timeout (check for null)
-      if (fadeInTimeout !== null) {
-        clearTimeout(fadeInTimeout);
+    if (indicator && pageWrapper) {
+      // Kill previous instances if they exist
+      if (indicatorScrubTrigger) {
+        indicatorScrubTrigger.kill();
+        indicatorScrubTrigger = null;
+        console.log("Killed previous indicator Scrub Trigger");
       }
-      fadeInTimeout = setTimeout(() => {
-        gsap.to(indicator, { opacity: 0.6, duration: 0.5, overwrite: true });
-        isVisible = true;
-      }, delay);
-    };
-
-    const hideIndicator = () => {
-      // Cancel any pending show (check for null)
-      if (fadeInTimeout !== null) {
-        clearTimeout(fadeInTimeout);
+      if (indicatorCallbackTrigger) {
+        indicatorCallbackTrigger.kill();
+        indicatorCallbackTrigger = null;
+        console.log("Killed previous indicator Callback Trigger");
       }
-      gsap.to(indicator, { opacity: 0, duration: 0.3, overwrite: true });
-      isVisible = false;
-    };
 
-    // Initial Setup
-    gsap.set(indicator, { opacity: 0 }); // Start hidden
-    isVisible = false;
+      // Scroll-based fade-out using ScrollTrigger (Scrub)
+      const animation = gsap.fromTo(
+        indicator,
+        { opacity: 0.6 },
+        { opacity: 0, immediateRender: false }
+      );
+      indicatorScrubTrigger = ScrollTrigger.create({
+        trigger: pageWrapper,
+        scroller: pageWrapper,
+        start: "10px top",
+        end: "+=150",
+        animation: animation,
+        scrub: 0.5,
+        // markers: true // For debugging scrub
+      });
+      console.log("Setup new indicator Scrub Trigger");
 
-    // Check initial scroll position
-    if (pageWrapper.scrollTop < 10) {
-      showIndicator(3000); // If at top, schedule delayed show
-    }
+      // Re-introduce the 3-sec fade-in logic + show/hide callbacks
+      let fadeInTimeout: number | null = null;
+      const showIndicator = (delay = 0) => {
+        // Prevent scheduling if scrub trigger is active (i.e., user has scrolled down)
+        if (indicatorScrubTrigger?.isActive) return;
+        clearTimeout(fadeInTimeout as number);
+        fadeInTimeout = setTimeout(() => {
+          if (pageWrapper.scrollTop < 10) {
+            gsap.to(indicator, { opacity: 0.6, duration: 0.5, overwrite: true });
+          }
+        }, delay);
+      };
 
-    // ScrollTrigger to manage visibility based on scroll
-    ScrollTrigger.create({
-      trigger: pageWrapper,
-      scroller: pageWrapper,
-      start: "10px top", // Trigger 10px away from the top
-      end: "bottom bottom", // Keep trigger active until bottom
-      // When scrolling DOWN past the start point
-      onEnter: () => {
-        console.log("Scrolled away from top: Hiding indicator");
-        hideIndicator();
-      },
-      // When scrolling UP back past the start point (to the top)
-      onLeaveBack: () => {
-        console.log("Scrolled back to top: Scheduling indicator show");
-        // Check again in case of quick scroll-back
-        if (pageWrapper.scrollTop < 10) {
-          showIndicator(3000);
+      const hideIndicator = () => {
+        clearTimeout(fadeInTimeout as number);
+        // Don't force hide if the scrub animation is controlling opacity
+        if (!indicatorScrubTrigger?.isActive) {
+          gsap.to(indicator, { opacity: 0, duration: 0.3, overwrite: true });
         }
-      },
-    });
+      };
+
+      gsap.set(indicator, { opacity: 0 });
+      if (pageWrapper.scrollTop < 10) {
+        showIndicator(3000);
+      }
+
+      // Setup callbacks trigger
+      indicatorCallbackTrigger = ScrollTrigger.create({
+        trigger: pageWrapper,
+        scroller: pageWrapper,
+        start: "10px top",
+        onEnter: hideIndicator, // Hide when scrolling down past 10px
+        onLeaveBack: () => {
+          // When scrolling back to top
+          if (pageWrapper.scrollTop < 10) {
+            showIndicator(3000); // Reschedule show
+          }
+        },
+        // markers: {startColor: "green", endColor: "red", indent: 50}, // For debugging callbacks
+      });
+      console.log("Setup new indicator Callback Trigger");
+    } else {
+      console.warn("Indicator animation setup skipped: elements not found.");
+    }
   }
+
+  document.addEventListener("astro:page-load", setupIndicatorAnimation, { once: false });
 </script>

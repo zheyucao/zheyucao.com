@@ -2,7 +2,7 @@
 
 ---
 
-<div id="dynamic-background-container">
+<div id="dynamic-background-container" transition:persist={true}>
   <svg id="dynamic-background-svg" width="100%" height="100%"></svg>
 </div>
 
@@ -11,9 +11,11 @@
   const svgContainer = document.getElementById("dynamic-background-svg") as SVGElement | null;
 
   if (svgContainer) {
+    // console.log('[DynamicBackground] Script Execution Start'); // Removed debug log
+
     const isMobileDevice =
       ("maxTouchPoints" in navigator && navigator.maxTouchPoints > 0) || window.innerWidth < 1024; // Consider tablets/smaller laptops potentially lower-spec too
-    console.log(`Lower performance device detected: ${isMobileDevice}`); // Optional logging
+    // console.log(`Lower performance device detected: ${isMobileDevice}`); // Optional logging
 
     const config = {
       numBlobs: isMobileDevice ? 3 : 4, // Fewer blobs on lower-spec
@@ -28,12 +30,9 @@
       mouseInfluenceRadius: 580,
       mouseForce: -800,
       opacity: 0.8,
-      enableShapeChanging: false, // Keep disabled for performance
-      // Disable collision and interaction on lower-spec devices
+      enableShapeChanging: false,
       enableCollisionDetection: !isMobileDevice,
       enableMouseInteraction: !isMobileDevice,
-      // enableHueShift: true, // Removed, now always handled by CSS
-      // useCssHueShift: true, // Removed, CSS is the only method now
     };
 
     interface Vector {
@@ -117,16 +116,7 @@
       // config.enableHueShift remains true always
     }
 
-    // Always add class for CSS hue shift animation
     svgContainer.classList.add("css-hue-shift-active");
-    // Removed conditional logic
-    /*
-    if (config.enableHueShift && config.useCssHueShift) {
-      svgContainer.classList.add('css-hue-shift-active');
-    } else {
-      svgContainer.classList.remove('css-hue-shift-active');
-    }
-    */
 
     // --- Color Scheme ---
     interface ColorScheme {
@@ -264,6 +254,7 @@
 
     // --- Blob Class Logic (within init) ---
     function initBlobs() {
+      // console.log('[DynamicBackground] initBlobs() Called'); // Removed debug log
       blobs = [];
       svgContainer!.innerHTML = "";
       svgGroup = document.createElementNS(svgNS, "g");
@@ -573,12 +564,19 @@
       if (elapsedSinceLastExecution < targetFrameInterval) {
         return; // Skip logic if not enough time has passed
       }
-      // Adjust last execution time, accounting for potential overshoot
       lastLogicExecutionTime = timestamp - (elapsedSinceLastExecution % targetFrameInterval);
 
       // --- Now execute the throttled logic ---
       const deltaTime = timestamp - lastTimestamp;
       lastTimestamp = timestamp;
+
+      // REMOVED Check if svgGroup still exists before proceeding
+      /*
+      if (!svgGroup || svgGroup.children.length === 0) {
+          console.error('[DynamicBackground] svgGroup missing or empty in animate loop! Aborting frame.');
+          return; 
+      }
+      */
 
       // FPS Calculation and Mode Switching (only if not initially mobile)
       if (!isMobileDevice && deltaTime > 0) {
@@ -600,10 +598,8 @@
 
           // Hysteresis Logic
           if (targetLevel === currentPerformanceLevel) {
-            framesInCurrentRange = 0; // Reset counter if FPS is in the current level's range
+            framesInCurrentRange = 0;
           } else {
-            // Check if we should switch based on sustained FPS in the target range
-            // This is a simplified hysteresis: checks if current FPS meets the criteria to move
             let shouldSwitch = false;
             if (targetLevel > currentPerformanceLevel) {
               // Moving UP
@@ -612,31 +608,30 @@
               else if (currentPerformanceLevel === 2 && avgFps >= level2_RecoveryFps)
                 shouldSwitch = true;
               else if (currentPerformanceLevel === 3 && avgFps >= level4_MinFps)
-                shouldSwitch = true; // Directly use level 4 min
+                shouldSwitch = true;
             } else {
               // Moving DOWN
               if (currentPerformanceLevel === 4 && avgFps < level4_DegradeFps) shouldSwitch = true;
-              else if (currentPerformanceLevel === 3 && avgFps < level2_MaxFps)
-                shouldSwitch = true; // Use level 2 max
-              else if (currentPerformanceLevel === 2 && avgFps < level1_MaxFps) shouldSwitch = true; // Use level 1 max
+              else if (currentPerformanceLevel === 3 && avgFps < level2_MaxFps) shouldSwitch = true;
+              else if (currentPerformanceLevel === 2 && avgFps < level1_MaxFps) shouldSwitch = true;
             }
 
             if (shouldSwitch) {
               framesInCurrentRange++;
               if (framesInCurrentRange >= requiredFramesForSwitch) {
                 updatePerformanceLevel(targetLevel);
-                framesInCurrentRange = 0; // Reset counter after switch
+                framesInCurrentRange = 0;
               }
             } else {
-              framesInCurrentRange = 0; // Reset if FPS condition for switching isn't met
+              framesInCurrentRange = 0;
             }
           }
-
-          // console.log(`Avg FPS: ${avgFps.toFixed(1)}, Level: ${currentPerformanceLevel}`); // Re-enabled logging
+          // Re-comment the FPS log
+          // console.log(`Avg FPS: ${avgFps.toFixed(1)}, Level: ${currentPerformanceLevel}`);
         }
       }
 
-      // Get dimensions once per frame
+      // --- Existing Animation Logic ---
       const { width: containerWidth, height: containerHeight } =
         svgContainer!.getBoundingClientRect();
 

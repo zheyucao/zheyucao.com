@@ -113,6 +113,20 @@ const currentYear = new Date().getFullYear();
     color: var(--footer-copyright);
   }
 
+  /* Style for the active footer link - Now hides the LI */
+  .footer-column-2 ul li.active {
+    /* Hide the entire list item */
+    display: none;
+    /* Remove previous styling properties */
+    /*
+    color: var(--footer-heading); 
+    font-weight: 600; 
+    text-decoration: none; 
+    pointer-events: none; 
+    cursor: default;
+    */
+  }
+
   /* Desktop layout: 3 columns with 2:1:1 ratio */
   @media (min-width: 768px) {
     .footer-content {
@@ -141,33 +155,79 @@ const currentYear = new Date().getFullYear();
   import { gsap } from "gsap";
   import { ScrollTrigger } from "gsap/ScrollTrigger";
 
-  gsap.registerPlugin(ScrollTrigger);
+  function setupFooterAnimation() {
+    // Ensure plugin is registered (safe to call multiple times)
+    gsap.registerPlugin(ScrollTrigger);
 
-  const footerElement = document.querySelector(".site-footer");
-  const pageWrapper = document.querySelector(".page-wrapper");
+    const footerElement = document.querySelector(".site-footer");
+    const pageWrapper = document.querySelector(".page-wrapper");
 
-  if (footerElement && pageWrapper) {
-    gsap.fromTo(
-      footerElement,
-      {
-        // From state (start hidden/blurred/slightly down)
-        opacity: 0,
-        y: 15, // Slightly less vertical movement
-      },
-      {
-        // To state (fully visible/sharp/at position)
-        opacity: 1,
-        y: 0,
-        ease: "power1.in", // Gentle ease
-        scrollTrigger: {
-          trigger: footerElement,
-          scroller: pageWrapper,
-          start: "top 95%", // Start when top of footer is 95% down the viewport
-          end: "top 70%", // End when top of footer is 70% down the viewport
-          scrub: 1, // Smooth scrubbing (value 1 for a slight delay)
-          // markers: true, // Uncomment for debugging
-        },
-      }
-    );
+    if (footerElement && pageWrapper) {
+      // Kill previous ScrollTriggers targeting the footer to prevent duplication
+      ScrollTrigger.getAll().forEach((trigger) => {
+        if (trigger.trigger === footerElement) {
+          trigger.kill();
+          console.log("Killed previous footer ScrollTrigger"); // Debug log
+        }
+      });
+
+      gsap.fromTo(
+        footerElement,
+        { opacity: 0, y: 15 },
+        {
+          opacity: 1,
+          y: 0,
+          ease: "power1.in",
+          scrollTrigger: {
+            trigger: footerElement,
+            scroller: pageWrapper,
+            start: "top 95%",
+            end: "top 40%",
+            scrub: 1,
+            // markers: true,
+          },
+        }
+      );
+      console.log("Setup new footer ScrollTrigger"); // Debug log
+    } else {
+      console.warn("Footer animation setup skipped: elements not found.");
+    }
   }
+
+  // Run setup on initial load and after SPA navigations
+  document.addEventListener("astro:page-load", setupFooterAnimation, { once: false });
+</script>
+
+<script>
+  // Client-side script to mark the active footer link
+  function updateActiveFooterLink() {
+    const currentPath = window.location.pathname;
+    const normalizedPath = "/" + currentPath.replace(/^\/+|\/+$/g, "");
+    const rootPath = "/";
+    const links = document.querySelectorAll(".footer-column-2 ul li a");
+
+    links.forEach((link) => {
+      const linkHref = link.getAttribute("href");
+      const linkParentLi = link.closest("li");
+      if (!linkHref || !linkParentLi) return;
+      const normalizedHref = "/" + linkHref.replace(/^\/+|\/+$/g, "");
+
+      linkParentLi.classList.remove("active"); // Remove active from all first
+
+      if (linkHref === rootPath && (currentPath === rootPath || currentPath === "/index.html")) {
+        linkParentLi.classList.add("active");
+      } else if (
+        linkHref !== rootPath &&
+        linkHref.startsWith("/") &&
+        !linkHref.includes("#") &&
+        normalizedHref === normalizedPath
+      ) {
+        linkParentLi.classList.add("active");
+      }
+    });
+  }
+
+  // Run update on initial load and after SPA navigations
+  document.addEventListener("astro:page-load", updateActiveFooterLink);
+  // updateActiveFooterLink(); // Initial call might still be needed
 </script>
