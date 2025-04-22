@@ -8,8 +8,8 @@ const currentYear = new Date().getFullYear();
     <div class="footer-column footer-column-1">
       <h4>Zheyu Cao</h4>
       <p class="footer-description">
-        A brief tagline or mission statement can go here. Exploring the intersection of technology
-        and creativity.
+        Currently a third-year student at Northwestern Polytechnical University, pursuing a
+        Bachelor's degree in Computer Science.
       </p>
       <p class="copyright">&copy; {currentYear} Zheyu Cao. All rights reserved.</p>
     </div>
@@ -17,17 +17,23 @@ const currentYear = new Date().getFullYear();
       <h4>Links</h4>
       <ul>
         <li><a href="/">Home</a></li>
-        <li><a href="/#about-section">About</a></li>
+        <li><a href="/timeline">Timeline</a></li>
         <li><a href="/projects">Projects</a></li>
         <li><a href="/resume">Resume</a></li>
+        <li><a href="/contact">Contact</a></li>
       </ul>
     </div>
     <div class="footer-column footer-column-3">
       <h4>Connect</h4>
       <ul>
-        <li><a href="#" target="_blank" rel="noopener noreferrer">GitHub</a></li>
-        <li><a href="#" target="_blank" rel="noopener noreferrer">LinkedIn</a></li>
-        <li><a href="#" target="_blank" rel="noopener noreferrer">Email</a></li>
+        <li>
+          <a href="https://github.com/zheyu-cao" target="_blank" rel="noopener noreferrer">GitHub</a
+          >
+        </li>
+        <li>
+          <a href="mailto:zheyucao2004@gmail.com" target="_blank" rel="noopener noreferrer">Email</a
+          >
+        </li>
       </ul>
     </div>
   </div>
@@ -157,7 +163,7 @@ const currentYear = new Date().getFullYear();
           trigger: footerElement,
           scroller: pageWrapper,
           start: "top 95%", // Start when top of footer is 95% down the viewport
-          end: "top 40%", // End when top of footer is 70% down the viewport
+          end: "top 70%", // End when top of footer is 70% down the viewport
           scrub: 1, // Smooth scrubbing (value 1 for a slight delay)
           // markers: true, // Uncomment for debugging
         },
