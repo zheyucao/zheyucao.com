@@ -44,12 +44,12 @@ const currentYear = new Date().getFullYear();
     background-color: var(--footer-bg);
     color: var(--footer-text);
     padding: 4rem 10%; /* Generous padding */
-    min-height: 40vh; /* Approximate target height */
-    display: flex; /* Use flex to help vertical alignment if needed */
-    align-items: center;
-    position: relative; /* Keep in document flow */
-    z-index: 5; /* Above background */
-    font-family: var(--font-family-sans); /* Use sans-serif for footer text */
+    /* min-height: 40vh; */ /* Let padding/content determine height */
+    display: flex;
+    /* align-items: center; */ /* Remove vertical centering for now */
+    position: relative;
+    z-index: 5;
+    font-family: var(--font-family-sans);
     transition:
       background-color 0.3s ease,
       color 0.3s ease; /* Smooth theme transition */
