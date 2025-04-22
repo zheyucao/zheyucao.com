@@ -1,1 +1,0 @@
-import{g as o,S as t}from"./ScrollTrigger.CKx49QUS.js";o.registerPlugin(t);const r=document.querySelector(".site-footer"),e=document.querySelector(".page-wrapper");r&&e&&o.fromTo(r,{opacity:0,y:15},{opacity:1,y:0,ease:"power1.in",scrollTrigger:{trigger:r,scroller:e,start:"top 95%",end:"top 40%",scrub:1}});
