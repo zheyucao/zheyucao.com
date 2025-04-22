@@ -45,8 +45,10 @@ const currentYear = new Date().getFullYear();
     color: var(--footer-text);
     padding: 4rem 10%; /* Generous padding */
     /* min-height: 40vh; */ /* Let padding/content determine height */
+    min-height: 40vh; /* Restore original height */
     display: flex;
     /* align-items: center; */ /* Remove vertical centering for now */
+    align-items: center; /* Restore vertical centering */
     position: relative;
     z-index: 5;
     font-family: var(--font-family-sans);
