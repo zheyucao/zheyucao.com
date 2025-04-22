@@ -91,20 +91,32 @@ const showScrollIndicator = currentPath === "/";
       console.error("Page wrapper element not found for IntersectionObserver.");
     }
   </script>
-  <!-- System Theme Change Listener -->
+  <!-- System Theme Handling -->
   <script>
     const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
 
-    const handleChange = (e) => {
-      if (e.matches) {
+    // Function to apply the theme class based on query match
+    const checkAndApplyTheme = () => {
+      if (mediaQuery.matches) {
         document.documentElement.classList.add("dark");
       } else {
         document.documentElement.classList.remove("dark");
       }
+      console.log(
+        "[Theme] Applied theme based on prefers-color-scheme:",
+        mediaQuery.matches ? "dark" : "light"
+      ); // Debug log
     };
 
-    // Initial check is done by inline script, this only handles changes
-    mediaQuery.addEventListener("change", handleChange);
+    // Listener for live theme changes
+    mediaQuery.addEventListener("change", checkAndApplyTheme);
+
+    // Listener to re-apply theme after client-side navigation
+    document.addEventListener("astro:page-load", checkAndApplyTheme);
+
+    // Optional: Apply on initial script load for non-Astro SPA navigators?
+    // The inline script should handle the very first load.
+    // checkAndApplyTheme();
   </script>
 </html>
 
