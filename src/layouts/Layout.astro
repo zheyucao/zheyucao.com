@@ -126,6 +126,9 @@ const showScrollIndicator = currentPath === "/";
     --bg-color: #ffffff;
     --text-color: #2e2e2e;
     --text-muted: #555555;
+    --link-color: var(--text-color);
+    --link-hover-color: var(--text-muted);
+    --link-visited-color: var(--text-muted);
     --footer-bg: #f8f9faaa; /* Light footer */
     --footer-text: #343a40;
     --footer-heading: #212529;
@@ -145,6 +148,9 @@ const showScrollIndicator = currentPath === "/";
     --bg-color: #121212; /* Slightly off-black */
     --text-color: #e5e5e5;
     --text-muted: #ccc;
+    --link-color: var(--text-color);
+    --link-hover-color: var(--text-muted);
+    --link-visited-color: var(--text-muted);
     --footer-bg: #161616aa;
     --footer-text: #cccccc;
     --footer-heading: #eeeeee;
@@ -181,6 +187,26 @@ const showScrollIndicator = currentPath === "/";
 
   .main-content {
     min-height: 100vh;
+  }
+
+  /* Base link style */
+  a {
+    color: var(--link-color);
+    text-decoration: none; /* Explicitly remove default underline */
+    transition: color 0.2s ease;
+  }
+
+  /* Hover and focus style */
+  a:hover,
+  a:focus {
+    color: var(--link-hover-color);
+    text-decoration: underline; /* Add underline only on hover/focus */
+    text-underline-offset: 0.2em; /* Apply the offset */
+  }
+
+  /* Visited link style */
+  a:visited {
+    color: var(--link-visited-color);
   }
 </style>
 

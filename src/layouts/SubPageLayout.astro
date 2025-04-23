@@ -35,8 +35,16 @@ const { title } = Astro.props;
   .back-link {
     display: block;
     margin-bottom: 1.5rem;
+    color: var(--text-muted); /* Specific color for this link */
     font-family: var(--font-family-sans);
+    text-decoration: none; /* Remove default underline */
     font-size: 0.9rem;
+    transition: color 0.2s ease;
+  }
+  .back-link:hover {
+    color: var(--text-color); /* Use text color for hover, removing accent color */
+    text-decoration: underline; /* Add underline on hover */
+    text-underline-offset: 0.2em; /* Add the offset */
   }
   .subpage-title {
     /* Match About Me title style */
