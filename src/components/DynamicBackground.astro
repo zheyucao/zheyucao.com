@@ -691,10 +691,8 @@
     width: 100%;
     height: 100%;
     z-index: -1;
-    /* Default blur for smaller screens */
     filter: blur(30px);
-    opacity: 0.4;
-    /* Add transition for smooth blur changes on resize (optional) */
+    opacity: var(--dynamic-bg-opacity);
     transition: filter 0.3s ease;
   }
 
