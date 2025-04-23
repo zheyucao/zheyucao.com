@@ -11,10 +11,12 @@ const { title } = Astro.props;
 <Layout title={title}>
   <main class="subpage-main">
     <div class="subpage-header">
-      <a href="/" class="back-link">&larr; Back to Home</a>
-      <h1 class="subpage-title">{title}</h1>
+      <span class="back-link-wrapper scroll-animate">
+        <a href="/" class="back-link">&larr; Back to Home</a>
+      </span>
+      <h1 class="subpage-title scroll-animate">{title}</h1>
     </div>
-    <div class="subpage-content">
+    <div class="subpage-content scroll-animate">
       <slot />
       {/* Where the page-specific content will go */}
     </div>
@@ -57,4 +59,54 @@ const { title } = Astro.props;
     font-size: 1.2rem;
     line-height: 1.6;
   }
+
+  /* Style for the wrapper */
+  .back-link-wrapper {
+    display: inline-block; /* Needed for transform animation */
+    vertical-align: top; /* Optional: adjust alignment */
+  }
+
+  /* Animation Delays (Adjusted Order) */
+  .back-link-wrapper.scroll-animate {
+    transition-delay: 0s; /* Wrapper appears first */
+  }
+  .subpage-title.scroll-animate {
+    transition-delay: 0.1s; /* Title appears slightly first */
+  }
+  .subpage-content.scroll-animate {
+    transition-delay: 0.2s; /* Content appears slightly after */
+  }
 </style>
+
+<script>
+  // Use astro:page-load which should fire reliably with or without View Transitions
+  document.addEventListener("astro:page-load", () => {
+    const backLinkWrapperElement = document.querySelector(".back-link-wrapper.scroll-animate"); // Target the wrapper
+    const titleElement = document.querySelector(".subpage-title.scroll-animate");
+    const contentElement = document.querySelector(".subpage-content.scroll-animate");
+
+    // Ensure elements exist before trying to add class
+    const elements = [backLinkWrapperElement, titleElement, contentElement].filter((el) => el);
+
+    // Reset animation state briefly before applying 'visible'
+    elements.forEach((el) => {
+      // Check if el exists and is an HTMLElement before accessing offsetHeight
+      if (el instanceof HTMLElement) {
+        el.classList.remove("visible");
+        void el.offsetHeight; // Force reflow
+      }
+    });
+
+    // Add 'visible' class to trigger animation
+    requestAnimationFrame(() => {
+      elements.forEach((el) => {
+        if (el) {
+          // Check if element exists before adding class
+          el.classList.add("visible");
+        }
+      });
+    });
+
+    // console.log('[SubPageLayout] Animation triggered after swap for elements:', elements.length);
+  });
+</script>
