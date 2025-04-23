@@ -4,18 +4,70 @@
 
 <section class="resume-section scroll-reveal-animate">
   <h2>Honors & Awards</h2>
-  <ul class="awards-list">
-    <li><strong>China National Scholarship</strong> (2024.11)</li>
-    <li>NPU <strong>Outstanding Student & First-Class Scholarship</strong> (2024.11)</li>
-    <li>NPU <strong>Outstanding Student & Second-Class Scholarship</strong> (2023.11)</li>
-    <li>
-      China Robot Competition: <strong>National First Prize</strong> (x2), <strong
-        >National Second Prize</strong
-      > (x1) (2023.10, 2024.05, 2024.11)
-    </li>
-    <li>China Robot Championship: <strong>National First Prize</strong> (2024.10)</li>
-    <li>Other national, provincial, and university-level awards and honors.</li>
-  </ul>
+
+  <div class="award-entry">
+    <div class="header">
+      <span class="institution"><strong>China National Scholarship</strong></span>
+      <span class="date">2024.11</span>
+    </div>
+  </div>
+
+  <div class="award-entry">
+    <div class="header">
+      <span class="institution"
+        >NPU <strong>Outstanding Student & First-Class Scholarship</strong></span
+      >
+      <span class="date">2024.11</span>
+    </div>
+  </div>
+
+  <div class="award-entry">
+    <div class="header">
+      <span class="institution"
+        >NPU <strong>Outstanding Student & Second-Class Scholarship</strong></span
+      >
+      <span class="date">2023.11</span>
+    </div>
+  </div>
+
+  <div class="award-entry">
+    <div class="header">
+      <span class="institution">China Robot Contest: <strong>National First Prize</strong></span>
+      <span class="date">2024.11</span>
+    </div>
+  </div>
+
+  <div class="award-entry">
+    <div class="header">
+      <span class="institution">China Robot Contest: <strong>National First Prize</strong></span>
+      <span class="date">2024.05</span>
+    </div>
+  </div>
+
+  <div class="award-entry">
+    <div class="header">
+      <span class="institution">China Robot Contest: <strong>National Second Prize</strong></span>
+      <span class="date">2023.10</span>
+    </div>
+  </div>
+
+  <div class="award-entry">
+    <div class="header">
+      <span class="institution"
+        >China Robot Championship: <strong>National First Prize</strong></span
+      >
+      <span class="date">2024.10</span>
+    </div>
+  </div>
+
+  <div class="award-entry">
+    <div class="header">
+      <span class="institution"
+        >Other national, provincial, and university-level awards and honors.</span
+      >
+      <span class="date"></span>
+    </div>
+  </div>
 </section>
 
 <style>
@@ -29,25 +81,37 @@
     border-bottom: 1px solid var(--text-muted);
     padding-bottom: 0.5rem;
   }
-  .awards-list {
-    list-style: none; /* Remove default bullets */
-    padding-left: 0;
-    margin: 0;
-    font-size: 1rem;
-    line-height: 1.8; /* Slightly more line height for readability */
+  .award-entry {
+    margin-bottom: 1.5rem;
   }
-  .awards-list li {
-    margin-bottom: 0.5rem;
-    padding-left: 1.5rem; /* Space for custom bullet/icon */
-    position: relative;
+  .award-entry:last-child {
+    margin-bottom: 0;
   }
-  /* Add a simple custom bullet */
-  .awards-list li::before {
-    content: "🏆"; /* You can use other icons or symbols */
-    position: absolute;
-    left: 0;
-    top: 0.1em; /* Adjust vertical alignment */
-    font-size: 0.9em;
+  .award-entry .header {
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    font-size: 1.1rem;
+    line-height: 1.5;
+  }
+  .award-entry .institution {
+    margin-right: 1rem;
+  }
+  .award-entry .date {
+    font-family: var(--font-family-sans);
     color: var(--text-muted);
+    font-size: 0.95rem;
+    white-space: nowrap;
+    padding-left: 1rem;
+  }
+  @media (max-width: 600px) {
+    .award-entry .header {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+    .award-entry .date {
+      margin-top: 0.3rem;
+      padding-left: 0;
+    }
   }
 </style>

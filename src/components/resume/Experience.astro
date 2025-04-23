@@ -6,12 +6,16 @@
   <h2>Experience</h2>
   <div class="experience-entry">
     <div class="header">
-      <span class="institution"
-        ><strong>Westlake University NLP Lab (Prof. Yue Zhang's Group)</strong> - Research Intern</span
+      <span class="institution"><strong>Westlake University NLP Lab</strong> - Research Intern</span
       >
       <span class="date">2024.07 – 2024.09</span>
     </div>
     <ul class="details">
+      <li>
+        Supervisor: <strong
+          ><a href="https://frcchang.github.io/" target="_blank">Prof. Yue Zhang</a></strong
+        >
+      </li>
       <li>Focus: LLM Prompting, Reasoning, Chain of Thought.</li>
       <!-- Add more details here if available -->
     </ul>
@@ -20,29 +24,30 @@
   <div class="experience-entry">
     <div class="header">
       <span class="institution"
-        ><strong>NPU Soccer Robot Innovation Base V5++ Team</strong> - Captain</span
+        ><strong>Team V5++, NPU Soccer Robot Innovation Base</strong> - Leader</span
       >
       <span class="date">2023.05 – Present</span>
     </div>
     <ul class="details">
       <li>Managed team operations, served as Technical Director, led recruitment.</li>
+      <li>Led design and implementation of 2023-2025 recruitment technical exams.</li>
       <li>Handled team DevOps (cloud storage, LLM chatbot, code hosting, etc.).</li>
-      <li>Team awarded University Model Team (2022).</li>
+      <li>Team awarded <strong>Model Team of NPU</strong> (2022).</li>
     </ul>
   </div>
 
   <div class="experience-entry">
     <div class="header">
       <span class="institution"
-        ><strong>OS Experimental Pilot Class uniOS Project</strong> - Core Member</span
+        ><strong>uniOS Project, NPU Operating System Pilot Course</strong> - Core Member</span
       >
       <span class="date">2024.09 – 2025.01</span>
     </div>
     <ul class="details">
-      <li>Independently completed Bootloader, Paging, Process Scheduling, Fork syscall, etc.</li>
+      <li>Independently completed Bootloader, Paging, Process Scheduling, Fork Syscall, etc.</li>
       <li>
         Developed desktop environment (2-person team), responsible for system design, hardware
-        drivers, composition layer.
+        drivers and composition layer.
       </li>
     </ul>
   </div>
@@ -50,14 +55,16 @@
   <div class="experience-entry">
     <div class="header">
       <span class="institution"
-        ><strong>National Undergrad Innovation & Entrepreneurship Training Program</strong> - Member</span
+        ><strong>Undergraduate Innovation & Entrepreneurship Training Program</strong> - Member</span
       >
       <span class="date">2023.09 – 2024.06</span>
     </div>
     <ul class="details">
       <li>
-        Project: UAV Camouflage Object Recognition based on Hyperspectral Image Reconstruction
-        (Completed with Good standing).
+        National project, completed with <strong>Good standing</strong> (2024).
+      </li>
+      <li>
+        Project: UAV Camouflage Object Recognition based on Hyperspectral Image Reconstruction.
       </li>
       <li>Contributed to UAV joint control development.</li>
     </ul>
@@ -108,6 +115,21 @@
   .experience-entry .details li {
     margin-bottom: 0.3rem;
   }
+
+  /* --- Add styles for specific link --- */
+  section a {
+    color: var(--text-muted);
+    font-family: var(--font-family-serif);
+    text-decoration: none;
+    transition: color 0.2s ease;
+  }
+
+  section a:hover {
+    color: var(--text-color);
+    text-decoration: underline;
+    text-underline-offset: 0.2em;
+  }
+  /* --- End added styles --- */
 
   @media (max-width: 600px) {
     .experience-entry .header {
