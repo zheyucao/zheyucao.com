@@ -4,13 +4,30 @@
 
 <section class="about-section" id="about-section">
   <h2 class="about-title scroll-target-title">About Me</h2>
-  <p class="about-content scroll-target-content">
-    This is some placeholder text about me. This site is still under construction!
-  </p>
+  <div class="about-content scroll-target-content">
+    <p>
+      This site is still under construction. It's under very active development, so every time you
+      visit, there might be something new!
+    </p>
+    <p>Here's the pages you can find on this site:</p>
+    <ul class="about-nav-list">
+      <li>
+        <a href="/timeline">Timeline</a>: A record of my experiences, listed in chronological order.
+      </li>
+      <li>
+        <a href="/resume">Resume</a>: My resume, including my education, experience, skills, and
+        awards.
+      </li>
+      <li>
+        <a href="/projects">Projects</a>: My projects, including my personal, class and hobby
+        projects.
+      </li>
+      <li><a href="/contact">Contact</a>: Contact me through email and social media.</li>
+    </ul>
+  </div>
 </section>
 
 <style>
-  /* Styles moved from index.astro, now scoped to About component */
   .about-section {
     padding: 15vh 10%;
     min-height: 70vh;
@@ -27,6 +44,35 @@
     line-height: 1.6;
     max-width: 65ch;
   }
+
+  /* --- Styles for the navigation list --- */
+  .about-nav-list {
+    list-style: none; /* Remove default bullets */
+    padding-left: 0; /* Remove default padding */
+    margin-top: 2rem; /* Add some space above the list */
+  }
+
+  .about-nav-list li {
+    margin-bottom: 1rem; /* Space below each list item, reduced from 1.5rem */
+  }
+
+  .about-nav-list a {
+    /* Styles copied from .back-link */
+    display: inline-block; /* Use inline-block instead of block */
+    color: var(--text-muted);
+    font-family: var(--font-family-sans);
+    text-decoration: none;
+    font-size: 1rem; /* Slightly larger than back-link's 0.9rem */
+    transition: color 0.2s ease;
+  }
+
+  .about-nav-list a:hover {
+    /* Hover styles copied from .back-link:hover */
+    color: var(--text-color);
+    text-decoration: underline;
+    text-underline-offset: 0.2em;
+  }
+  /* --- End Styles for navigation list --- */
 </style>
 
 <script>
@@ -62,8 +108,8 @@
         scrollTrigger: {
           trigger: aboutTitle,
           scroller: pageWrapper,
-          start: "top 90%",
-          end: "bottom 0%",
+          start: "top 85%",
+          end: "bottom 5%",
           scrub: 1,
         },
       });
@@ -81,13 +127,13 @@
         scrollTrigger: {
           trigger: aboutContent,
           scroller: pageWrapper,
-          start: "top 85%",
-          end: "bottom 15%",
+          start: "top 85%", // 提前触发动画
+          end: "bottom 25%", // 提前结束动画
           scrub: 1,
         },
       });
       contentTimeline
-        .to(aboutContent, { opacity: 1, y: 0, ease: "power1.inOut", duration: 2 })
+        .to(aboutContent, { opacity: 1, y: 0, ease: "power1.inOut", duration: 3 })
         .to(aboutContent, { opacity: 0, y: -30, ease: "power1.inOut", duration: 1 });
       console.log("Setup About Content ScrollTrigger"); // Debug log
     }
