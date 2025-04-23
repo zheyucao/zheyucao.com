@@ -7,6 +7,17 @@ import Awards from "../components/resume/Awards.astro";
 ---
 
 <SubPageLayout title="Resume">
+  <div class="resume-download-cta">
+    <a
+      href="https://static.angine.tech/czy/resume.pdf"
+      target="_blank"
+      rel="noopener noreferrer"
+      download="Zheyu_Cao_Resume_ZH.pdf"
+      class="button download-button"
+    >
+      下载中文简历 (Download Chinese Resume PDF) <span aria-hidden="true">&darr;</span>
+    </a>
+  </div>
   <div class="resume-columns-wrapper">
     <div class="resume-main-column">
       <Education />
@@ -20,37 +31,62 @@ import Awards from "../components/resume/Awards.astro";
 </SubPageLayout>
 
 <style>
+  /* --- Styles for Download Button --- */
+  .resume-download-cta {
+    margin-bottom: 1.5rem;
+    text-align: left;
+  }
+  .button.download-button {
+    display: inline-block;
+    padding: 0.6em 1.2em;
+    border: 1px solid var(--text-muted);
+    color: var(--text-muted);
+    background-color: transparent;
+    border-radius: 4px;
+    text-decoration: none;
+    font-family: var(--font-family-sans);
+    font-size: 0.9rem;
+    transition: all 0.2s ease;
+    cursor: pointer;
+  }
+  .button.download-button:hover {
+    background-color: var(--text-muted);
+    color: var(--bg-color);
+    border-color: var(--text-muted);
+  }
+  .button.download-button span {
+    margin-left: 0.5em;
+  }
+  @media (max-width: 600px) {
+    .resume-download-cta {
+      text-align: left;
+      margin-bottom: 2rem;
+    }
+  }
+
+  /* --- Column Layout Styles --- */
   .resume-columns-wrapper {
     display: flex;
-    flex-direction: row; /* Default direction */
-    gap: 3rem; /* Space between columns */
+    flex-direction: row;
+    gap: 3rem;
   }
-
   .resume-main-column {
-    flex: 2; /* Main column takes up 2/3 of the space */
-    /* Or use flex-basis: 65%; */
-    min-width: 0; /* Prevent content overflow issues in flex items */
-    font-size: 1.05rem; /* Increase base font size */
-  }
-
-  .resume-sidebar {
-    flex: 1; /* Sidebar takes up 1/3 of the space */
-    /* Or use flex-basis: 35%; */
+    flex: 2;
     min-width: 0;
-    /* Optional: Add some top margin if sidebar starts lower than main */
-    /* margin-top: 4rem; */
-    font-size: 1.05rem; /* Increase base font size */
+    font-size: 1.05rem; /* Keep increased font size */
   }
-
-  /* Responsive adjustments for smaller screens */
+  .resume-sidebar {
+    flex: 1;
+    min-width: 0;
+    font-size: 1.05rem; /* Keep increased font size */
+  }
   @media (max-width: 900px) {
-    /* Adjust breakpoint as needed */
     .resume-columns-wrapper {
-      flex-direction: column; /* Stack columns */
-      gap: 0; /* Remove gap when stacked, components have bottom margin */
+      flex-direction: column;
+      gap: 0;
     }
     .resume-sidebar {
-      margin-top: 0; /* Reset potential top margin */
+      margin-top: 0;
     }
   }
 </style>
