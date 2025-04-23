@@ -42,7 +42,7 @@ import Awards from "../components/resume/Awards.astro";
     border: 1px solid var(--text-muted);
     color: var(--text-muted);
     background-color: transparent;
-    border-radius: 4px;
+    border-radius: 8px;
     text-decoration: none;
     font-family: var(--font-family-sans);
     font-size: 0.9rem;
@@ -50,9 +50,10 @@ import Awards from "../components/resume/Awards.astro";
     cursor: pointer;
   }
   .button.download-button:hover {
-    background-color: var(--text-muted);
-    color: var(--bg-color);
-    border-color: var(--text-muted);
+    border-color: var(--button-hover-text);
+    background-color: var(--button-hover-bg);
+    color: var(--button-hover-text);
+    /* backdrop-filter: saturate(1.4) brightness(1.2); */
   }
   .button.download-button span {
     margin-left: 0.5em;
