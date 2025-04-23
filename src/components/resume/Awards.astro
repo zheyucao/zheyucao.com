@@ -1,0 +1,53 @@
+---
+// No props needed
+---
+
+<section class="resume-section scroll-reveal-animate">
+  <h2>Honors & Awards</h2>
+  <ul class="awards-list">
+    <li><strong>China National Scholarship</strong> (2024.11)</li>
+    <li>NPU <strong>Outstanding Student & First-Class Scholarship</strong> (2024.11)</li>
+    <li>NPU <strong>Outstanding Student & Second-Class Scholarship</strong> (2023.11)</li>
+    <li>
+      China Robot Competition: <strong>National First Prize</strong> (x2), <strong
+        >National Second Prize</strong
+      > (x1) (2023.10, 2024.05, 2024.11)
+    </li>
+    <li>China Robot Championship: <strong>National First Prize</strong> (2024.10)</li>
+    <li>Other national, provincial, and university-level awards and honors.</li>
+  </ul>
+</section>
+
+<style>
+  .resume-section {
+    margin-bottom: 4rem;
+  }
+  h2 {
+    font-size: clamp(1.8rem, 1.5rem + 1.5vw, 2.8rem);
+    margin-bottom: 2rem;
+    font-weight: 600;
+    border-bottom: 1px solid var(--text-muted);
+    padding-bottom: 0.5rem;
+  }
+  .awards-list {
+    list-style: none; /* Remove default bullets */
+    padding-left: 0;
+    margin: 0;
+    font-size: 1rem;
+    line-height: 1.8; /* Slightly more line height for readability */
+  }
+  .awards-list li {
+    margin-bottom: 0.5rem;
+    padding-left: 1.5rem; /* Space for custom bullet/icon */
+    position: relative;
+  }
+  /* Add a simple custom bullet */
+  .awards-list li::before {
+    content: "🏆"; /* You can use other icons or symbols */
+    position: absolute;
+    left: 0;
+    top: 0.1em; /* Adjust vertical alignment */
+    font-size: 0.9em;
+    color: var(--text-muted);
+  }
+</style>

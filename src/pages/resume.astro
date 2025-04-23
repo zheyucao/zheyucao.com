@@ -1,7 +1,54 @@
 ---
 import SubPageLayout from "../layouts/SubPageLayout.astro";
+import Education from "../components/resume/Education.astro";
+import Experience from "../components/resume/Experience.astro";
+import Skills from "../components/resume/Skills.astro";
+import Awards from "../components/resume/Awards.astro";
 ---
 
 <SubPageLayout title="Resume">
-  <p>Content coming soon... (Likely a PDF download link)</p>
+  <div class="resume-columns-wrapper">
+    <div class="resume-main-column">
+      <Education />
+      <Awards />
+      <Experience />
+    </div>
+    <div class="resume-sidebar">
+      <Skills />
+    </div>
+  </div>
 </SubPageLayout>
+
+<style>
+  .resume-columns-wrapper {
+    display: flex;
+    flex-direction: row; /* Default direction */
+    gap: 3rem; /* Space between columns */
+  }
+
+  .resume-main-column {
+    flex: 2; /* Main column takes up 2/3 of the space */
+    /* Or use flex-basis: 65%; */
+    min-width: 0; /* Prevent content overflow issues in flex items */
+  }
+
+  .resume-sidebar {
+    flex: 1; /* Sidebar takes up 1/3 of the space */
+    /* Or use flex-basis: 35%; */
+    min-width: 0;
+    /* Optional: Add some top margin if sidebar starts lower than main */
+    /* margin-top: 4rem; */
+  }
+
+  /* Responsive adjustments for smaller screens */
+  @media (max-width: 900px) {
+    /* Adjust breakpoint as needed */
+    .resume-columns-wrapper {
+      flex-direction: column; /* Stack columns */
+      gap: 0; /* Remove gap when stacked, components have bottom margin */
+    }
+    .resume-sidebar {
+      margin-top: 0; /* Reset potential top margin */
+    }
+  }
+</style>

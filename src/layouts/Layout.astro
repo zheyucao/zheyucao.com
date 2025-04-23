@@ -58,38 +58,53 @@ const showScrollIndicator = currentPath === "/";
       <main class="main-content">
         <slot />
       </main>
+      <div class="some-empty-space" style="height: 10vh;"></div>
       <Footer />
       {/* Conditionally render ScrollIndicator */}
       {showScrollIndicator && <ScrollIndicator />}
     </div>
   </body><script>
-    const pageWrapper = document.querySelector(".page-wrapper");
+    let currentIntersectionObserver: IntersectionObserver | null = null; // Added type annotation
 
-    const observerOptions = {
-      root: pageWrapper, // Observe intersections within the page-wrapper
-      rootMargin: "0px",
-      threshold: 0.1,
-    };
+    document.addEventListener("astro:page-load", () => {
+      // 1. Disconnect old observer if it exists
+      if (currentIntersectionObserver) {
+        currentIntersectionObserver.disconnect();
+      }
 
-    const observerCallback = (entries, observer) => {
-      entries.forEach((entry) => {
-        // console.log("Observing:", entry.target, "Is intersecting:", entry.isIntersecting); // Removed debug log
-        if (entry.isIntersecting) {
-          entry.target.classList.add("visible");
-          observer.unobserve(entry.target);
-        }
-      });
-    };
+      // 2. Set up the new observer for the current page
+      const pageWrapper = document.querySelector(".page-wrapper");
+      if (!pageWrapper) {
+        console.error("Page wrapper element not found for IntersectionObserver.");
+        return;
+      }
+      const observerOptions = {
+        root: pageWrapper, // Observe intersections within the page-wrapper
+        rootMargin: "0px",
+        threshold: 0.1,
+      };
 
-    const observer = new IntersectionObserver(observerCallback, observerOptions);
+      const observerCallback = (entries, observer) => {
+        entries.forEach((entry) => {
+          // console.log("Observing:", entry.target, "Is intersecting:", entry.isIntersecting); // Removed debug log
+          if (entry.isIntersecting) {
+            entry.target.classList.add("visible");
+            observer.unobserve(entry.target);
+          }
+        });
+      };
 
-    const targets = document.querySelectorAll(".scroll-animate");
-    // Ensure pageWrapper exists before observing
-    if (pageWrapper) {
-      targets.forEach((target) => observer.observe(target));
-    } else {
-      console.error("Page wrapper element not found for IntersectionObserver.");
-    }
+      const newObserver = new IntersectionObserver(observerCallback, observerOptions);
+
+      // 3. Store the new observer instance
+      currentIntersectionObserver = newObserver;
+
+      // 4. Find and observe targets *on the current page*
+      const targets = document.querySelectorAll(".scroll-reveal-animate"); // Corrected selector was applied previously
+      targets.forEach((target) => newObserver.observe(target));
+
+      // console.log(`[ScrollReveal] Observer set up for ${targets.length} targets on page load.`);
+    });
   </script>
   <!-- System Theme Handling -->
   <script>
@@ -211,23 +226,43 @@ const showScrollIndicator = currentPath === "/";
 </style>
 
 <style is:global>
-  /* Animation styles moved to global scope */
-  .scroll-animate {
+  /* --- Animation Styles --- */
+
+  /* == Scroll Reveal Animation (Triggered by JS Intersection Observer) == */
+  .scroll-reveal-animate {
+    /* Initial state */
     opacity: 0;
     filter: blur(5px);
-    transform: translateY(20px);
-    /* Promote to own layer to potentially fix Firefox glitches */
-    transform: translateZ(0);
+    transform: translateY(20px) translateZ(0);
     will-change: opacity, filter, transform;
+    /* Transition applied when .visible is added */
     transition:
       opacity 0.8s ease-out,
       filter 0.8s ease-out,
       transform 0.8s ease-out;
   }
-
-  .scroll-animate.visible {
+  .scroll-reveal-animate.visible {
+    /* Final state */
     opacity: 1;
     filter: blur(0px);
-    transform: translateY(0) translateZ(0); /* Keep consistent transform */
+    transform: translateY(0) translateZ(0);
+  }
+
+  /* == Page Load Animation (Triggered by CSS Animation on element load/re-insertion) == */
+  .page-load-initial-state {
+    /* Initial state ONLY (no transition here) */
+    opacity: 0;
+    filter: blur(5px);
+    transform: translateY(20px) translateZ(0);
+    will-change: opacity, filter, transform;
+  }
+
+  @keyframes pageLoadAnimate {
+    to {
+      /* Final state */
+      opacity: 1;
+      filter: blur(0px);
+      transform: translateY(0) translateZ(0);
+    }
   }
 </style>
