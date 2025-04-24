@@ -51,6 +51,214 @@ const showScrollIndicator = currentPath === "/";
       href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap"
       rel="stylesheet"
     />
+
+    <style>
+      :root {
+        /* Light Theme (Default) */
+        --bg-color: #ffffff;
+        --text-color: #2e2e2e;
+        --text-muted: #383838;
+        --link-color: var(--text-color);
+        --link-hover-color: #101010;
+        --link-visited-color: #101010;
+        --footer-bg: #f8f9faaa; /* Light footer */
+        --footer-text: #343a40;
+        --footer-heading: #212529;
+        --footer-link: #384044;
+        --footer-link-hover: #212529;
+        --footer-copyright: #6c757d;
+        --dynamic-bg-opacity: 0.5; /* Lighter opacity for light theme */
+
+        /* Button Download Hover */
+        --button-hover-bg: #55555516;
+        --button-hover-text: #121212;
+
+        --font-family-serif: "EB Garamond", Garamond, "Times New Roman", serif;
+        --font-family-sans:
+          "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial,
+          sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+      }
+
+      html.dark {
+        /* Dark Theme Overrides */
+        --bg-color: #121212; /* Slightly off-black */
+        --text-color: #e3e3e3;
+        --text-muted: #d4d4d4;
+        --link-color: var(--text-color);
+        --link-hover-color: #fff;
+        --link-visited-color: #fff;
+        --footer-bg: #161616aa;
+        --footer-text: #cccccc;
+        --footer-heading: #eeeeee;
+        --footer-link: #cccccc;
+        --footer-link-hover: #ffffff;
+        --footer-copyright: #888888;
+        --dynamic-bg-opacity: 0.4; /* Keep original opacity for dark theme */
+
+        /* Button Download Hover */
+        --button-hover-bg: #cccccc16;
+        --button-hover-text: #fff;
+      }
+
+      html {
+        /* Ensure no overscroll rule here */
+        background-color: var(--bg-color); /* Use CSS variable */
+      }
+
+      html,
+      body {
+        margin: 0;
+        width: 100%;
+        height: 100%;
+        font-family: var(--font-family-serif);
+        color: var(--text-color); /* Apply base text color */
+        /* Ensure smooth transitions for color changes */
+        transition:
+          background-color 0.3s ease,
+          color 0.3s ease;
+      }
+
+      .page-wrapper {
+        height: 100vh;
+        overflow-y: auto;
+        position: relative; /* Context for absolutely positioned children if needed */
+        overscroll-behavior-y: contain;
+      }
+
+      .main-content {
+        min-height: 100vh;
+      }
+    </style>
+
+    <style is:global>
+      /* --- Animation Styles --- */
+
+      /* == Scroll Reveal Animation (Triggered by JS Intersection Observer) == */
+      .scroll-reveal-animate {
+        /* Initial state */
+        opacity: 0;
+        filter: blur(5px);
+        transform: translateY(20px) translateZ(0);
+        will-change: opacity, filter, transform;
+        /* Transition applied when .visible is added */
+        transition:
+          opacity 0.8s ease-out,
+          filter 0.8s ease-out,
+          transform 0.8s ease-out;
+      }
+      .scroll-reveal-animate.visible {
+        /* Final state */
+        opacity: 1;
+        filter: blur(0px);
+        transform: translateY(0) translateZ(0);
+      }
+
+      /* == Page Load Animation (Triggered by CSS Animation on element load/re-insertion) == */
+      .page-load-initial-state {
+        /* Initial state ONLY (no transition here) */
+        opacity: 0;
+        filter: blur(5px);
+        transform: translateY(20px) translateZ(0);
+        will-change: opacity, filter, transform;
+      }
+
+      @keyframes pageLoadAnimate {
+        to {
+          /* Final state */
+          opacity: 1;
+          filter: blur(0px);
+          transform: translateY(0) translateZ(0);
+        }
+      }
+
+      /* Base link style */
+      a {
+        color: var(--text-color);
+        text-decoration: underline; /* Add default underline */
+        text-underline-offset: 0.1em; /* Add default offset */
+        transition: color 0.2s ease;
+      }
+
+      /* Hover and focus style */
+      a:hover,
+      a:focus,
+      a:active {
+        color: var(--link-hover-color);
+        text-decoration: underline; /* Ensure underline persists */
+        text-underline-offset: 0.1em; /* Ensure offset persists */
+      }
+    </style>
+
+    <script>
+      let currentIntersectionObserver: IntersectionObserver | null = null; // Added type annotation
+
+      document.addEventListener("astro:page-load", () => {
+        // 1. Disconnect old observer if it exists
+        if (currentIntersectionObserver) {
+          currentIntersectionObserver.disconnect();
+        }
+
+        // 2. Set up the new observer for the current page
+        const pageWrapper = document.querySelector(".page-wrapper");
+        if (!pageWrapper) {
+          console.error("Page wrapper element not found for IntersectionObserver.");
+          return;
+        }
+        const observerOptions = {
+          root: pageWrapper, // Observe intersections within the page-wrapper
+          rootMargin: "0px",
+          threshold: 0.1,
+        };
+
+        const observerCallback = (entries, observer) => {
+          entries.forEach((entry) => {
+            // console.log("Observing:", entry.target, "Is intersecting:", entry.isIntersecting); // Removed debug log
+            if (entry.isIntersecting) {
+              entry.target.classList.add("visible");
+              observer.unobserve(entry.target);
+            }
+          });
+        };
+
+        const newObserver = new IntersectionObserver(observerCallback, observerOptions);
+
+        // 3. Store the new observer instance
+        currentIntersectionObserver = newObserver;
+
+        // 4. Find and observe targets *on the current page*
+        const targets = document.querySelectorAll(".scroll-reveal-animate"); // Corrected selector was applied previously
+        targets.forEach((target) => newObserver.observe(target));
+
+        // console.log(`[ScrollReveal] Observer set up for ${targets.length} targets on page load.`);
+      });
+    </script>
+    <!-- System Theme Handling -->
+    <script>
+      const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
+
+      // Function to apply the theme class based on query match
+      const checkAndApplyTheme = () => {
+        if (mediaQuery.matches) {
+          document.documentElement.classList.add("dark");
+        } else {
+          document.documentElement.classList.remove("dark");
+        }
+        console.log(
+          "[Theme] Applied theme based on prefers-color-scheme:",
+          mediaQuery.matches ? "dark" : "light"
+        ); // Debug log
+      };
+
+      // Listener for live theme changes
+      mediaQuery.addEventListener("change", checkAndApplyTheme);
+
+      // Listener to re-apply theme after client-side navigation
+      document.addEventListener("astro:page-load", checkAndApplyTheme);
+
+      // Optional: Apply on initial script load for non-Astro SPA navigators?
+      // The inline script should handle the very first load.
+      // checkAndApplyTheme();
+    </script>
   </head>
   <body>
     <div class="page-wrapper">
@@ -63,214 +271,5 @@ const showScrollIndicator = currentPath === "/";
       {/* Conditionally render ScrollIndicator */}
       {showScrollIndicator && <ScrollIndicator />}
     </div>
-  </body><script>
-    let currentIntersectionObserver: IntersectionObserver | null = null; // Added type annotation
-
-    document.addEventListener("astro:page-load", () => {
-      // 1. Disconnect old observer if it exists
-      if (currentIntersectionObserver) {
-        currentIntersectionObserver.disconnect();
-      }
-
-      // 2. Set up the new observer for the current page
-      const pageWrapper = document.querySelector(".page-wrapper");
-      if (!pageWrapper) {
-        console.error("Page wrapper element not found for IntersectionObserver.");
-        return;
-      }
-      const observerOptions = {
-        root: pageWrapper, // Observe intersections within the page-wrapper
-        rootMargin: "0px",
-        threshold: 0.1,
-      };
-
-      const observerCallback = (entries, observer) => {
-        entries.forEach((entry) => {
-          // console.log("Observing:", entry.target, "Is intersecting:", entry.isIntersecting); // Removed debug log
-          if (entry.isIntersecting) {
-            entry.target.classList.add("visible");
-            observer.unobserve(entry.target);
-          }
-        });
-      };
-
-      const newObserver = new IntersectionObserver(observerCallback, observerOptions);
-
-      // 3. Store the new observer instance
-      currentIntersectionObserver = newObserver;
-
-      // 4. Find and observe targets *on the current page*
-      const targets = document.querySelectorAll(".scroll-reveal-animate"); // Corrected selector was applied previously
-      targets.forEach((target) => newObserver.observe(target));
-
-      // console.log(`[ScrollReveal] Observer set up for ${targets.length} targets on page load.`);
-    });
-  </script>
-  <!-- System Theme Handling -->
-  <script>
-    const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
-
-    // Function to apply the theme class based on query match
-    const checkAndApplyTheme = () => {
-      if (mediaQuery.matches) {
-        document.documentElement.classList.add("dark");
-      } else {
-        document.documentElement.classList.remove("dark");
-      }
-      console.log(
-        "[Theme] Applied theme based on prefers-color-scheme:",
-        mediaQuery.matches ? "dark" : "light"
-      ); // Debug log
-    };
-
-    // Listener for live theme changes
-    mediaQuery.addEventListener("change", checkAndApplyTheme);
-
-    // Listener to re-apply theme after client-side navigation
-    document.addEventListener("astro:page-load", checkAndApplyTheme);
-
-    // Optional: Apply on initial script load for non-Astro SPA navigators?
-    // The inline script should handle the very first load.
-    // checkAndApplyTheme();
-  </script>
+  </body>
 </html>
-
-<style>
-  :root {
-    /* Light Theme (Default) */
-    --bg-color: #ffffff;
-    --text-color: #2e2e2e;
-    --text-muted: #383838;
-    --link-color: var(--text-color);
-    --link-hover-color: #101010;
-    --link-visited-color: #101010;
-    --footer-bg: #f8f9faaa; /* Light footer */
-    --footer-text: #343a40;
-    --footer-heading: #212529;
-    --footer-link: #384044;
-    --footer-link-hover: #212529;
-    --footer-copyright: #6c757d;
-    --dynamic-bg-opacity: 0.5; /* Lighter opacity for light theme */
-
-    /* Button Download Hover */
-    --button-hover-bg: #55555516;
-    --button-hover-text: #121212;
-
-    --font-family-serif: "EB Garamond", Garamond, "Times New Roman", serif;
-    --font-family-sans:
-      "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif,
-      "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
-  }
-
-  html.dark {
-    /* Dark Theme Overrides */
-    --bg-color: #121212; /* Slightly off-black */
-    --text-color: #e3e3e3;
-    --text-muted: #d4d4d4;
-    --link-color: var(--text-color);
-    --link-hover-color: #fff;
-    --link-visited-color: #fff;
-    --footer-bg: #161616aa;
-    --footer-text: #cccccc;
-    --footer-heading: #eeeeee;
-    --footer-link: #cccccc;
-    --footer-link-hover: #ffffff;
-    --footer-copyright: #888888;
-    --dynamic-bg-opacity: 0.4; /* Keep original opacity for dark theme */
-
-    /* Button Download Hover */
-    --button-hover-bg: #cccccc16;
-    --button-hover-text: #fff;
-  }
-
-  html {
-    /* Ensure no overscroll rule here */
-    background-color: var(--bg-color); /* Use CSS variable */
-  }
-
-  html,
-  body {
-    margin: 0;
-    width: 100%;
-    height: 100%;
-    font-family: var(--font-family-serif);
-    color: var(--text-color); /* Apply base text color */
-    /* Ensure smooth transitions for color changes */
-    transition:
-      background-color 0.3s ease,
-      color 0.3s ease;
-  }
-
-  .page-wrapper {
-    height: 100vh;
-    overflow-y: auto;
-    position: relative; /* Context for absolutely positioned children if needed */
-    overscroll-behavior-y: contain;
-  }
-
-  .main-content {
-    min-height: 100vh;
-  }
-
-  /* Base link style */
-  a {
-    color: var(--link-color);
-    text-decoration: none; /* Explicitly remove default underline */
-    transition: color 0.2s ease;
-  }
-
-  /* Hover and focus style */
-  a:hover,
-  a:focus {
-    color: var(--link-hover-color);
-    text-decoration: underline; /* Add underline only on hover/focus */
-    text-underline-offset: 0.2em; /* Apply the offset */
-  }
-
-  /* Visited link style */
-  a:visited {
-    color: var(--link-visited-color);
-  }
-</style>
-
-<style is:global>
-  /* --- Animation Styles --- */
-
-  /* == Scroll Reveal Animation (Triggered by JS Intersection Observer) == */
-  .scroll-reveal-animate {
-    /* Initial state */
-    opacity: 0;
-    filter: blur(5px);
-    transform: translateY(20px) translateZ(0);
-    will-change: opacity, filter, transform;
-    /* Transition applied when .visible is added */
-    transition:
-      opacity 0.8s ease-out,
-      filter 0.8s ease-out,
-      transform 0.8s ease-out;
-  }
-  .scroll-reveal-animate.visible {
-    /* Final state */
-    opacity: 1;
-    filter: blur(0px);
-    transform: translateY(0) translateZ(0);
-  }
-
-  /* == Page Load Animation (Triggered by CSS Animation on element load/re-insertion) == */
-  .page-load-initial-state {
-    /* Initial state ONLY (no transition here) */
-    opacity: 0;
-    filter: blur(5px);
-    transform: translateY(20px) translateZ(0);
-    will-change: opacity, filter, transform;
-  }
-
-  @keyframes pageLoadAnimate {
-    to {
-      /* Final state */
-      opacity: 1;
-      filter: blur(0px);
-      transform: translateY(0) translateZ(0);
-    }
-  }
-</style>
