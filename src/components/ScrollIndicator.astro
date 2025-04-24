@@ -66,6 +66,7 @@
 
   let indicatorScrubTrigger: ScrollTrigger | null = null;
   let indicatorCallbackTrigger: ScrollTrigger | null = null;
+  let fadeInTimeout: ReturnType<typeof setTimeout> | null = null;
 
   function setupIndicatorAnimation() {
     // Ensure plugin is registered
@@ -105,11 +106,13 @@
       console.log("Setup new indicator Scrub Trigger");
 
       // Re-introduce the 3-sec fade-in logic + show/hide callbacks
-      let fadeInTimeout: number | null = null;
       const showIndicator = (delay = 0) => {
         // Prevent scheduling if scrub trigger is active (i.e., user has scrolled down)
         if (indicatorScrubTrigger?.isActive) return;
-        clearTimeout(fadeInTimeout as number);
+        // Check if timeout exists before clearing
+        if (fadeInTimeout !== null) {
+          clearTimeout(fadeInTimeout);
+        }
         fadeInTimeout = setTimeout(() => {
           if (pageWrapper.scrollTop < 10) {
             gsap.to(indicator, { opacity: 0.6, duration: 0.5, overwrite: true });
@@ -118,7 +121,10 @@
       };
 
       const hideIndicator = () => {
-        clearTimeout(fadeInTimeout as number);
+        // Check if timeout exists before clearing
+        if (fadeInTimeout !== null) {
+          clearTimeout(fadeInTimeout);
+        }
         // Don't force hide if the scrub animation is controlling opacity
         if (!indicatorScrubTrigger?.isActive) {
           gsap.to(indicator, { opacity: 0, duration: 0.3, overwrite: true });
