@@ -72,6 +72,8 @@ const showScrollIndicator = currentPath === "/";
         /* Button Download Hover */
         --button-hover-bg: #55555516;
         --button-hover-text: #121212;
+        --button-border-color: #55555599;
+        --button-border-hover-color: #121212cc;
 
         --font-family-serif: "EB Garamond", Garamond, "Times New Roman", serif;
         --font-family-sans:
@@ -96,8 +98,10 @@ const showScrollIndicator = currentPath === "/";
         --dynamic-bg-opacity: 0.4; /* Keep original opacity for dark theme */
 
         /* Button Download Hover */
-        --button-hover-bg: #cccccc16;
+        --button-hover-bg: #cccccc26;
         --button-hover-text: #fff;
+        --button-border-color: #cccccc99;
+        --button-border-hover-color: #ffffffcc;
       }
 
       html {
@@ -175,7 +179,7 @@ const showScrollIndicator = currentPath === "/";
       a {
         color: var(--text-color);
         text-decoration: underline; /* Add default underline */
-        text-underline-offset: 0.1em; /* Add default offset */
+        text-underline-offset: 0.2em; /* Add default offset */
         transition: color 0.2s ease;
       }
 
@@ -185,7 +189,7 @@ const showScrollIndicator = currentPath === "/";
       a:active {
         color: var(--link-hover-color);
         text-decoration: underline; /* Ensure underline persists */
-        text-underline-offset: 0.1em; /* Ensure offset persists */
+        text-underline-offset: 0.2em; /* Ensure offset persists */
       }
     </style>
 
