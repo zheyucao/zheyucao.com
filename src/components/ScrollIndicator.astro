@@ -145,10 +145,71 @@
         // markers: {startColor: "green", endColor: "red", indent: 50}, // For debugging callbacks
       });
       console.log("Setup new indicator Callback Trigger");
+
+      // --- Add Click Listener for Scrolling ---
+      // Re-confirm indicator exists to satisfy potential linter issues
+      if (indicator) {
+        indicator.addEventListener("click", () => {
+          const currentOpacity = parseFloat(window.getComputedStyle(indicator).opacity);
+          if (currentOpacity > 0.1) {
+            window.scrollBy({
+              top: window.innerHeight,
+              left: 0,
+              behavior: "smooth",
+            });
+          }
+        });
+        console.log("Added click listener to scroll indicator");
+      }
+      // --- End Add Click Listener ---
     } else {
       console.warn("Indicator animation setup skipped: elements not found.");
     }
   }
 
-  document.addEventListener("astro:page-load", setupIndicatorAnimation, { once: false });
+  // Main event listener
+  document.addEventListener(
+    "astro:page-load",
+    () => {
+      // Run the animation setup first
+      setupIndicatorAnimation();
+
+      // Now, separately set up the click listener
+      const indicatorForClick = document.querySelector("#scroll-indicator");
+      const pageWrapper = document.querySelector(".page-wrapper"); // Get the scroll container
+
+      if (indicatorForClick && pageWrapper) {
+        // Make sure both exist
+        console.log("[ClickScroll] Attaching click listener to indicator."); // Debug log
+        indicatorForClick.addEventListener("click", () => {
+          console.log("[ClickScroll] Scroll indicator clicked!"); // Debug log
+          const currentOpacity = parseFloat(window.getComputedStyle(indicatorForClick).opacity);
+          console.log("[ClickScroll] Current Opacity:", currentOpacity); // Debug log
+
+          if (currentOpacity > 0.1) {
+            // Check opacity
+            console.log("[ClickScroll] Scrolling page wrapper..."); // Debug log
+            pageWrapper.scrollBy({
+              // Scroll the pageWrapper
+              top: pageWrapper.clientHeight, // Scroll by its own height
+              left: 0,
+              behavior: "smooth",
+            });
+          } else {
+            console.log("[ClickScroll] Scroll aborted due to low opacity."); // Debug log
+          }
+        });
+      } else {
+        if (!indicatorForClick)
+          console.warn(
+            "[ClickScroll] Indicator element (#scroll-indicator) not found for click listener."
+          );
+        if (!pageWrapper)
+          console.warn(
+            "[ClickScroll] Page wrapper element (.page-wrapper) not found for scrolling."
+          ); // Added specific warning
+      }
+    },
+    { once: false }
+  );
 </script>
