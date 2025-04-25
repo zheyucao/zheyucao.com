@@ -135,8 +135,9 @@
         },
       });
       contentTimeline
+        .to(aboutContent, { opacity: 1, y: 0, ease: "power1.inOut", duration: 2 })
         .to(aboutContent, { opacity: 1, y: 0, ease: "power1.inOut", duration: 3 })
-        .to(aboutContent, { opacity: 0, y: -30, ease: "power1.inOut", duration: 1 });
+        .to(aboutContent, { opacity: 0, y: -30, ease: "power1.inOut", duration: 2 });
       console.log("Setup About Content ScrollTrigger"); // Debug log
     }
   }
