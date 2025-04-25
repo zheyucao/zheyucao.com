@@ -51,7 +51,7 @@ const currentYear = new Date().getFullYear();
   .site-footer {
     background-color: var(--footer-bg);
     color: var(--footer-text);
-    padding: 4rem 20%; /* Generous padding */
+    padding: 4rem 10%; /* Generous padding */
     /* min-height: 40vh; */ /* Let padding/content determine height */
     min-height: 40vh; /* Restore original height */
     display: flex;
@@ -138,6 +138,9 @@ const currentYear = new Date().getFullYear();
 
   /* Desktop layout: 3 columns with 2:1:1 ratio */
   @media (min-width: 768px) {
+    .site-footer {
+      padding: 4rem 20%; /* Generous padding */
+    }
     .footer-content {
       flex-wrap: nowrap; /* Prevent wrapping on desktop */
       gap: 3rem; /* Adjust desktop gap */
