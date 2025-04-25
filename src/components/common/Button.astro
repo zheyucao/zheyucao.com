@@ -1,0 +1,97 @@
+---
+// src/components/common/Button.astro
+import type { HTMLAttributes } from "astro/types";
+
+interface Props extends HTMLAttributes<"a"> {
+  href: string;
+  text: string;
+  download?: string | boolean; // Optional: true or suggested filename
+  icon?: string | null; // Optional icon character or class, defaults to null
+  wrapperClass?: string; // Optional class for the wrapper div
+  iconPosition?: "left" | "right"; // Optional icon position, defaults to left
+}
+
+const {
+  href,
+  text,
+  download,
+  icon = null, // Default to no icon
+  class: className, // User can pass additional classes to the <a> tag
+  wrapperClass, // Class for the div
+  iconPosition = "left", // Default to left
+  ...rest // Pass other attributes like target, rel
+} = Astro.props;
+
+// Determine the final download attribute value
+const downloadAttr = download === "" ? true : download;
+---
+
+<div class:list={["button-wrapper", wrapperClass]}>
+  <a href={href} download={downloadAttr} class:list={["button button-link", className]} {...rest}>
+    {/* Add specific class to span based on position */}
+    {
+      iconPosition === "left" && icon && (
+        <span aria-hidden="true" class="button-icon icon-left" set:html={icon} />
+      )
+    }
+    {text}
+    {
+      iconPosition === "right" && icon && (
+        <span aria-hidden="true" class="button-icon icon-right" set:html={icon} />
+      )
+    }
+  </a>
+</div>
+
+<style>
+  /* Styles adapted for general button */
+  .button-wrapper {
+    margin-bottom: 1.5rem;
+    text-align: left;
+  }
+
+  .button.button-link {
+    display: inline-flex; /* Use flex to align text and icon */
+    align-items: center; /* Vertically center icon and text */
+    justify-content: center; /* Center content if needed */
+    padding: 0.6em 1.2em;
+    border: 1px solid var(--button-border-color);
+    color: var(--text-muted);
+    background-color: transparent;
+    border-radius: 8px;
+    text-decoration: none;
+    font-family: var(--font-family-sans);
+    font-size: 0.9rem;
+    transition: all 0.2s ease;
+    cursor: pointer;
+    line-height: 1.4; /* Ensure consistent height */
+  }
+
+  .button.button-link:hover {
+    border-color: var(--button-border-hover-color);
+    background-color: var(--button-hover-bg);
+    color: var(--button-hover-text);
+  }
+
+  .button-icon {
+    margin: 0; /* Reset margin */
+    display: inline-block;
+    vertical-align: middle;
+  }
+
+  /* Style based on explicit class */
+  .button-icon.icon-left {
+    margin-right: 0.5em;
+  }
+  .button-icon.icon-right {
+    margin-left: 0.5em;
+  }
+
+  /* Optional: Responsive adjustments if needed */
+  @media (max-width: 600px) {
+    .button-wrapper {
+      /* Keep mobile styles if they are generic enough */
+      margin-bottom: 2rem;
+    }
+  }
+</style>

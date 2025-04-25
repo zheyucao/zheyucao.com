@@ -6,20 +6,20 @@ import Skills from "../components/resume/Skills.astro";
 import Awards from "../components/resume/Awards.astro";
 import ContactInfo from "../components/resume/ContactInfo.astro";
 import Profile from "../components/resume/Profile.astro";
+import Button from "../components/common/Button.astro";
 ---
 
 <SubPageLayout title="Résumé">
-  <div class="resume-download-cta">
-    <a
-      href="https://static.angine.tech/czy/resume.pdf"
-      target="_blank"
-      rel="noopener noreferrer"
-      download="Zheyu_Cao_Resume_ZH.pdf"
-      class="button download-button"
-    >
-      Download Résumé PDF (in Chinese) <span aria-hidden="true" class="download-arrow">&darr;</span>
-    </a>
-  </div>
+  <Button
+    href="https://static.angine.tech/czy/resume.pdf"
+    text="Download Résumé PDF (in Chinese)"
+    download="Zheyu_Cao_Resume_ZH.pdf"
+    icon="↓"
+    iconPosition="left"
+    target="_blank"
+    rel="noopener noreferrer"
+    wrapperClass="resume-page-download"
+  />
   <div class="resume-columns-wrapper">
     <div class="resume-main-column">
       <Profile />
@@ -35,41 +35,6 @@ import Profile from "../components/resume/Profile.astro";
 </SubPageLayout>
 
 <style>
-  /* --- Styles for Download Button --- */
-  .resume-download-cta {
-    margin-bottom: 1.5rem;
-    text-align: left;
-  }
-  .button.download-button {
-    display: inline-block;
-    padding: 0.6em 1.2em;
-    border: 1px solid var(--button-border-color);
-    color: var(--text-muted);
-    background-color: transparent;
-    border-radius: 8px;
-    text-decoration: none;
-    font-family: var(--font-family-sans);
-    font-size: 0.9rem;
-    transition: all 0.2s ease;
-    cursor: pointer;
-  }
-  .button.download-button:hover {
-    border-color: var(--button-border-hover-color);
-    background-color: var(--button-hover-bg);
-    color: var(--button-hover-text);
-    /* backdrop-filter: saturate(1.4) brightness(1.2); */
-  }
-  .button.download-button span {
-    margin-left: 0.5em;
-  }
-
-  @media (max-width: 600px) {
-    .resume-download-cta {
-      text-align: left;
-      margin-bottom: 2rem;
-    }
-  }
-
   /* --- Column Layout Styles --- */
   .resume-columns-wrapper {
     display: flex;
