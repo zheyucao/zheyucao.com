@@ -51,7 +51,7 @@ const currentYear = new Date().getFullYear();
   .site-footer {
     background-color: var(--footer-bg);
     color: var(--footer-text);
-    padding: 4rem 10%; /* Generous padding */
+    padding: 4rem 20%; /* Generous padding */
     /* min-height: 40vh; */ /* Let padding/content determine height */
     min-height: 40vh; /* Restore original height */
     display: flex;
@@ -73,7 +73,6 @@ const currentYear = new Date().getFullYear();
   }
 
   .footer-column {
-    /* flex: 1 1 100%; */ /* Removed, handled by specific columns below */
     margin-bottom: 1.5rem; /* Spacing when stacked */
   }
 
@@ -147,7 +146,7 @@ const currentYear = new Date().getFullYear();
       margin-bottom: 0; /* Remove stacking margin */
     }
     .footer-column-1 {
-      flex: 2 1 0%; /* 2 parts */
+      flex: 4 1 0%; /* 3 parts */
     }
     .footer-column-2,
     .footer-column-3 {
@@ -155,7 +154,7 @@ const currentYear = new Date().getFullYear();
     }
 
     .footer-description {
-      width: 70%;
+      width: 75%;
     }
   }
 </style>

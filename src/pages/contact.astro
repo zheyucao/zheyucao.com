@@ -1,7 +1,140 @@
 ---
 import SubPageLayout from "../layouts/SubPageLayout.astro";
+import { Icon } from "astro-icon/components"; // Import Icon component
 ---
 
 <SubPageLayout title="Contact">
-  <p>Content coming soon... (Contact form or info)</p>
+  <div class="contact-content">
+    <p class="intro-text">Feel free to reach out!</p>
+
+    {/* Section 1: Primary Contact */}
+    <h3 class="contact-section-title">Primary Contact</h3>
+    <p class="section-description">For academic or direct inquiries:</p>
+    <ul class="contact-list">
+      <li>
+        <Icon name="ri:mail-line" class="contact-icon" />
+        <a href="mailto:zheyucao2004@gmail.com">zheyucao2004@gmail.com</a> &nbsp;(Academic)
+      </li>
+      <li>
+        <Icon name="ri:mail-line" class="contact-icon" />
+        <a href="mailto:hi@zheyucao.com">hi@zheyucao.com</a> &nbsp;(Personal)
+      </li>
+      <li>
+        <Icon name="ri:github-line" class="contact-icon" />
+        <a href="https://github.com/zheyu-cao" target="_blank" rel="noopener noreferrer"
+          >github.com/zheyu-cao</a
+        >
+      </li>
+      <li>
+        <Icon name="ri:wechat-line" class="contact-icon" />
+        <span>aktsnnm</span>
+      </li>
+      <li>
+        <Icon name="ri:qq-line" class="contact-icon" />
+        <span>1060864974</span>
+      </li>
+      <li>
+        <Icon name="ri:planet-line" class="contact-icon" />
+        <a href="https://zheyucao.com" target="_blank" rel="noopener noreferrer">zheyucao.com</a>
+      </li>
+    </ul>
+
+    {/* Section 2: Online Alias / Personal */}
+    <h3 class="contact-section-title">Online Presence</h3>
+    <p class="section-description">
+      I also use the name <strong>Angine</strong> online. You can find me through:
+    </p>
+    <ul class="contact-list">
+      <li>
+        <Icon name="ri:mail-line" class="contact-icon" />
+        <a href="mailto:me@angine.tech">me@angine.tech</a>
+      </li>
+      <li>
+        <Icon name="ri:github-line" class="contact-icon" />
+        <a href="https://github.com/angine04" target="_blank" rel="noopener noreferrer"
+          >github.com/angine04</a
+        >
+      </li>
+      <li>
+        <Icon name="ri:links-line" class="contact-icon" />
+        <a href="https://angine.tech" target="_blank" rel="noopener noreferrer"
+          >https://angine.tech</a
+        >
+      </li>
+    </ul>
+  </div>
 </SubPageLayout>
+
+<style>
+  .contact-content {
+    max-width: 600px;
+  }
+
+  .intro-text {
+    margin-bottom: 1rem; /* Reduced margin */
+    font-size: 1.2em;
+    line-height: 1.7;
+    color: var(--text-muted);
+  }
+
+  .contact-section-title {
+    font-size: 1.4rem; /* Slightly smaller than page title */
+    font-weight: 600;
+    margin-top: 3rem; /* Space above section title */
+    margin-bottom: 0.5rem;
+    color: var(--text-heading-color); /* Use a heading color variable if available */
+  }
+
+  .section-description {
+    font-size: 1.2rem;
+    color: var(--text-muted);
+    margin-bottom: 1.5rem;
+    line-height: 1.6;
+  }
+
+  .contact-list {
+    list-style: none;
+    padding-left: 0;
+    margin: 0;
+    line-height: 1.9;
+  }
+  .contact-list li {
+    margin-bottom: 1.2rem;
+    display: flex;
+    align-items: flex-start; /* Align icon to top of text */
+    font-size: 1.1rem;
+  }
+  .contact-icon {
+    margin-right: 1em;
+    font-size: 1.3em;
+    flex-shrink: 0;
+    opacity: 0.9;
+    /* transform: translateY(0.08em); */ /* Removed transform, using align-items: flex-start */
+    color: var(--icon-color);
+    margin-top: 0.1em; /* Align icon slightly lower */
+  }
+
+  .contact-list a,
+  .contact-list span {
+    word-break: break-all;
+  }
+
+  .contact-list a {
+    color: var(--link-color);
+    text-decoration: none;
+    transition: color 0.3s ease;
+  }
+  .contact-list a:hover {
+    color: var(--link-hover-color);
+    text-decoration: underline;
+  }
+
+  .section-divider {
+    border: 0;
+    height: 1px;
+    background: var(--divider-color);
+    margin: 3rem 0; /* Space around divider */
+  }
+
+  /* Remove label styles as they are no longer used */
+</style>
