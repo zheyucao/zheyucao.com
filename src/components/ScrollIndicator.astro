@@ -143,9 +143,15 @@
         start: "10px top",
         onEnter: hideIndicator, // Hide when scrolling down past 10px
         onLeaveBack: () => {
-          // When scrolling back to top
-          if (pageWrapper.scrollTop < 10) {
-            showIndicator(3000); // Reschedule show
+          // When scrolling back to top (scrollTop < 10)
+          if (pageWrapper.scrollTop < 5) {
+            // If VERY close to top, force hide and do NOT schedule show
+            console.log("ScrollIndicator: At very top onLeaveBack, forcing hide.");
+            hideIndicator(); // Force hide immediately
+          } else {
+            // Otherwise, schedule the show as before
+            console.log("ScrollIndicator: Near top onLeaveBack, scheduling show.");
+            showIndicator(3000);
           }
         },
         // markers: {startColor: "green", endColor: "red", indent: 50}, // For debugging callbacks

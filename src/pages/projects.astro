@@ -1,7 +1,137 @@
 ---
 import SubPageLayout from "../layouts/SubPageLayout.astro";
+import ProjectCard from "../components/projects/ProjectCard.astro";
+
+// Example data (replace with your actual data later)
+const projects = [
+  {
+    title: "uniOS",
+    timeframe: "September 2024 – February 2025",
+    githubUrl: "https://github.com/angine04/unios",
+    techStack: ["C", "Assembly", "Makefile", "QEMU"],
+    imageSrc: "/images/projects/unios.png",
+    imageAlt: "Screenshot of the uniOS project",
+    description: `
+      <p>An operating system pilot course project involving independent completion of labs (Bootloader, Paging, Scheduling, Syscalls).</p>
+      <p>Co-developed the graphics system (2-person team):</p>
+      <ul>
+        <li>Responsible for system design, drivers, and composition layer.</li>
+        <li>Implemented features like antialiasing, dirty region detection, and alpha blending.</li>
+        <li>Designed and implemented a simple window manager and GUI.</li>
+      </ul>
+    `,
+  },
+  {
+    title: "zheyucao.com (This Website)",
+    timeframe: "April 2024",
+    githubUrl: "https://github.com/zheyu-cao/zheyucao.com",
+    projectUrl: "https://zheyucao.com",
+    techStack: ["Astro", "TypeScript", "CSS", "GSAP", "Node.js"],
+    imageSrc: "/images/projects/portfolio.png", // Placeholder path
+    imageAlt: "Screenshot of the portfolio website homepage",
+    description: `
+      <p>My personal portfolio site, designed and built from scratch.</p>
+      <p>Features include:</p>
+      <ul>
+          <li>Dynamic background animations.</li>
+          <li>Responsive design for various screen sizes.</li>
+          <li>Smooth page transitions and scroll-triggered animations.</li>
+          <li>Content showcasing timeline, projects, and resume.</li>
+      </ul>
+    `,
+  },
+  {
+    title: "v5Embark",
+    timeframe: "March 2024",
+    githubUrl: "https://github.com/angine04/v5Embark",
+    imageSrc: "/images/projects/embark.png",
+    imageAlt: "v5Embark",
+    techStack: ["Next.js", "React", "TypeScript", "Tailwind CSS"],
+    description: `
+        <p>A service for Team V5++ NPU Soccer Robot Innovation Base that facilitates new member registration and information collection.</p>
+    `,
+  },
+  {
+    title: "v5Beacon",
+    timeframe: "March 2024",
+    imageSrc: "/images/projects/beacon.png",
+    imageAlt: "v5Beacon",
+    githubUrl: "https://github.com/angine04/v5Beacon",
+    techStack: ["Next.js", "React", "TypeScript", "Tailwind CSS"],
+    description: `
+        <p>A central portal for Team V5++ NPU Soccer Robot Innovation Base providing unified access to all team services and resources.</p>
+    `,
+  },
+  {
+    title: "Angine Sans",
+    timeframe: "February 2024",
+    githubUrl: "https://github.com/angine04/angine-sans",
+    imageSrc: "/images/projects/angine_sans.png",
+    imageAlt: "Angine Sans",
+    description: `
+        <p>A custom web font created for myself.</p>
+    `,
+  },
+  // Add more projects here
+];
 ---
 
 <SubPageLayout title="Projects">
-  <p>Content coming soon...</p>
+  <p class="page-intro">
+    Here are some of the projects I've worked on. You can find more details and other experiments on
+    my GitHub profiles.
+  </p>
+  <div class="projects-grid">
+    {
+      projects.map((project) => (
+        <ProjectCard
+          title={project.title}
+          timeframe={project.timeframe}
+          imageSrc={project.imageSrc}
+          imageAlt={project.imageAlt}
+          githubUrl={project.githubUrl}
+          projectUrl={project.projectUrl}
+          techStack={project.techStack}
+        >
+          {/* Use set:html directly on a div or similar inside the slot */}
+          <div set:html={project.description} />
+        </ProjectCard>
+      ))
+    }
+  </div>
 </SubPageLayout>
+
+<style>
+  .page-intro {
+    font-size: 1.2rem;
+    color: var(--text-muted);
+    margin-bottom: 3rem;
+    max-width: 70ch;
+  }
+  .projects-grid {
+    /* display: grid; */ /* Remove grid display */
+    /* grid-template-columns: repeat(auto-fit, minmax(380px, 1fr)); */
+    /* align-items: start; */
+
+    /* Use CSS Columns */
+    column-count: 1; /* Default to 1 column on mobile */
+    column-gap: 3rem; /* Adjust gap */
+    gap: 3rem; /* Keep vertical gap between items in the same column */
+  }
+
+  /* Apply multi-column layout for wider screens */
+  @media (min-width: 768px) {
+    .projects-grid {
+      column-count: 2;
+      column-gap: 3rem; /* Use the larger gap for desktop */
+      gap: 3rem;
+    }
+  }
+
+  /* Ensure cards don't break across columns */
+  .projects-grid > :global(.project-card) {
+    break-inside: avoid;
+    /* margin-bottom is handled by the grid gap, but ensure it exists */
+    /* margin-bottom: 3rem; */
+  }
+</style>
