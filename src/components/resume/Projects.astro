@@ -1,0 +1,114 @@
+---
+// No props needed
+---
+
+<section class="resume-section scroll-reveal-animate">
+  <h2>Projects</h2>
+  <div class="project-entry">
+    <div class="header">
+      <span class="institution"
+        ><strong>uniOS Project, NPU Operating System Pilot Course</strong></span
+      >
+      <span class="date">2024.09 – 2025.01</span>
+    </div>
+    <ul class="details">
+      <li>
+        Independently completed course labs, including Bootloader, Paging, Process Scheduling,
+        Syscalls, etc.
+      </li>
+      <li>
+        Implemented graphics system for uniOS (2-person team).
+        <ul>
+          <li>Responsible for system design, hardware drivers and composition layer.</li>
+          <li>Implemented antialiasing, dirty region detection, alpha blending, etc.</li>
+          <li>Designed and implemented a simple window manager and GUI for uniOS.</li>
+          <li>
+            GitHub Repository: <a href="https://github.com/angine04/unios" target="_blank"
+              >https://github.com/angine04/unios</a
+            >.
+          </li>
+        </ul>
+      </li>
+    </ul>
+  </div>
+
+  <div class="project-entry">
+    <div class="header">
+      <span class="institution"><strong>zheyucao.com</strong></span>
+      <span class="date">2025.04</span>
+    </div>
+    <ul class="details">
+      <li>This website which you're currently on.</li>
+      <li>
+        A personal portfolio website, built by me for myself It is built using:
+        <ul>
+          <li>Astro as the framework.</li>
+          <li>Plain CSS for styling.</li>
+          <li>GSAP for animations.</li>
+          <li></li>
+
+          <li>
+            GitHub Repository: <a href="https://github.com/zheyu-cao/zheyucao.com" target="_blank"
+              >https://github.com/zheyu-cao/zheyucao.com</a
+            >.
+          </li>
+        </ul>
+      </li>
+    </ul>
+  </div>
+</section>
+
+<style>
+  .resume-section {
+    margin-bottom: 4rem;
+  }
+  h2 {
+    font-size: clamp(1.8rem, 1.5rem + 1.5vw, 2.8rem);
+    margin-bottom: 2rem;
+    font-weight: 600;
+    border-bottom: 1px solid var(--text-muted);
+    padding-bottom: 0.5rem;
+  }
+  ul {
+    margin-top: 0.5rem;
+  }
+  .project-entry {
+    margin-bottom: 2.5rem; /* Space between entries */
+  }
+  .project-entry:last-child {
+    margin-bottom: 0;
+  }
+  .project-entry .header {
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    margin-bottom: 0.8rem;
+    font-size: 1.2rem;
+    align-items: baseline;
+  }
+  .project-entry .date {
+    font-family: var(--font-family-sans);
+    color: var(--text-muted);
+    font-size: 1rem;
+    white-space: nowrap;
+  }
+  .project-entry .details {
+    list-style: disc; /* Use bullet points */
+    padding-left: 1.5rem; /* Standard padding for list */
+    margin-left: 0;
+    font-size: 1.1rem;
+    line-height: 1.8;
+  }
+  .project-entry .details li {
+    margin-bottom: 0.3rem;
+  }
+  @media (max-width: 600px) {
+    .project-entry .header {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+    .project-entry .date {
+      margin-top: 0.3rem;
+    }
+  }
+</style>
