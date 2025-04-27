@@ -10,8 +10,8 @@
   content: "";
   position: absolute;
   left: 11px; /* Aligned with center of marker */
-  top: 1rem; /* Start below the marker */
-  bottom: -1.5rem; /* Extend past the bottom padding */
+  top: 0.5rem; /* Start below the marker */
+  bottom: -0.5rem; /* Extend past the bottom padding */
   width: 2px;
   background-color: var(--timeline-line-color);
   transform: translateX(-50%);
@@ -21,7 +21,7 @@
 .timeline-marker {
   position: absolute;
   left: 11px;
-  top: 0.9rem; /* Align vertically with text */
+  top: 0.5rem; /* Align vertically with text */
   width: 0.5rem;
   height: 0.5rem;
   background-color: var(--timeline-marker-bg-color);
@@ -32,17 +32,14 @@
 
 .timeline-header {
   margin-bottom: 0.5rem;
-  display: flex;
-  flex-wrap: wrap;
-  align-items: baseline;
-  gap: 0.5rem 1rem;
 }
 
 .timeline-date {
   font-family: var(--font-family-sans);
   color: var(--text-muted);
   font-size: 0.9rem;
-  flex-shrink: 0;
+  display: block;
+  margin-bottom: 0.25rem;
 }
 
 .timeline-title {
@@ -50,6 +47,8 @@
   font-weight: 600;
   margin: 0;
   color: var(--heading-color);
+  display: block;
+  margin-bottom: 0.4rem;
 }
 
 .timeline-category {
@@ -61,6 +60,7 @@
   border-radius: 4px;
   text-transform: uppercase;
   letter-spacing: 0.5px;
+  display: inline-block;
 }
 
 .timeline-description {

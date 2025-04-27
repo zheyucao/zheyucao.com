@@ -5,7 +5,7 @@ export interface TimelineEventItem {
   dateRange?: string; // Formatted display range (e.g., "Jul 2024 – Sep 2024")
   title: string;
   category: "Experiences" | "Honors";
-  description: string; // HTML string
+  description?: string; // HTML string
 }
 
 export const allTimelineEvents: TimelineEventItem[] = [

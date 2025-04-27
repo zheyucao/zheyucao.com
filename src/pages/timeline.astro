@@ -101,11 +101,16 @@ let initialFilteredEvents = allTimelineEvents.sort((a, b) =>
       return currentSort === "newest" ? dateNumB - dateNumA : dateNumA - dateNumB;
     });
 
-    // 4. Generate HTML (Don't update DOM yet)
+    // 4. Generate HTML
     let timelineHTML = "";
     filteredEvents.forEach((event, index) => {
       const isLast = index === filteredEvents.length - 1;
       const displayDate = event.dateRange ? event.dateRange : formatTimelineDate(event.date);
+      // Conditionally include the description div
+      const descriptionHTML = event.description
+        ? `<div class="timeline-description">${event.description}</div>`
+        : ""; // Render nothing if description is missing
+
       timelineHTML += `
         <li class="timeline-event ${isLast ? "is-last" : ""}">
           <div class="timeline-marker"></div>
@@ -113,11 +118,9 @@ let initialFilteredEvents = allTimelineEvents.sort((a, b) =>
             <div class="timeline-header">
               <span class="timeline-date">${displayDate}</span>
               <h3 class="timeline-title">${event.title}</h3>
-              ${event.category ? `<span class="timeline-category">${event.category}</span>` : ""}
+              <!-- ${event.category ? `<span class="timeline-category">${event.category}</span>` : ""} -->
             </div>
-            <div class="timeline-description">
-              ${event.description}
-            </div>
+            ${descriptionHTML}
           </div>
         </li>
       `;

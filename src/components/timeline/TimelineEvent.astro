@@ -4,7 +4,7 @@ interface Props {
   date: string; // Represents end date if range exists
   dateRange?: string; // <<< Add dateRange prop
   title: string;
-  description: string; // Add description prop
+  description?: string; // <<< Make description optional
   category?: string;
   isLast?: boolean; // To prevent line extending past the last item
 }
@@ -18,8 +18,8 @@ const { date, dateRange, title, description, category, isLast = false } = Astro.
     <div class="timeline-header">
       <span class="timeline-date">{dateRange || date}</span>
       <h3 class="timeline-title">{title}</h3>
-      {category && <span class="timeline-category">{category}</span>}
+      <!-- {category && <span class="timeline-category">{category}</span>} -->
     </div>
-    <div class="timeline-description" set:html={description} />
+    {description && <div class="timeline-description" set:html={description} />}
   </div>
 </li>
