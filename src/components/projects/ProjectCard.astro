@@ -22,7 +22,7 @@ const {
 } = Astro.props;
 ---
 
-<article class="project-card scroll-reveal-animate">
+<article class="project-card">
   {
     imageSrc && (
       <div class="project-image-wrapper">
@@ -84,6 +84,24 @@ const {
     flex-direction: column;
     transition: all 0.2s ease-out;
     margin-bottom: 3rem; /* Space below card */
+
+    /* Initial state */
+    opacity: 0;
+    filter: blur(5px);
+    transform: translateY(20px) translateZ(0);
+    will-change: opacity, filter, transform;
+    /* Transition applied when .visible is added */
+    transition:
+      opacity 0.8s ease-out,
+      filter 0.8s ease-out,
+      transform 0.8s ease-out;
+  }
+
+  .project-card.visible {
+    /* Final state */
+    opacity: 1;
+    filter: blur(0px);
+    transform: translateY(0) translateZ(0);
   }
 
   .project-card:hover {
@@ -193,3 +211,47 @@ const {
     list-style: disc;
   }
 </style>
+
+<script>
+  let currentIntersectionObserver: IntersectionObserver | null = null; // Added type annotation
+
+  document.addEventListener("astro:page-load", () => {
+    // 1. Disconnect old observer if it exists
+    if (currentIntersectionObserver) {
+      currentIntersectionObserver.disconnect();
+    }
+
+    // 2. Set up the new observer for the current page
+    const pageWrapper = document.querySelector(".page-wrapper");
+    if (!pageWrapper) {
+      console.error("Page wrapper element not found for IntersectionObserver.");
+      return;
+    }
+    const observerOptions = {
+      root: pageWrapper, // Observe intersections within the page-wrapper
+      rootMargin: "0px",
+      threshold: 0.2,
+    };
+
+    const observerCallback = (entries, observer) => {
+      entries.forEach((entry) => {
+        // console.log("Observing:", entry.target, "Is intersecting:", entry.isIntersecting); // Removed debug log
+        if (entry.isIntersecting) {
+          entry.target.classList.add("visible");
+          observer.unobserve(entry.target);
+        }
+      });
+    };
+
+    const newObserver = new IntersectionObserver(observerCallback, observerOptions);
+
+    // 3. Store the new observer instance
+    currentIntersectionObserver = newObserver;
+
+    // 4. Find and observe targets *on the current page*
+    const targets = document.querySelectorAll(".project-card"); // Corrected selector was applied previously
+    targets.forEach((target) => newObserver.observe(target));
+
+    // console.log(`[ScrollReveal] Observer set up for ${targets.length} targets on page load.`);
+  });
+</script>

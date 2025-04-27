@@ -222,7 +222,7 @@ const showScrollIndicator = currentPath === "/";
         const observerOptions = {
           root: pageWrapper, // Observe intersections within the page-wrapper
           rootMargin: "0px",
-          threshold: 0.1,
+          threshold: 0.2,
         };
 
         const observerCallback = (entries, observer) => {
