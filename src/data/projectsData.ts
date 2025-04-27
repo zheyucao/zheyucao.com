@@ -4,6 +4,7 @@ export interface ProjectDataItem {
   title: string;
   timeframe?: string;
   githubUrl?: string;
+  githubRepos?: { title?: string; url: string }[];
   projectUrl?: string;
   techStack?: string[];
   imageSrc?: string;
@@ -18,18 +19,38 @@ export const allProjectsData: ProjectDataItem[] = [
     title: "uniOS",
     timeframe: "September 2024 – February 2025",
     githubUrl: "https://github.com/angine04/unios",
-    techStack: ["C", "Assembly", "Makefile", "QEMU"],
+    techStack: ["C", "Assembly", "QEMU", "Makefile"], // Core techs for OS dev
     imageSrc: "/images/projects/unios.png",
     imageAlt: "Screenshot of the uniOS project",
     description: `
-        <p>An operating system pilot course project involving independent completion of labs (Bootloader, Paging, Scheduling, Syscalls).</p>
-        <p>Co-developed the graphics system (2-person team):</p>
+        <p>An operating system pilot course project focused on core kernel concepts through independently completed labs.</p>
+        <p>Key kernel development labs included:</p>
         <ul>
-          <li>Responsible for system design, drivers, and composition layer.</li>
-          <li>Implemented features like antialiasing, dirty region detection, and alpha blending.</li>
-          <li>Designed and implemented a simple window manager and GUI.</li>
+          <li><strong>Bootloader & Initialization:</strong> Developed the bootloader and managed system startup sequences in assembly.</li>
+          <li><strong>Memory Management:</strong> Implemented virtual memory using paging mechanisms.</li>
+          <li><strong>Process Scheduling:</strong> Designed and implemented a basic process scheduler.</li>
+          <li><strong>System Calls:</strong> Managed kernel-user space interaction through system call handling.</li>
+        </ul>
+        <p>Additionally, co-developed the graphics system (2-person team):</p>
+        <ul>
+          <li>Led system design, driver implementation, and the composition layer.</li>
+          <li>Implemented features like antialiasing, dirty region detection, alpha blending, etc.</li>
+          <li>Designed and built a foundational window manager and GUI toolkit.</li>
         </ul>
       `,
+  },
+  {
+    title: "zheyucao.com (This Website)",
+    timeframe: "April 2025",
+    githubUrl: "https://github.com/zheyu-cao/zheyucao.com",
+    projectUrl: "https://zheyucao.com",
+    techStack: ["Astro", "TypeScript"], // Core framework, lang, animation lib
+    imageSrc: "/images/projects/portfolio.png", // Placeholder path
+    imageAlt: "Screenshot of the portfolio website homepage",
+    description: `
+        <p>My personal portfolio site, designed and built from scratch using Astro.</p>
+        <p>Features dynamic background effects, responsive design, smooth transitions, and content showcasing timeline, projects, and resume.</p>
+      `, // More concise description
   },
   {
     title: "Angine Sans",
@@ -38,26 +59,27 @@ export const allProjectsData: ProjectDataItem[] = [
     imageSrc: "/images/projects/angine_sans.png",
     imageAlt: "Angine Sans",
     description: `
-          <p>A custom web font created for myself.</p>
+          <p>An open-source custom sans-serif typeface derived from Noto Sans.</p>
+          <p>Designed initially for personal use and branding, and shared under the SIL Open Font License 1.1.</p>
       `,
   },
   {
-    title: "zheyucao.com (This Website)",
-    timeframe: "April 2025",
-    githubUrl: "https://github.com/zheyu-cao/zheyucao.com",
-    projectUrl: "https://zheyucao.com",
-    techStack: ["Astro", "TypeScript", "CSS", "GSAP", "Node.js"],
-    imageSrc: "/images/projects/portfolio.png", // Placeholder path
-    imageAlt: "Screenshot of the portfolio website homepage",
+    title: "Tooi Programming Language",
+    timeframe: "March 2025 – Present",
+    githubUrl: "https://github.com/angine04/tooi",
+    techStack: ["C++", "CMake", "Catch2"], // Core lang, build, test
+    imageSrc: "/images/projects/tooi.png",
+    imageAlt: "Representation of the Tooi language project",
     description: `
-        <p>My personal portfolio site, designed and built from scratch.</p>
-        <p>Features include:</p>
+        <p>A toy scripting language designed to run via REPL or script files. Currently work in progress.</p>
+        <p>Key implemented features include:</p>
         <ul>
-            <li>Dynamic background animations.</li>
-            <li>Responsive design for various screen sizes.</li>
-            <li>Smooth page transitions and scroll-triggered animations.</li>
-            <li>Content showcasing timeline, projects, and resume.</li>
+            <li>Command-line interface with REPL environment (using linenoise).</li>
+            <li>Robust error handling system.</li>
+            <li>Lexical analyzer (Scanner) for tokenizing source code.</li>
+            <li>Integrated unit testing framework (Catch2).</li>
         </ul>
+        <p>Parser development is in progress, with plans for a semantic analyzer, interpreter, and standard library.</p>
       `,
   },
   {
@@ -66,10 +88,10 @@ export const allProjectsData: ProjectDataItem[] = [
     githubUrl: "https://github.com/angine04/v5Embark",
     imageSrc: "/images/projects/embark.png",
     imageAlt: "v5Embark",
-    techStack: ["Next.js", "React", "TypeScript", "Tailwind CSS"],
+    techStack: ["Next.js", "React", "TypeScript", "Tailwind CSS", "MongoDB", "Mongoose"],
     description: `
-          <p>A service for Team V5++ NPU Soccer Robot Innovation Base that facilitates new member registration and information collection.</p>
-      `,
+          <p>A web service for Team V5++ (NPU Soccer Robot Team) to streamline new member registration and information management using Next.js and MongoDB.</p>
+      `, // Slightly enhanced description
   },
   {
     title: "v5Beacon",
@@ -79,7 +101,41 @@ export const allProjectsData: ProjectDataItem[] = [
     githubUrl: "https://github.com/angine04/v5Beacon",
     techStack: ["Next.js", "React", "TypeScript", "Tailwind CSS"],
     description: `
-          <p>A central portal for Team V5++ NPU Soccer Robot Innovation Base providing unified access to all team services and resources.</p>
+          <p>A central web portal for Team V5++ providing unified access to team services and resources, built with Next.js.</p>
+      `, // Slightly enhanced description
+  },
+  {
+    title: "cash Shell",
+    timeframe: "October 2024",
+    githubUrl: "https://github.com/angine04/cash",
+    techStack: ["C++", "CMake"],
+    description: `
+        <p>A simple C++ toy shell ("cash").</p>
+        <ul>
+            <li>Executes external commands with argument/quote handling.</li>
+            <li>Includes built-ins (<em>history</em>, <em>cd</em>, etc.) and single pipes.</li>
+            <li>Utilizes <em>fork</em>, <em>exec</em>, and <em>pipe</em> system calls.</li>
+        </ul>
+      `,
+  },
+  {
+    title: "Student Management System (DBLabs)",
+    timeframe: "November 2024",
+    githubRepos: [
+      { title: "Backend", url: "https://github.com/angine04/dblabs-backend" },
+      { title: "Frontend", url: "https://github.com/angine04/dblabs-frontend" },
+    ],
+    techStack: ["Python", "Flask", "PostgreSQL", "React", "TypeScript"], // Core backend/frontend techs, DB, ORM
+    imageSrc: "/images/projects/dblabs.png",
+    imageAlt: "Screenshot of the Student Management System UI",
+    description: `
+        <p>A full-stack Student Management System developed for a university database course assignment (DBLabs).</p>
+        <p>Key aspects include:</p>
+        <ul>
+            <li>Comprehensive database design (PostgreSQL) based on requirement analysis, ensuring data integrity via constraints.</li>
+            <li>Python backend using Flask and SQLAlchemy (ORM) providing RESTful APIs for CRUD operations.</li>
+            <li>React frontend (TypeScript) for a responsive user interface, interacting with the backend API.</li>
+        </ul>
       `,
   },
 

@@ -16,7 +16,6 @@
     "@iconify-json/ri": "^1.2.5",
     "astro": "^5.7.3",
     "astro-icon": "^1.1.5",
-    "blurhash": "^2.0.5",
     "gsap": "^3.12.7"
   },
   "devDependencies": {
