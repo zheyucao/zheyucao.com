@@ -1,7 +1,244 @@
 ---
 import SubPageLayout from "../layouts/SubPageLayout.astro";
+import { allTimelineEvents } from "../data/timelineEvents";
+
+// Use the imported data
+const allEvents = allTimelineEvents;
+
+// Calculate unique categories based on actual data
+const categories = [...new Set(allEvents.map((event) => event.category).filter(Boolean))].sort();
+
+// Remove placeholder/unused variable definitions
+// const TimelineEvent = ... (If component not used for SSR)
+// const initialSort = ...
+// const processedEvents = ...
 ---
 
 <SubPageLayout title="Timeline">
-  <p>Content coming soon...</p>
+  <div class="timeline-controls">
+    <div class="control-group category-tabs">
+      <button type="button" class="category-tab" data-category="all" aria-pressed="true">All</button
+      >
+      {
+        categories.map((cat) => (
+          <button type="button" class="category-tab" data-category={cat}>
+            {cat}
+          </button>
+        ))
+      }
+    </div>
+    <!-- <div class="control-group">
+      <button type="button" id="sort-toggle" data-sort-current="newest">Newest First</button>
+    </div> -->
+  </div>
+
+  <ul class="timeline-container"></ul>
 </SubPageLayout>
+
+{/* Pass data to client script */}
+<script define:vars={{ allEvents }}>
+  // State variables
+  let currentFilter = "all";
+  let currentSort = "newest"; // 'newest' or 'oldest'
+
+  // DOM References
+  const categoryTabs = document.querySelectorAll(".category-tab");
+  const sortToggleButton = document.getElementById("sort-toggle");
+  const timelineContainer = document.querySelector(".timeline-container");
+  const allEventsData = allEvents; // Get data passed from server
+
+  // Helper to format YYYY-MM to Month Year
+  function formatTimelineDate(dateStr) {
+    if (!dateStr || !dateStr.includes("-")) return dateStr; // Return original if invalid
+    const [year, month] = dateStr.split("-");
+    const dateObj = new Date(parseInt(year), parseInt(month) - 1); // Month is 0-indexed
+    return dateObj.toLocaleString("en-US", { month: "long", year: "numeric" });
+  }
+
+  function renderTimeline() {
+    if (!timelineContainer || !allEventsData) return;
+
+    // 1. Filter
+    let filteredEvents = allEventsData;
+    if (currentFilter !== "all") {
+      filteredEvents = allEventsData.filter((event) => event.category === currentFilter);
+    }
+
+    // 2. Sort (Important: Sort based on original YYYY-MM for accuracy)
+    filteredEvents.sort((a, b) => {
+      // Pad month for correct string comparison or convert to comparable number
+      const dateNumA = parseInt(a.date.replace("-", ""));
+      const dateNumB = parseInt(b.date.replace("-", ""));
+      return currentSort === "newest" ? dateNumB - dateNumA : dateNumA - dateNumB;
+    });
+
+    // 3. Render
+    let timelineHTML = "";
+    filteredEvents.forEach((event, index) => {
+      const isLast = index === filteredEvents.length - 1;
+      // Use dateRange if it exists, otherwise format the single date
+      const displayDate = event.dateRange ? event.dateRange : formatTimelineDate(event.date);
+      timelineHTML += `
+        <li class="timeline-event ${isLast ? "is-last" : ""}">
+          <div class="timeline-marker"></div>
+          <div class="timeline-content">
+            <div class="timeline-header">
+              <span class="timeline-date">${displayDate}</span>
+              <h3 class="timeline-title">${event.title}</h3>
+              ${event.category ? `<span class="timeline-category">${event.category}</span>` : ""}
+            </div>
+            <div class="timeline-description">
+              ${event.description}
+            </div>
+          </div>
+        </li>
+      `;
+    });
+
+    // 4. Update DOM
+    timelineContainer.innerHTML = timelineHTML;
+  }
+
+  // --- Event Listeners ---
+  categoryTabs.forEach((tab) => {
+    if (!(tab instanceof HTMLElement)) return;
+    tab.addEventListener("click", (e) => {
+      if (e.currentTarget instanceof HTMLElement) {
+        const target = e.currentTarget;
+        const category = target.dataset.category;
+        if (category) {
+          currentFilter = category;
+          updateCategoryTabStates();
+          renderTimeline();
+        }
+      }
+    });
+  });
+
+  sortToggleButton?.addEventListener("click", () => {
+    // Toggle sort state
+    currentSort = currentSort === "newest" ? "oldest" : "newest";
+    updateSortToggleState();
+    renderTimeline();
+  });
+
+  // --- Helper for Control States ---
+  function updateCategoryTabStates() {
+    categoryTabs.forEach((tab) => {
+      if (!(tab instanceof HTMLElement)) return;
+      if (tab.dataset.category === currentFilter) {
+        tab.setAttribute("aria-pressed", "true");
+      } else {
+        tab.removeAttribute("aria-pressed");
+      }
+    });
+  }
+
+  function updateSortToggleState() {
+    if (!sortToggleButton) return;
+    sortToggleButton.dataset.sortCurrent = currentSort;
+    sortToggleButton.textContent = currentSort === "newest" ? "Newest First" : "Oldest First";
+    // aria-pressed state could be managed here too if needed,
+    // but text change might be sufficient feedback.
+  }
+
+  // --- Initial Setup ---
+  function initialize() {
+    if (!timelineContainer) return;
+    renderTimeline();
+    updateCategoryTabStates(); // Set initial active category tab
+    updateSortToggleState(); // Set initial sort button text
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", initialize);
+  } else {
+    initialize();
+  }
+</script>
+
+<style>
+  .timeline-controls {
+    margin-bottom: 3rem;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.5rem;
+    align-items: center;
+  }
+  .control-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.8rem;
+    align-items: center;
+  }
+  .control-group label {
+    font-weight: 500;
+    margin-right: 0.5rem;
+    color: var(--text-muted);
+  }
+
+  .controls-note {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    width: 100%;
+    text-align: right;
+    margin: 0.5rem 0 0;
+  }
+
+  .timeline-container {
+    padding: 0;
+    margin: 0;
+    /* No specific layout needed here, handled by list items */
+  }
+
+  /* Category Tabs Styling */
+  .category-tabs {
+    gap: 0.5rem 0rem;
+    border-bottom: 1px solid var(--divider-color);
+    margin-bottom: -1px;
+    font-family: var(--font-family-sans);
+  }
+  .category-tab {
+    font-family: inherit;
+    font-size: 1rem;
+    padding: 0.5em 1em 0.8em;
+    border: none;
+    border-bottom-width: 3px;
+    border-bottom-style: solid;
+    border-bottom-color: transparent;
+    background-color: transparent;
+    color: var(--text-muted);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    margin-bottom: -1px;
+  }
+  .category-tab:hover {
+    border-bottom-color: var(--text-color);
+    background-color: transparent;
+    color: var(--text-color);
+  }
+  .category-tab[aria-pressed="true"] {
+    border-bottom-color: var(--text-color);
+    background-color: transparent;
+    color: var(--text-color);
+    font-weight: 600;
+  }
+
+  #sort-toggle {
+    font-family: inherit;
+    font-size: 0.9rem;
+    padding: 0.4em 0.9em;
+    border-radius: 6px;
+    border: 1px solid var(--button-border-hover-color);
+    background-color: var(--button-hover-bg);
+    color: var(--button-hover-text);
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+  #sort-toggle:hover {
+    border-color: var(--button-border-color);
+    background-color: transparent;
+    color: var(--text-muted);
+  }
+</style>
