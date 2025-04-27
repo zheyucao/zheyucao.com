@@ -140,22 +140,18 @@ const {
   .project-tech-stack {
     display: flex;
     flex-wrap: wrap;
-    gap: 1rem; /* Reduced gap between tags */
+    gap: 0.4rem; /* Reduced gap between tags */
     font-family: inherit; /* Inherit sans-serif from parent */
     line-height: 1.4; /* Adjusted line height */
+    padding: 0.2em 0;
   }
 
   .tech-tag {
     background-color: var(--tag-bg-color);
     color: var(--tag-text-color);
     font-size: 0.85rem; /* Keep tags slightly smaller */
-    padding: 0.2em 0; /* Reduced padding */
     border-radius: 4px;
     font-family: inherit; /* Inherit sans-serif from parent */
-  }
-
-  .project-tech-stack:first-child {
-    padding-left: 0;
   }
 
   .project-links {
