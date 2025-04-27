@@ -1,6 +1,8 @@
 ---
 import SubPageLayout from "../layouts/SubPageLayout.astro";
+import TimelineEvent from "../components/timeline/TimelineEvent.astro";
 import { allTimelineEvents } from "../data/timelineEvents";
+import "../styles/timeline.css";
 
 // Use the imported data
 const allEvents = allTimelineEvents;
@@ -8,9 +10,16 @@ const allEvents = allTimelineEvents;
 // Calculate unique categories based on actual data
 const categories = [...new Set(allEvents.map((event) => event.category).filter(Boolean))].sort();
 
+// Initial sort for SSR
+let initialSortOrder = "newest"; // Default
+let initialFilteredEvents = allTimelineEvents.sort((a, b) =>
+  initialSortOrder === "newest"
+    ? new Date(b.date).getTime() - new Date(a.date).getTime()
+    : new Date(a.date).getTime() - new Date(b.date).getTime()
+);
+
 // Remove placeholder/unused variable definitions
 // const TimelineEvent = ... (If component not used for SSR)
-// const initialSort = ...
 // const processedEvents = ...
 ---
 
@@ -32,7 +41,21 @@ const categories = [...new Set(allEvents.map((event) => event.category).filter(B
     </div> -->
   </div>
 
-  <ul class="timeline-container"></ul>
+  <ul class="timeline-container mt-8">
+    {/* Initial server-side render */}
+    {
+      initialFilteredEvents.map((event, index) => (
+        <TimelineEvent
+          date={event.date}
+          dateRange={event.dateRange}
+          title={event.title}
+          description={event.description}
+          category={event.category}
+          isLast={index === initialFilteredEvents.length - 1}
+        />
+      ))
+    }
+  </ul>
 </SubPageLayout>
 
 {/* Pass data to client script */}
@@ -194,8 +217,6 @@ const categories = [...new Set(allEvents.map((event) => event.category).filter(B
   /* Category Tabs Styling */
   .category-tabs {
     gap: 0.5rem 0rem;
-    border-bottom: 1px solid var(--divider-color);
-    margin-bottom: -1px;
     font-family: var(--font-family-sans);
   }
   .category-tab {
@@ -213,13 +234,11 @@ const categories = [...new Set(allEvents.map((event) => event.category).filter(B
     margin-bottom: -1px;
   }
   .category-tab:hover {
-    border-bottom-color: var(--text-color);
-    background-color: transparent;
+    border-bottom-color: var(--button-border-color);
     color: var(--text-color);
   }
   .category-tab[aria-pressed="true"] {
-    border-bottom-color: var(--text-color);
-    background-color: transparent;
+    border-bottom-color: var(--button-border-hover-color);
     color: var(--text-color);
     font-weight: 600;
   }
