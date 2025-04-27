@@ -78,28 +78,33 @@ let initialFilteredEvents = allTimelineEvents.sort((a, b) =>
     return dateObj.toLocaleString("en-US", { month: "long", year: "numeric" });
   }
 
-  function renderTimeline() {
+  async function renderTimeline() {
     if (!timelineContainer || !allEventsData) return;
 
-    // 1. Filter
+    // 1. Add fade-out class
+    timelineContainer.classList.add("is-updating");
+
+    // Wait for CSS transition (duration should match CSS)
+    // Using a timeout is simpler here than transitionend event
+    await new Promise((resolve) => setTimeout(resolve, 300)); // Match CSS transition duration
+
+    // 2. Filter
     let filteredEvents = allEventsData;
     if (currentFilter !== "all") {
       filteredEvents = allEventsData.filter((event) => event.category === currentFilter);
     }
 
-    // 2. Sort (Important: Sort based on original YYYY-MM for accuracy)
+    // 3. Sort
     filteredEvents.sort((a, b) => {
-      // Pad month for correct string comparison or convert to comparable number
       const dateNumA = parseInt(a.date.replace("-", ""));
       const dateNumB = parseInt(b.date.replace("-", ""));
       return currentSort === "newest" ? dateNumB - dateNumA : dateNumA - dateNumB;
     });
 
-    // 3. Render
+    // 4. Generate HTML (Don't update DOM yet)
     let timelineHTML = "";
     filteredEvents.forEach((event, index) => {
       const isLast = index === filteredEvents.length - 1;
-      // Use dateRange if it exists, otherwise format the single date
       const displayDate = event.dateRange ? event.dateRange : formatTimelineDate(event.date);
       timelineHTML += `
         <li class="timeline-event ${isLast ? "is-last" : ""}">
@@ -118,31 +123,36 @@ let initialFilteredEvents = allTimelineEvents.sort((a, b) =>
       `;
     });
 
-    // 4. Update DOM
+    // 5. Update DOM
     timelineContainer.innerHTML = timelineHTML;
+
+    // 6. Remove fade-out class to trigger fade-in (due to transition)
+    timelineContainer.classList.remove("is-updating");
   }
 
   // --- Event Listeners ---
   categoryTabs.forEach((tab) => {
     if (!(tab instanceof HTMLElement)) return;
-    tab.addEventListener("click", (e) => {
+    tab.addEventListener("click", async (e) => {
       if (e.currentTarget instanceof HTMLElement) {
         const target = e.currentTarget;
         const category = target.dataset.category;
-        if (category) {
+        if (category && category !== currentFilter) {
           currentFilter = category;
           updateCategoryTabStates();
-          renderTimeline();
+          await renderTimeline();
         }
       }
     });
   });
 
-  sortToggleButton?.addEventListener("click", () => {
-    // Toggle sort state
+  sortToggleButton?.addEventListener("click", async () => {
+    const previousSort = currentSort;
     currentSort = currentSort === "newest" ? "oldest" : "newest";
-    updateSortToggleState();
-    renderTimeline();
+    if (previousSort !== currentSort) {
+      updateSortToggleState();
+      await renderTimeline();
+    }
   });
 
   // --- Helper for Control States ---
@@ -259,5 +269,48 @@ let initialFilteredEvents = allTimelineEvents.sort((a, b) =>
     border-color: var(--button-border-color);
     background-color: transparent;
     color: var(--text-muted);
+  }
+
+  /* Added Animation Styles */
+  @keyframes fadeOut {
+    from {
+      opacity: 1;
+    }
+    to {
+      opacity: 0;
+    }
+  }
+
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+
+  .timeline-container {
+    /* Add transition for smoother effect when class is removed */
+    transition: opacity 0.3s ease-out;
+    /* padding/margin already exist */
+    padding: 0;
+    margin: 0;
+  }
+
+  .timeline-container.is-updating {
+    opacity: 0;
+    /* You could use animation instead if preferred */
+    /* animation: fadeOut 0.3s ease-out forwards; */
+  }
+
+  /* Consider users who prefer reduced motion */
+  @media (prefers-reduced-motion: reduce) {
+    .timeline-container,
+    .timeline-container.is-updating {
+      transition: none;
+      animation: none;
+      opacity: 1; /* Ensure it's always visible */
+    }
   }
 </style>
