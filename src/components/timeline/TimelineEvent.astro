@@ -9,7 +9,7 @@ interface Props {
   isLast?: boolean; // To prevent line extending past the last item
 }
 
-const { date, dateRange, title, description, category, isLast = false } = Astro.props;
+const { date, dateRange, title, description, /*category,*/ isLast = false } = Astro.props;
 ---
 
 <li class:list={["timeline-event", { "is-last": isLast }]}>
