@@ -131,6 +131,23 @@ let initialFilteredEvents = allTimelineEvents.sort((a, b) =>
 
     // 6. Remove fade-out class to trigger fade-in (due to transition)
     timelineContainer.classList.remove("is-updating");
+
+    // 7. Dispatch event to re-initialize footer animation after the opacity transition finishes
+    function reinitFooterAnimation() {
+      console.log("Dispatching refresh-footer-animation event after transition");
+      document.dispatchEvent(new CustomEvent("refresh-footer-animation"));
+    }
+
+    // Add the event listener - it will fire once when the opacity transition completes
+    const handleTransitionEnd = (event) => {
+      // Ensure the transition is on the timelineContainer itself and for opacity
+      if (event.target === timelineContainer && event.propertyName === "opacity") {
+        reinitFooterAnimation();
+      }
+    };
+
+    // Use { once: true } to automatically remove listener after first trigger
+    timelineContainer.addEventListener("transitionend", handleTransitionEnd, { once: true });
   }
 
   // --- Event Listeners ---

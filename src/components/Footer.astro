@@ -174,15 +174,16 @@ const currentYear = new Date().getFullYear();
     const footerElement = document.querySelector(".site-footer");
     const pageWrapper = document.querySelector(".page-wrapper");
 
-    if (footerElement && pageWrapper) {
-      // Kill previous ScrollTriggers targeting the footer to prevent duplication
-      ScrollTrigger.getAll().forEach((trigger) => {
-        if (trigger.trigger === footerElement) {
-          trigger.kill();
-          console.log("Killed previous footer ScrollTrigger"); // Debug log
-        }
-      });
+    // Kill previous ScrollTriggers targeting the footer FIRST
+    ScrollTrigger.getAll().forEach((trigger) => {
+      // Simplify the check: Only kill triggers directly associated with footerElement
+      if (trigger.trigger === footerElement) {
+        trigger.kill();
+        console.log("Killed previous footer ScrollTrigger before setup (trigger match)"); // Debug log
+      }
+    });
 
+    if (footerElement && pageWrapper) {
       gsap.fromTo(
         footerElement,
         { opacity: 0, y: 15 },
@@ -200,14 +201,28 @@ const currentYear = new Date().getFullYear();
           },
         }
       );
-      console.log("Setup new footer ScrollTrigger"); // Debug log
+      console.log("Setup new footer ScrollTrigger (using pageWrapper scroller)");
     } else {
       console.warn("Footer animation setup skipped: elements not found.");
     }
   }
 
+  // Function to initialize, called on page load
+  function initializeFooter() {
+    setupFooterAnimation();
+  }
+
+  // Listen for a custom event to re-run the setup
+  document.addEventListener("refresh-footer-animation", () => {
+    console.log("Received refresh-footer-animation event, re-running setup...");
+    // Debounce or add checks if necessary, but directly calling setup is okay for now
+    setupFooterAnimation();
+  });
+
   // Run setup on initial load and after SPA navigations
-  document.addEventListener("astro:page-load", setupFooterAnimation, { once: false });
+  // Ensure this listener doesn't add multiple 'refresh-footer-animation' listeners on navigations
+  // Using astro:page-load should be fine as the script re-runs
+  document.addEventListener("astro:page-load", initializeFooter);
 </script>
 
 <script>
