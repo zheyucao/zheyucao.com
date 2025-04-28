@@ -60,15 +60,23 @@ let initialFilteredEvents = allTimelineEvents.sort((a, b) =>
 
 {/* Pass data to client script */}
 <script define:vars={{ allEvents }}>
+  // console.log("[Timeline Script] Executing script block."); // Log 1: Script execution start
+
   // State variables
   let currentFilter = "all";
   let currentSort = "newest"; // 'newest' or 'oldest'
 
-  // DOM References
-  const categoryTabs = document.querySelectorAll(".category-tab");
-  const sortToggleButton = document.getElementById("sort-toggle");
-  const timelineContainer = document.querySelector(".timeline-container");
+  // DOM References (potential issue if run before DOM ready on navigation)
+  // We will re-query these inside astro:page-load
+  // const categoryTabs = document.querySelectorAll(".category-tab");
+  // const sortToggleButton = document.getElementById("sort-toggle");
+  // const timelineContainer = document.querySelector(".timeline-container");
+  let categoryTabs = null; // Initialize as null
+  let sortToggleButton = null;
+  let timelineContainer = null;
   const allEventsData = allEvents; // Get data passed from server
+
+  // console.log("[Timeline Script] Script block executed, waiting for astro:page-load."); // Log: Script block done
 
   // Helper to format YYYY-MM to Month Year
   function formatTimelineDate(dateStr) {
@@ -79,14 +87,23 @@ let initialFilteredEvents = allTimelineEvents.sort((a, b) =>
   }
 
   async function renderTimeline() {
-    if (!timelineContainer || !allEventsData) return;
+    // console.log(
+    //   `[Timeline Script] renderTimeline START - Filter: ${currentFilter}, Sort: ${currentSort}`
+    // ); // Log 5: renderTimeline start
+    // Ensure container is valid (queried in astro:page-load)
+    if (!timelineContainer || !allEventsData) {
+      console.warn(
+        "[Timeline Script] renderTimeline ABORT - Missing container or data. Container:", // Keep important warning
+        timelineContainer
+      );
+      return;
+    }
 
     // 1. Add fade-out class
     timelineContainer.classList.add("is-updating");
 
-    // Wait for CSS transition (duration should match CSS)
-    // Using a timeout is simpler here than transitionend event
-    await new Promise((resolve) => setTimeout(resolve, 300)); // Match CSS transition duration
+    // Wait for CSS transition
+    await new Promise((resolve) => setTimeout(resolve, 300));
 
     // 2. Filter
     let filteredEvents = allEventsData;
@@ -96,9 +113,14 @@ let initialFilteredEvents = allTimelineEvents.sort((a, b) =>
 
     // 3. Sort
     filteredEvents.sort((a, b) => {
-      const dateNumA = parseInt(a.date.replace("-", ""));
-      const dateNumB = parseInt(b.date.replace("-", ""));
-      return currentSort === "newest" ? dateNumB - dateNumA : dateNumA - dateNumB;
+      // Ensure date comparison handles potential non-standard formats robustly
+      const dateA = new Date(a.date.includes("-") ? a.date : `${a.date}-01-01`); // Assume year if no month/day
+      const dateB = new Date(b.date.includes("-") ? b.date : `${b.date}-01-01`);
+      // Fallback to 0 if dates are invalid
+      const timeA = isNaN(dateA.getTime()) ? 0 : dateA.getTime();
+      const timeB = isNaN(dateB.getTime()) ? 0 : dateB.getTime();
+
+      return currentSort === "newest" ? timeB - timeA : timeA - timeB;
     });
 
     // 4. Generate HTML
@@ -106,10 +128,9 @@ let initialFilteredEvents = allTimelineEvents.sort((a, b) =>
     filteredEvents.forEach((event, index) => {
       const isLast = index === filteredEvents.length - 1;
       const displayDate = event.dateRange ? event.dateRange : formatTimelineDate(event.date);
-      // Conditionally include the description div
       const descriptionHTML = event.description
         ? `<div class="timeline-description">${event.description}</div>`
-        : ""; // Render nothing if description is missing
+        : "";
 
       timelineHTML += `
         <li class="timeline-event ${isLast ? "is-last" : ""}">
@@ -129,54 +150,95 @@ let initialFilteredEvents = allTimelineEvents.sort((a, b) =>
     // 5. Update DOM
     timelineContainer.innerHTML = timelineHTML;
 
-    // 6. Remove fade-out class to trigger fade-in (due to transition)
+    // 6. Remove fade-out class
     timelineContainer.classList.remove("is-updating");
+    // console.log(`[Timeline Script] renderTimeline END - DOM updated.`); // Log 5: renderTimeline end
 
-    // 7. Dispatch event to re-initialize footer animation after the opacity transition finishes
+    // 7. Dispatch event to re-initialize footer animation
     function reinitFooterAnimation() {
-      console.log("Dispatching refresh-footer-animation event after transition");
+      // console.log("[Timeline Script] Dispatching refresh-footer-animation event after transition"); // Removed log
       document.dispatchEvent(new CustomEvent("refresh-footer-animation"));
     }
-
-    // Add the event listener - it will fire once when the opacity transition completes
-    const handleTransitionEnd = (event) => {
-      // Ensure the transition is on the timelineContainer itself and for opacity
-      if (event.target === timelineContainer && event.propertyName === "opacity") {
-        reinitFooterAnimation();
-      }
-    };
-
-    // Use { once: true } to automatically remove listener after first trigger
-    timelineContainer.addEventListener("transitionend", handleTransitionEnd, { once: true });
+    // Use a flag to prevent adding multiple listeners if renderTimeline is called rapidly
+    if (!timelineContainer.hasAttribute("data-transition-listener-added")) {
+      const handleTransitionEnd = (event) => {
+        if (event.target === timelineContainer && event.propertyName === "opacity") {
+          reinitFooterAnimation();
+          // Clean up listener and flag
+          timelineContainer.removeEventListener("transitionend", handleTransitionEnd);
+          timelineContainer.removeAttribute("data-transition-listener-added");
+          // console.log("[Timeline Script] TransitionEnd listener removed."); // Removed log
+        }
+      };
+      timelineContainer.addEventListener("transitionend", handleTransitionEnd);
+      timelineContainer.setAttribute("data-transition-listener-added", "true"); // Set flag
+      // console.log("[Timeline Script] TransitionEnd listener added."); // Removed log
+    }
   }
 
-  // --- Event Listeners ---
-  categoryTabs.forEach((tab) => {
-    if (!(tab instanceof HTMLElement)) return;
-    tab.addEventListener("click", async (e) => {
-      if (e.currentTarget instanceof HTMLElement) {
-        const target = e.currentTarget;
-        const category = target.dataset.category;
-        if (category && category !== currentFilter) {
-          currentFilter = category;
-          updateCategoryTabStates();
+  // Define handler function outside for potential removal (though Astro lifecycle handles this better)
+  const handleCategoryClick = async (e) => {
+    // console.log("[Timeline Script] Category tab clicked!", e.currentTarget); // Log 4: Click handler start
+    if (e.currentTarget instanceof HTMLElement) {
+      const target = e.currentTarget;
+      const category = target.dataset.category;
+      // console.log(
+      //   `[Timeline Script] Clicked category: ${category}, Current filter: ${currentFilter}`
+      // ); // Log 4: Category info
+      if (category && category !== currentFilter) {
+        currentFilter = category;
+        updateCategoryTabStates(); // Update immediately
+        // console.log("[Timeline Script] Calling renderTimeline from tab click."); // Log 4: Calling render
+        await renderTimeline();
+      } else {
+        // console.log("[Timeline Script] Click ignored - category same or invalid."); // Log 4: Click ignored
+      }
+    }
+  };
+
+  // --- Event Listeners Setup (called within astro:page-load) ---
+  function setupEventListeners() {
+    // console.log("[Timeline Script] Setting up event listeners..."); // Removed log
+    if (!categoryTabs) {
+      console.error("[Timeline Script] Cannot setup listeners: categoryTabs not found."); // Keep error
+      return;
+    }
+    categoryTabs.forEach((tab) => {
+      if (!(tab instanceof HTMLElement)) return;
+      // Remove listener first (important for astro:page-load)
+      tab.removeEventListener("click", handleCategoryClick);
+      // Add the listener
+      tab.addEventListener("click", handleCategoryClick);
+      // console.log(`[Timeline Script] Added click listener to tab ${index + 1}:`, tab); // Removed log
+    });
+
+    // Setup sort toggle listener (if element exists)
+    if (sortToggleButton) {
+      // Define handler
+      const handleSortClick = async () => {
+        // console.log("[Timeline Script] Sort toggle clicked!"); // Removed log
+        const previousSort = currentSort;
+        currentSort = currentSort === "newest" ? "oldest" : "newest";
+        if (previousSort !== currentSort) {
+          updateSortToggleState(); // Update UI
+          // console.log("[Timeline Script] Calling renderTimeline from sort click."); // Removed log
           await renderTimeline();
         }
-      }
-    });
-  });
-
-  sortToggleButton?.addEventListener("click", async () => {
-    const previousSort = currentSort;
-    currentSort = currentSort === "newest" ? "oldest" : "newest";
-    if (previousSort !== currentSort) {
-      updateSortToggleState();
-      await renderTimeline();
+      };
+      // Remove previous listener & add new one
+      sortToggleButton.removeEventListener("click", handleSortClick);
+      sortToggleButton.addEventListener("click", handleSortClick);
+      // console.log("[Timeline Script] Added click listener to sort toggle."); // Removed log
+    } else {
+      // console.log("[Timeline Script] Sort toggle button not found, skipping listener."); // Removed log
     }
-  });
+    // console.log("[Timeline Script] Event listeners setup complete."); // Removed log
+  }
 
   // --- Helper for Control States ---
   function updateCategoryTabStates() {
+    if (!categoryTabs) return; // Guard against null
+    // console.log(`[Timeline Script] Updating category tab states. Active: ${currentFilter}`); // Removed log
     categoryTabs.forEach((tab) => {
       if (!(tab instanceof HTMLElement)) return;
       if (tab.dataset.category === currentFilter) {
@@ -188,26 +250,62 @@ let initialFilteredEvents = allTimelineEvents.sort((a, b) =>
   }
 
   function updateSortToggleState() {
-    if (!sortToggleButton) return;
+    if (!sortToggleButton) return; // Guard against null
+    // console.log(`[Timeline Script] Updating sort toggle state. Current: ${currentSort}`); // Removed log
     sortToggleButton.dataset.sortCurrent = currentSort;
     sortToggleButton.textContent = currentSort === "newest" ? "Newest First" : "Oldest First";
-    // aria-pressed state could be managed here too if needed,
-    // but text change might be sufficient feedback.
   }
 
-  // --- Initial Setup ---
-  function initialize() {
-    if (!timelineContainer) return;
-    renderTimeline();
-    updateCategoryTabStates(); // Set initial active category tab
-    updateSortToggleState(); // Set initial sort button text
+  // --- Initialization Logic (called within astro:page-load) ---
+  function initializeTimeline() {
+    // console.log("[Timeline Script] initializeTimeline START"); // Log 2: Initialize start
+
+    // Query DOM elements *inside* initialization, as they might change with VT
+    categoryTabs = document.querySelectorAll(".category-tab");
+    sortToggleButton = document.getElementById("sort-toggle");
+    timelineContainer = document.querySelector(".timeline-container");
+
+    // console.log(
+    //   `[Timeline Script] DOM Refs queried: categoryTabs=${categoryTabs?.length}, sortToggle=${!!sortToggleButton}, container=${!!timelineContainer}`
+    // ); // Removed log
+
+    if (!timelineContainer || !categoryTabs || categoryTabs.length === 0) {
+      console.error(
+        "[Timeline Script] initializeTimeline ABORT - Essential elements not found in DOM." // Keep error
+      );
+      return;
+    }
+
+    // Set initial state based on what's rendered (or defaults)
+    // Note: The initial state might need smarter logic if SSR state needs to be preserved across navigation
+    currentFilter = "all"; // Reset to default or read from persisted state if implemented
+    currentSort = "newest"; // Reset to default
+
+    // Render based on initial state (will also update tab/button UI via helpers)
+    renderTimeline(); // Initial render based on default/reset state
+    updateCategoryTabStates(); // Ensure UI matches state
+    updateSortToggleState(); // Ensure UI matches state
+    setupEventListeners(); // Setup listeners *after* initial state & render
+
+    // console.log("[Timeline Script] initializeTimeline END"); // Log 2: Initialize end
   }
 
-  if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", initialize);
-  } else {
-    initialize();
-  }
+  // --- Astro Lifecycle Integration ---
+  document.addEventListener("astro:page-load", () => {
+    // console.log("[Timeline Script] astro:page-load event fired."); // Removed log
+    // Reset filter/sort state on navigation? Or try to persist? For now, reset.
+    // currentFilter = "all"; // State reset is now handled inside initializeTimeline
+    // currentSort = "newest";
+    // console.log("[Timeline Script] State reset on page load."); // Removed log
+    initializeTimeline(); // Run the initialization logic on every page load
+  });
+
+  // Initial load handling (for non-VT initial visit)
+  // astro:page-load also fires on initial load, so this might be redundant
+  // but let's keep it simple and rely only on astro:page-load
+  // console.log(
+  //   "[Timeline Script] Script loaded. Initialization will occur on astro:page-load event."
+  // ); // Removed log
 </script>
 
 <style>
