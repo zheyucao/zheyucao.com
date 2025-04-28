@@ -1,0 +1,26 @@
+---
+// Content for the "Keep in touch" section
+const email = "zheyucao2004@gmail.com"; // Example
+const githubUrl = "https://github.com/zheyu-cao"; // Example
+const contactUrl = "/contact";
+---
+
+<h2 slot="title" class="about-title scroll-target-title">Keep in touch</h2>
+
+<div class="about-content scroll-target-content">
+  <p>
+    {/* TODO: Add a short sentence inviting contact */}
+    Feel free to reach out or explore my profiles.
+  </p>
+  <div class="contact-links">
+    {/* TODO: Display primary contact methods */}
+    <a href={`mailto:${email}`}>Email</a>
+    <a href={githubUrl} target="_blank" rel="noopener noreferrer">GitHub</a>
+    {/* Add other key links if desired */}
+  </div>
+  <a href={contactUrl} class="cta-link">See All Contact Info &rarr;</a>
+  {
+    /* Add specific styles for .contact-links, .cta-link here if needed,
+      or define them globally in SectionWrapper with :global() */
+  }
+</div>

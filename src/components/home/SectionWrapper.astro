@@ -1,0 +1,91 @@
+---
+// Component: src/components/home/SectionWrapper.astro
+// Acts as a reusable layout for homepage sections with consistent style & animation
+import { gsap } from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
+
+// Register GSAP plugin (safe to call multiple times)
+gsap.registerPlugin(ScrollTrigger);
+---
+
+<section class="section-wrapper about-section">
+  {/* Title Slot */}
+  {
+    /* Expecting content like: <h2 slot="title" class="about-title scroll-target-title">Section Title</h2> */
+  }
+  <slot name="title" />
+
+  {/* Default Content Slot */}
+  {
+    /* Expecting content like: <div class="about-content scroll-target-content">...paragraphs, lists, etc...</div> */
+  }
+  <slot />
+</section>
+
+{/* Scoped styles for the wrapper itself */}
+<style>
+  .about-section {
+    padding: 15vh 10%;
+    min-height: 70vh; /* Adjust min-height per section if needed, or remove? */
+    /* Maybe add a border/separator between sections? */
+    /* border-bottom: 1px solid var(--timeline-line-color); */
+  }
+  /* Other styles specific ONLY to the wrapper element */
+</style>
+
+{/* Global styles for the content PASSED INTO the slots */}
+<style is:global>
+  /* Target title passed into the slot */
+  .about-section .about-title {
+    font-size: clamp(2rem, 2rem + 2vw, 4rem);
+    font-weight: 600;
+    margin-bottom: 1em;
+  }
+
+  /* Target content div passed into the slot */
+  .about-section .about-content {
+    font-size: 1.25rem; /* Base size for slotted content */
+    line-height: 1.6;
+    max-width: 65ch;
+  }
+
+  /* Target common elements INSIDE the slotted content div */
+  .about-section .about-content p {
+    font-size: inherit; /* Inherit the 1.25rem base */
+    margin-bottom: 1.5em; /* Restore default p margin */
+  }
+  .about-section .about-content ul {
+    list-style: none;
+    padding-left: 0;
+    margin-top: 1rem;
+  }
+  .about-section .about-content li {
+    margin-bottom: 0.75rem;
+  }
+
+  /* Target specific classes INSIDE the slotted content div */
+  .about-section .tech-stack {
+    font-size: 1rem;
+    color: var(--text-muted);
+    font-style: italic;
+    margin-bottom: 1em; /* Ensure consistent margin */
+  }
+  .about-section .highlight-item {
+    font-size: 1.1rem;
+    margin-bottom: 1em;
+  }
+  .about-section .cta-link {
+    display: inline-block;
+    margin-top: 1.5em;
+    font-weight: 500;
+  }
+  /* Example: Styles for .about-nav-list if used in slotted content */
+  .about-section .about-nav-list {
+    list-style: none;
+    padding-left: 0;
+    margin-top: 2rem;
+  }
+  .about-section .about-nav-list li {
+    margin-bottom: 1rem;
+  }
+</style>

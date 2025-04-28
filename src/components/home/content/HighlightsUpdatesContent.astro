@@ -1,0 +1,40 @@
+---
+// Content for the "Highlights & Updates" section
+import { allTimelineEvents } from "../../../data/timelineEvents"; // Adjusted path
+
+// TODO: Logic to select 2-3 most recent or important highlights
+const highlights = allTimelineEvents.slice(0, 3);
+const timelineUrl = "/timeline";
+
+function formatEventDate(dateStr) {
+  if (!dateStr) return "";
+  try {
+    const [year, month] = dateStr.split("-");
+    const date = new Date(parseInt(year), parseInt(month) - 1);
+    return date.toLocaleDateString("en-US", { year: "numeric", month: "short" });
+  } catch (e) {
+    console.error("Error parsing date:", e);
+    return dateStr;
+  }
+}
+---
+
+<h2 slot="title" class="about-title scroll-target-title">Highlights & Updates</h2>
+
+<div class="about-content scroll-target-content">
+  <ul class="highlights-list">
+    {
+      highlights.map((event) => (
+        <li class="highlight-item">
+          <span class="highlight-date">{formatEventDate(event.date)}:</span>
+          <span class="highlight-title">{event.title}</span>
+        </li>
+      ))
+    }
+  </ul>
+  <a href={timelineUrl} class="cta-link">View Full Timeline &rarr;</a>
+  {
+    /* Add specific styles for .highlights-list, .highlight-item, etc. here if needed,
+      or define them globally in SectionWrapper with :global() */
+  }
+</div>

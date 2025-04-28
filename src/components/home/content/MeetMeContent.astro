@@ -1,0 +1,39 @@
+---
+// Content for the "Meet me!" section
+import Button from "../../common/Button.astro";
+
+const resumeUrl = "/resume";
+---
+
+<h2 slot="title" class="about-title scroll-target-title">Meet me!</h2>
+
+<div class="about-content scroll-target-content">
+  <p>
+    I'm Zheyu Cao, an undergraduate in Computer Science and Technology at Northwestern Polytechnical
+    University. I enjoy tackling challenges and creating cool projects.
+  </p>
+
+  <p>
+    My experience ranges from frontend projects to crafting my own OS. I currently focus on
+    Artificial Intelligence, particularly exploring the multimodal and reasoning capabilities of
+    LLMs.
+  </p>
+
+  <p>
+    Seeking a Master's program in AI, I am eager to contribute to cutting-edge AI research and
+    development.
+  </p>
+
+  <Button
+    class="resume-button"
+    href={resumeUrl}
+    text="View Résumé"
+    wrapperClass="meet-me-cta-button"
+  />
+</div>
+
+<style>
+  .resume-button {
+    margin-top: 1.5rem;
+  }
+</style>

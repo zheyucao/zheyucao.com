@@ -1,18 +1,51 @@
 ---
 import Layout from "../layouts/Layout.astro";
 import Hero from "../components/home/Hero.astro";
-import About from "../components/home/About.astro";
+// import About from "../components/home/About.astro"; // Removed old component
+
+// Import new homepage sections - REMOVED OLD IMPORTS
+// import Introduction from "../components/home/Introduction.astro";
+// import FeaturedWorks from "../components/home/FeaturedWorks.astro";
+// import HighlightsUpdates from "../components/home/HighlightsUpdates.astro";
+// import Connect from "../components/home/Connect.astro";
+
+// Import the section wrapper and content components
+import SectionWrapper from "../components/home/SectionWrapper.astro";
+import MeetMeContent from "../components/home/content/MeetMeContent.astro";
+import FeaturedWorksContent from "../components/home/content/FeaturedWorksContent.astro";
+import HighlightsUpdatesContent from "../components/home/content/HighlightsUpdatesContent.astro";
+import ConnectContent from "../components/home/content/ConnectContent.astro";
 ---
 
 <Layout title="Homepage">
-  <main>
+  <main class="homepage-content">
     <Hero />
 
-    <About />
+    <SectionWrapper>
+      <MeetMeContent />
+    </SectionWrapper>
+    <!-- 
+    <SectionWrapper>
+      <FeaturedWorksContent />
+    </SectionWrapper>
+
+    <SectionWrapper>
+      <HighlightsUpdatesContent />
+    </SectionWrapper>
+
+    <SectionWrapper>
+      <ConnectContent />
+    </SectionWrapper> -->
   </main>
 </Layout>
 
 <style>
+  .homepage-content {
+    /* Styles specific to the homepage main container if needed */
+    /* Ensures sections flow vertically */
+    display: flex;
+    flex-direction: column;
+  }
   main {
     position: relative;
     width: 100%;

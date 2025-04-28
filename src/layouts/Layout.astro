@@ -248,12 +248,90 @@ const showScrollIndicator = currentPath === "/";
         // 3. Store the new observer instance
         currentIntersectionObserver = newObserver;
 
-        // 4. Find and observe targets *on the current page*
-        const targets = document.querySelectorAll(".scroll-reveal-animate"); // Corrected selector was applied previously
-        targets.forEach((target) => newObserver.observe(target));
-
-        // console.log(`[ScrollReveal] Observer set up for ${targets.length} targets on page load.`);
+        // 4. Find and observe all elements with the scroll-reveal-animate class
+        const elementsToObserve = document.querySelectorAll(".scroll-reveal-animate");
+        elementsToObserve.forEach((el) => {
+          newObserver.observe(el);
+        });
       });
+    </script>
+
+    {/* === GSAP Section Animation Script === */}
+    <script>
+      // Import GSAP and ScrollTrigger directly here
+      // Ensure GSAP is installed: npm install gsap
+      import { gsap } from "gsap";
+      import { ScrollTrigger } from "gsap/ScrollTrigger";
+
+      // Register GSAP plugin
+      gsap.registerPlugin(ScrollTrigger);
+
+      function setupSectionAnimations() {
+        const pageWrapper = document.querySelector(".page-wrapper");
+        if (!pageWrapper) {
+          console.warn("Section animations setup skipped: page wrapper not found.");
+          return;
+        }
+
+        // Find all section wrappers rendered on the page
+        const sections = document.querySelectorAll(".section-wrapper");
+
+        // If sections exist, proceed with setting up animations
+        if (sections.length > 0) {
+          sections.forEach((section) => {
+            const sectionTitle = section.querySelector(".scroll-target-title");
+            const sectionContent = section.querySelector(".scroll-target-content");
+
+            // Kill previous triggers associated with these specific elements
+            ScrollTrigger.getAll().forEach((trigger) => {
+              if (trigger.trigger === sectionTitle || trigger.trigger === sectionContent) {
+                trigger.kill();
+              }
+            });
+
+            // --- Section Title Animation ---
+            if (sectionTitle) {
+              gsap.set(sectionTitle, { filter: "blur(8px)", opacity: 0 });
+              gsap
+                .timeline({
+                  scrollTrigger: {
+                    trigger: sectionTitle,
+                    scroller: pageWrapper,
+                    start: "top 85%",
+                    end: "bottom 5%",
+                    scrub: 1,
+                  },
+                })
+                .to(sectionTitle, { filter: "blur(0px)", opacity: 1, ease: "sine", duration: 2 })
+                .to(sectionTitle, { filter: "blur(8px)", opacity: 0, ease: "sine", duration: 1 });
+            }
+
+            // --- Section Content Animation ---
+            if (sectionContent) {
+              gsap.set(sectionContent, { opacity: 0, y: 30 });
+              gsap
+                .timeline({
+                  scrollTrigger: {
+                    trigger: sectionContent,
+                    scroller: pageWrapper,
+                    start: "top 85%",
+                    end: "bottom 25%",
+                    scrub: 1,
+                  },
+                })
+                .to(sectionContent, { opacity: 1, y: 0, ease: "power1.inOut", duration: 2 })
+                .to(sectionContent, { opacity: 0, y: -30, ease: "power1.inOut", duration: 2 });
+            }
+          });
+          console.log(`GSAP: Setup animations for ${sections.length} sections.`);
+        } else {
+          // Optionally kill all ScrollTriggers if no sections are found (e.g., on non-homepage?)
+          // ScrollTrigger.getAll().forEach(trigger => trigger.kill());
+        }
+      }
+
+      // Run setup on initial load and after SPA navigations
+      document.addEventListener("astro:page-load", setupSectionAnimations);
     </script>
     <!-- System Theme Handling -->
     <script>
