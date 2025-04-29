@@ -298,11 +298,11 @@ const showScrollIndicator = currentPath === "/";
                     trigger: sectionTitle,
                     scroller: pageWrapper,
                     start: "top 85%",
-                    end: "bottom 5%",
+                    end: "bottom top",
                     scrub: 1,
                   },
                 })
-                .to(sectionTitle, { filter: "blur(0px)", opacity: 1, ease: "sine", duration: 2 })
+                .to(sectionTitle, { filter: "blur(0px)", opacity: 1, ease: "sine", duration: 8 })
                 .to(sectionTitle, { filter: "blur(8px)", opacity: 0, ease: "sine", duration: 1 });
             }
 
@@ -315,7 +315,7 @@ const showScrollIndicator = currentPath === "/";
                     trigger: sectionContent,
                     scroller: pageWrapper,
                     start: "top 85%",
-                    end: "bottom 25%",
+                    end: "bottom 30%",
                     scrub: 1,
                   },
                 })

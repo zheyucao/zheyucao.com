@@ -9,16 +9,7 @@ gsap.registerPlugin(ScrollTrigger);
 ---
 
 <section class="section-wrapper about-section">
-  {/* Title Slot */}
-  {
-    /* Expecting content like: <h2 slot="title" class="about-title scroll-target-title">Section Title</h2> */
-  }
   <slot name="title" />
-
-  {/* Default Content Slot */}
-  {
-    /* Expecting content like: <div class="about-content scroll-target-content">...paragraphs, lists, etc...</div> */
-  }
   <slot />
 </section>
 

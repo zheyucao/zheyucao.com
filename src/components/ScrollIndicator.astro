@@ -63,15 +63,16 @@
 <script>
   import { gsap } from "gsap";
   import { ScrollTrigger } from "gsap/ScrollTrigger";
+  import { ScrollToPlugin } from "gsap/ScrollToPlugin";
+
+  // Ensure plugin is registered
+  gsap.registerPlugin(ScrollTrigger, ScrollToPlugin);
 
   let indicatorScrubTrigger: ScrollTrigger | null = null;
   let indicatorCallbackTrigger: ScrollTrigger | null = null;
   let fadeInTimeout: ReturnType<typeof setTimeout> | null = null;
 
   function setupIndicatorAnimation() {
-    // Ensure plugin is registered
-    gsap.registerPlugin(ScrollTrigger);
-
     const indicator = document.querySelector("#scroll-indicator");
     const pageWrapper = document.querySelector(".page-wrapper");
 
@@ -160,20 +161,7 @@
 
       // --- Add Click Listener for Scrolling ---
       // Re-confirm indicator exists to satisfy potential linter issues
-      if (indicator) {
-        indicator.addEventListener("click", () => {
-          const currentOpacity = parseFloat(window.getComputedStyle(indicator).opacity);
-          if (currentOpacity > 0.1) {
-            window.scrollBy({
-              top: window.innerHeight,
-              left: 0,
-              behavior: "smooth",
-            });
-          }
-        });
-        console.log("Added click listener to scroll indicator");
-      }
-      // --- End Add Click Listener ---
+      // if (indicator) {\n      //   indicator.addEventListener(\"click\", () => {\n      //     const currentOpacity = parseFloat(window.getComputedStyle(indicator).opacity);\n      //     if (currentOpacity > 0.1) {\n      //       window.scrollBy({\n      //         top: window.innerHeight,\n      //         left: 0,\n      //         behavior: \"smooth\",\n      //       });\n      //     }\n      //   });\n      //   console.log(\"Added click listener to scroll indicator\");\n      // }\n      // --- End Add Click Listener ---\n    } else {\n      console.warn(\"Indicator animation setup skipped: elements not found.\");\n    }\n  }
     } else {
       console.warn("Indicator animation setup skipped: elements not found.");
     }
@@ -200,12 +188,11 @@
 
           if (currentOpacity > 0.1) {
             // Check opacity
-            console.log("[ClickScroll] Scrolling page wrapper..."); // Debug log
-            pageWrapper.scrollBy({
-              // Scroll the pageWrapper
-              top: pageWrapper.clientHeight, // Scroll by its own height
-              left: 0,
-              behavior: "smooth",
+            console.log("[ClickScroll] Scrolling page wrapper using GSAP..."); // Debug log
+            gsap.to(pageWrapper, {
+              duration: 0.8, // 滚动持续时间，可以调整
+              scrollTo: pageWrapper.scrollTop + pageWrapper.clientHeight, // 滚动到目标位置
+              ease: "power1.inOut", // 缓动函数，可以调整
             });
           } else {
             console.log("[ClickScroll] Scroll aborted due to low opacity."); // Debug log
