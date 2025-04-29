@@ -66,7 +66,7 @@ function formatEventDate(dateStr: string): string {
   }
 
   <div class="button-group">
-    <Button class="button" href={timelineUrl} text="View Full Timeline" wrapperClass="cta-link" />
+    <Button class="button" href={timelineUrl} text="View All Experiences" wrapperClass="cta-link" />
   </div>
 </div>
 
@@ -100,18 +100,19 @@ function formatEventDate(dateStr: string): string {
     display: block;
   }
 
-  .highlight-body {
+  .highlight-body p {
+    margin: 0;
   }
 
   .highlight-title {
-    font-size: 1.15rem;
+    font-size: 1.2rem;
     font-weight: 600;
     margin: 0 0 0.5rem 0;
     line-height: 1.5;
   }
 
   .highlight-summary,
-  .highlight-description :global(p) {
+  .highlight-description p {
     font-size: 1rem;
     color: var(--theme-text);
     margin: 0;
@@ -121,7 +122,7 @@ function formatEventDate(dateStr: string): string {
   .highlight-description {
     margin: 0;
   }
-  .highlight-description :global(ul) {
+  .highlight-description ul {
     padding-left: 1.2em;
     margin-top: 0.5em;
     list-style: disc;

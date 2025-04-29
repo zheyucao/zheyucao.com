@@ -20,6 +20,8 @@ export const allTimelineEvents: TimelineEventItem[] = [
     category: "Experiences",
     description: `<p>Completed a research internship at Westlake University NLP Lab, focusing on LLM prompting and reasoning under Prof. Yue Zhang.</p>`,
     isHighlight: true,
+    highlightSummary:
+      "Research internship at Westlake University NLP Lab, focusing on LLM prompting and reasoning under Prof. Yue Zhang.",
   },
   {
     date: "2024-06",
@@ -34,6 +36,7 @@ export const allTimelineEvents: TimelineEventItem[] = [
     category: "Experiences",
     isHighlight: true,
     description: `<p>Took on a leadership role for the Team V5++ of the NPU Soccer Robot Innovation Base, overseeing operations and technical direction.</p>`,
+    highlightSummary: "Became the leader of Team V5++ of NPU Soccer Robot Innovation Base.",
   },
   {
     date: "2023-05",
@@ -55,6 +58,7 @@ export const allTimelineEvents: TimelineEventItem[] = [
     category: "Honors",
     isHighlight: true,
     description: `<p>Awarded the prestigious China National Scholarship for academic excellence.</p>`,
+    highlightSummary: "Awarded the prestigious China National Scholarship for academic excellence.",
   },
   {
     date: "2024-11",

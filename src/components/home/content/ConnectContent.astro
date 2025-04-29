@@ -1,7 +1,10 @@
 ---
 // Content for the "Keep in touch" section
-const email = "zheyucao2004@gmail.com"; // Example
-const githubUrl = "https://github.com/zheyu-cao"; // Example
+import Button from "../../common/Button.astro"; // Import Button component
+import { Icon } from "astro-icon/components"; // Import Icon component
+
+const email = "zheyucao2004@gmail.com";
+const githubUrl = "https://github.com/zheyu-cao";
 const contactUrl = "/contact";
 ---
 
@@ -9,18 +12,73 @@ const contactUrl = "/contact";
 
 <div class="about-content scroll-target-content">
   <p>
-    {/* TODO: Add a short sentence inviting contact */}
-    Feel free to reach out or explore my profiles.
+    Pursuing a Master's in CS/AI, I'm eager to connect with professors and researchers about studies
+    or collaboration, and with recruiters about future opportunities.
   </p>
-  <div class="contact-links">
-    {/* TODO: Display primary contact methods */}
-    <a href={`mailto:${email}`}>Email</a>
-    <a href={githubUrl} target="_blank" rel="noopener noreferrer">GitHub</a>
-    {/* Add other key links if desired */}
+  <p>
+    Beyond that, I look forward to making friends from all walks of life. Please feel free to reach
+    out!
+  </p>
+
+  <div class="connect-icon-links">
+    <a href={`mailto:${email}`} title="Send me an email" aria-label="Email">
+      <Icon name="ri:mail-line" size={24} aria-hidden="true" />
+    </a>
+    <a
+      href={githubUrl}
+      target="_blank"
+      rel="noopener noreferrer"
+      title="View my GitHub profile"
+      aria-label="GitHub"
+    >
+      <Icon name="ri:github-line" size={22} aria-hidden="true" />
+    </a>
+    {/* Add other icons using Icon component here */}
   </div>
-  <a href={contactUrl} class="cta-link">See All Contact Info &rarr;</a>
-  {
-    /* Add specific styles for .contact-links, .cta-link here if needed,
-      or define them globally in SectionWrapper with :global() */
-  }
+
+  {/* Button for full contact page */}
+  <div class="button-group">
+    <Button class="button" href={contactUrl} text="See All Contact Info" wrapperClass="cta-link" />
+  </div>
 </div>
+
+<style>
+  p {
+    margin-bottom: 1.5rem; /* Space below intro text */
+    line-height: 1.7;
+    color: var(--theme-text);
+  }
+
+  .connect-icon-links {
+    display: flex;
+    align-items: center;
+    gap: 1.8rem; /* Generous spacing between icons */
+    margin-bottom: 2.5rem; /* Space below icons */
+  }
+
+  .connect-icon-links a {
+    color: var(--theme-icon-color); /* Use theme variable */
+    opacity: 0.8;
+    transition:
+      opacity 0.2s ease,
+      color 0.2s ease;
+    display: inline-block; /* Ensure proper spacing/alignment */
+  }
+
+  .connect-icon-links a:hover,
+  .connect-icon-links a:focus {
+    opacity: 1;
+    color: var(--theme-accent); /* Highlight with accent color */
+    outline: none;
+  }
+
+  /* Style for the button group containing the CTA button */
+  .button-group {
+    display: flex;
+    gap: 1rem;
+    margin-top: 1rem; /* Adjust spacing above button */
+  }
+
+  /* Remove styles specific to the old .cta-link if they exist */
+  /* .cta-link { ... } */
+</style>
