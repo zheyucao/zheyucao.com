@@ -7,15 +7,28 @@ import Footer from "../components/Footer.astro";
 // Define props interface and get the title prop
 interface Props {
   title?: string; // Optional title prop
+  showIndicatorOverride?: boolean; // Add override prop
 }
-const { title } = Astro.props;
+const { title, showIndicatorOverride } = Astro.props;
+
+// --- Add Detailed Log ---
+console.log(
+  `[Layout.astro] Rendering for path: "${Astro.url.pathname}". Received showIndicatorOverride: ${showIndicatorOverride} (Type: ${typeof showIndicatorOverride})`
+);
 
 // Set a default title if none is provided
 const pageTitle = `${title || "Homepage"} | Zheyu Cao`;
 
-// Determine if the scroll indicator should be shown (only on homepage)
+// Determine if the scroll indicator should be shown
 const currentPath = Astro.url.pathname;
-const showScrollIndicator = currentPath === "/";
+const shouldShowBasedOnPath = currentPath === "/";
+// Use override if provided, otherwise check path
+const showScrollIndicator =
+  showIndicatorOverride !== undefined ? showIndicatorOverride : shouldShowBasedOnPath;
+// --- Add Detailed Log ---
+console.log(
+  `[Layout.astro] Path check result: ${shouldShowBasedOnPath}. Final showScrollIndicator decision: ${showScrollIndicator}`
+);
 ---
 
 <!doctype html>

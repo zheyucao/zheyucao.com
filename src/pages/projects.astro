@@ -53,6 +53,89 @@ function slugify(text: string): string {
   </div>
 </SubPageLayout>
 
+<script>
+  import { gsap } from "gsap";
+  import { ScrollToPlugin } from "gsap/ScrollToPlugin";
+
+  gsap.registerPlugin(ScrollToPlugin);
+
+  function smoothScrollToTarget() {
+    console.log("[projects.astro] smoothScrollToTarget triggered.");
+    const params = new URLSearchParams(window.location.search);
+    const targetId = params.get("scrollTo");
+    console.log("[projects.astro] Target ID from URL:", targetId);
+
+    if (targetId) {
+      setTimeout(() => {
+        console.log("[projects.astro] Inside setTimeout. Attempting to find elements...");
+        const targetElement = document.getElementById(targetId);
+        const pageWrapperElement = document.querySelector(".page-wrapper") as HTMLElement | null;
+        console.log("[projects.astro] Found target element:", targetElement);
+        console.log("[projects.astro] Found page wrapper:", pageWrapperElement);
+
+        if (targetElement && pageWrapperElement) {
+          // Ensure both elements exist
+          console.log("[projects.astro] Both elements found. Calculating position...");
+          const header = document.querySelector("header");
+          const headerHeight = header ? header.offsetHeight : 0;
+          // Calculate the target scroll position *within* the pageWrapper
+          const targetOffsetTopInWrapper = targetElement.offsetTop;
+          const finalScrollPosition = targetOffsetTopInWrapper; // Offset relative to wrapper top
+
+          console.log(
+            `[projects.astro] Target offsetTop: ${targetOffsetTopInWrapper}, Final scroll position: ${finalScrollPosition}`
+          );
+
+          console.log("[projects.astro] Initiating GSAP scroll on .page-wrapper...");
+          gsap.to(pageWrapperElement, {
+            // Target the page wrapper
+            duration: 1,
+            scrollTo: {
+              y: finalScrollPosition, // Scroll the wrapper to this position
+              // autoKill: false // Might sometimes help if other triggers interfere, but let's omit for now
+            },
+            ease: "power4.out",
+            onComplete: () => {
+              console.log("[projects.astro] GSAP scroll completed.");
+            }, // Log completion
+            onStart: () => {
+              console.log("[projects.astro] GSAP scroll started.");
+            }, // Log start
+            onInterrupt: () => {
+              console.log("[projects.astro] GSAP scroll interrupted!");
+            }, // Log interruption
+          });
+
+          // Clean URL immediately
+          try {
+            history.replaceState(null, "", window.location.pathname);
+          } catch (e) {
+            console.error("Could not clean URL state:", e);
+          }
+        } else {
+          if (!targetElement)
+            console.warn(`[projects.astro] Element with id "${targetId}" not found.`);
+          if (!pageWrapperElement)
+            console.warn(`[projects.astro] .page-wrapper element not found.`);
+          // Clean URL even if target not found
+          try {
+            history.replaceState(null, "", window.location.pathname);
+          } catch {
+            // Intentionally ignore errors during this specific cleanup attempt
+          }
+        }
+      }, 100); // Keep a small delay (adjust if necessary)
+    } else {
+      console.log("[projects.astro] No 'scrollTo' parameter found.");
+    }
+  }
+
+  document.addEventListener("astro:page-load", smoothScrollToTarget);
+
+  // Optional: Run on initial load if needed, test if astro:page-load is sufficient
+  // smoothScrollToTarget();
+</script>
+
 <style>
   .page-intro {
     font-size: 1.2rem;

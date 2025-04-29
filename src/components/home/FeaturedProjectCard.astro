@@ -21,8 +21,8 @@ const {
 
 const githubUrl = undefined;
 
-// Construct the URL with anchor link
-const projectUrl = `/projects#${slug}`;
+// Construct URL with query parameter instead of hash
+const projectUrl = `/projects?scrollTo=${slug}`;
 ---
 
 <a href={projectUrl} class="featured-project-card">
