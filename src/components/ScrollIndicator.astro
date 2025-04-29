@@ -190,9 +190,9 @@
             // Check opacity
             console.log("[ClickScroll] Scrolling page wrapper using GSAP..."); // Debug log
             gsap.to(pageWrapper, {
-              duration: 0.8, // 滚动持续时间，可以调整
+              duration: 3.6, // 滚动持续时间，可以调整
               scrollTo: pageWrapper.scrollTop + pageWrapper.clientHeight, // 滚动到目标位置
-              ease: "power1.inOut", // 缓动函数，可以调整
+              ease: "power4.out", // 缓动函数，可以调整
             });
           } else {
             console.log("[ClickScroll] Scroll aborted due to low opacity."); // Debug log
