@@ -76,8 +76,6 @@ function slugify(text: string): string {
         if (targetElement && pageWrapperElement) {
           // Ensure both elements exist
           console.log("[projects.astro] Both elements found. Calculating position...");
-          const header = document.querySelector("header");
-          const headerHeight = header ? header.offsetHeight : 0;
           // Calculate the target scroll position *within* the pageWrapper
           const targetOffsetTopInWrapper = targetElement.offsetTop;
           const finalScrollPosition = targetOffsetTopInWrapper; // Offset relative to wrapper top
