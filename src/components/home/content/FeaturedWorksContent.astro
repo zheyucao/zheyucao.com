@@ -1,65 +1,72 @@
 ---
 // Content for the "Featured Works" section
-import { allProjectsData, type ProjectDataItem } from "../../../data/projectsData"; // Adjusted path, import type
+import { allProjectsData, type ProjectDataItem } from "../../../data/projectsData";
+import FeaturedProjectCard from "../FeaturedProjectCard.astro"; // Import the new card component
+import Button from "../../common/Button.astro";
 
-// Simple selection: take the first 3 projects.
-// TODO: Implement better selection logic later (e.g., based on an `isFeatured: true` flag you add to the data)
-const featuredProjects: ProjectDataItem[] = allProjectsData.slice(0, 3);
-
+// Filter projects marked as featured
+const featuredProjects: ProjectDataItem[] = allProjectsData.filter((project) => project.isFeatured);
 const projectsUrl = "/projects";
 
-// Helper to generate refined summaries for the homepage
-function getHomepageSummary(project: ProjectDataItem): string {
-  switch (project.title) {
-    case "uniOS":
-      return "An operating system pilot course project focused on core kernel concepts. Co-developed the graphics system, implementing features like alpha blending and a basic GUI toolkit.";
-    case "zheyucao.com (This Website)":
-      return "This personal portfolio site, built with Astro and TypeScript. Features responsive design, smooth transitions, and showcases my projects, timeline, and resume.";
-    case "Angine Sans":
-      return "An open-source sans-serif typeface derived from Noto Sans, designed for personal branding and shared under the SIL Open Font License.";
-    default:
-      // Fallback: extract first paragraph
-      return (
-        project.description?.split("</p>")[0].replace("<p>", "").trim() || "No summary available."
-      );
-  }
+// Simple slugify function (consider a more robust library for complex cases)
+function slugify(text: string): string {
+  return text
+    .toString()
+    .toLowerCase()
+    .replace(/\s+/g, "-") // Replace spaces with -
+    .replace(/[^\w-]+/g, "") // Remove all non-word chars (removed \ before -)
+    .replace(/--+/g, "-") // Replace multiple - with single - (removed \ before -)
+    .replace(/^-+/, "") // Trim - from start of text
+    .replace(/-+$/, ""); // Trim - from end of text
 }
 ---
 
 <h2 slot="title" class="about-title scroll-target-title">Featured Works</h2>
 
-<div class="about-content scroll-target-content">
-  <ul class="featured-works-list">
-    {
-      featuredProjects.map((project) => (
-        <li class="featured-work-item">
-          <h3>{project.title}</h3>
-          {/* Use the helper function to get refined summary */}
-          <p class="work-description">{getHomepageSummary(project)}</p>
-          {project.techStack && (
-            <p class="tech-stack">
-              <em>Tech Stack: {project.techStack.join(", ")}</em>
-            </p>
-          )}
-          <div class="work-links">
-            {project.githubUrl && (
-              <a href={project.githubUrl} target="_blank" rel="noopener noreferrer">
-                GitHub
-              </a>
-            )}
-            {project.projectUrl && (
-              <a href={project.projectUrl} target="_blank" rel="noopener noreferrer">
-                Live Demo
-              </a>
-            )}
-          </div>
-        </li>
-      ))
-    }
-  </ul>
-  <a href={projectsUrl} class="cta-link">View All Projects &rarr;</a>
+<div class="about-content scroll-target-content featured-works-container">
   {
-    /* Add specific styles for .featured-works-list, .featured-work-item, etc. here if needed,
-      or define them globally in SectionWrapper with :global() */
+    featuredProjects.map((project) => {
+      const slug = slugify(project.title);
+      return (
+        <FeaturedProjectCard
+          title={project.title}
+          homepageSummary={project.homepageSummary}
+          imageAlt={project.imageAlt}
+          githubUrl={project.githubUrl}
+          slug={slug}
+        />
+      );
+    })
   }
+
+  <div class="button-group">
+    <Button
+      class="button"
+      href={projectsUrl}
+      text="View All Projects"
+      wrapperClass="projects-cta-button"
+    />
+  </div>
 </div>
+
+<style>
+  .featured-works-container {
+    display: grid;
+    grid-template-columns: 1fr; /* Default: 1 column */
+    gap: 2rem; /* Spacing between cards (vertical and horizontal in grid) */
+  }
+
+  /* Apply 2-column layout on wider screens */
+  @media (min-width: 696px) {
+    /* Adjust breakpoint as needed (e.g., 992px for larger screens) */
+    .featured-works-container {
+      width: 100%;
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+  .button-group {
+    display: flex;
+    gap: 1rem; /* Adjust spacing as needed */
+    margin-top: 4rem;
+  }
+</style>

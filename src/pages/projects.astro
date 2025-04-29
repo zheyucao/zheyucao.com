@@ -9,6 +9,18 @@ const projects = allProjectsData;
 
 // Remove inline data definition
 // const projects = [ ... ];
+
+// Copied slugify function from FeaturedWorksContent.astro
+function slugify(text: string): string {
+  return text
+    .toString()
+    .toLowerCase()
+    .replace(/\s+/g, "-")
+    .replace(/[^\w-]+/g, "")
+    .replace(/--+/g, "-")
+    .replace(/^-+/, "")
+    .replace(/-+$/, "");
+}
 ---
 
 <SubPageLayout title="Projects">
@@ -18,21 +30,25 @@ const projects = allProjectsData;
   </p>
   <div class="projects-grid">
     {
-      projects.map((project) => (
-        <ProjectCard
-          title={project.title}
-          timeframe={project.timeframe}
-          imageSrc={project.imageSrc}
-          imageAlt={project.imageAlt}
-          githubUrl={project.githubUrl}
-          projectUrl={project.projectUrl}
-          githubRepos={project.githubRepos}
-          techStack={project.techStack}
-        >
-          {/* Use set:html directly on a div or similar inside the slot */}
-          <div set:html={project.description} />
-        </ProjectCard>
-      ))
+      projects.map((project) => {
+        const slug = slugify(project.title); // Generate slug
+        return (
+          <ProjectCard
+            id={slug}
+            title={project.title}
+            timeframe={project.timeframe}
+            imageSrc={project.imageSrc}
+            imageAlt={project.imageAlt}
+            githubUrl={project.githubUrl}
+            projectUrl={project.projectUrl}
+            githubRepos={project.githubRepos}
+            techStack={project.techStack}
+          >
+            {/* Use set:html directly on a div or similar inside the slot */}
+            <div set:html={project.description} />
+          </ProjectCard>
+        );
+      })
     }
   </div>
 </SubPageLayout>

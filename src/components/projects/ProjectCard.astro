@@ -2,6 +2,7 @@
 import { Icon } from "astro-icon/components";
 
 interface Props {
+  id?: string;
   title: string;
   imageSrc?: string;
   imageAlt?: string;
@@ -13,6 +14,7 @@ interface Props {
 }
 
 const {
+  id,
   title,
   imageSrc,
   imageAlt = "Project thumbnail", // Default alt text
@@ -24,7 +26,7 @@ const {
 } = Astro.props;
 ---
 
-<article class="project-card">
+<article id={id} class="project-card">
   {
     imageSrc && (
       <div class="project-image-wrapper">

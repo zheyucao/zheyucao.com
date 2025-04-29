@@ -9,8 +9,11 @@ export interface ProjectDataItem {
   techStack?: string[];
   imageSrc?: string;
   imageAlt?: string;
+  thumbnailSrc?: string; // Optional: Path to a square thumbnail image
   // blurhash?: string; // Add back if re-implementing blurhash
   description: string; // HTML string
+  homepageSummary?: string; // Concise summary for homepage
+  isFeatured?: boolean; // Flag for featuring on homepage
 }
 
 // Example data (replace with your actual data later)
@@ -22,6 +25,7 @@ export const allProjectsData: ProjectDataItem[] = [
     techStack: ["C", "Assembly", "QEMU", "Makefile"], // Core techs for OS dev
     imageSrc: "/images/projects/unios.png",
     imageAlt: "Screenshot of the uniOS project",
+    // thumbnailSrc: "/images/projects/unios-thumb.png", // Example path - provide actual square thumbnail later
     description: `
         <p>An operating system pilot course project focused on core kernel concepts through independently completed labs.</p>
         <p>Key kernel development labs included:</p>
@@ -38,9 +42,11 @@ export const allProjectsData: ProjectDataItem[] = [
           <li>Designed and built a foundational window manager and GUI toolkit.</li>
         </ul>
       `,
+    isFeatured: true,
+    homepageSummary: "A simple Operating System made from scratch in C and Assembly.",
   },
   {
-    title: "zheyucao.com (This Website)",
+    title: "zheyucao.com",
     timeframe: "April 2025",
     githubUrl: "https://github.com/zheyu-cao/zheyucao.com",
     projectUrl: "https://zheyucao.com",
@@ -51,6 +57,8 @@ export const allProjectsData: ProjectDataItem[] = [
         <p>My personal portfolio site, designed and built from scratch using Astro.</p>
         <p>Features dynamic background effects, responsive design, smooth transitions, and content showcasing timeline, projects, and resume.</p>
       `, // More concise description
+    isFeatured: true,
+    homepageSummary: "My personal portfolio website you're currently viewing, built with Astro.",
   },
   {
     title: "Angine Sans",
@@ -62,6 +70,9 @@ export const allProjectsData: ProjectDataItem[] = [
           <p>An open-source custom sans-serif typeface derived from Noto Sans.</p>
           <p>Designed initially for personal use and branding, and shared under the SIL Open Font License 1.1.</p>
       `,
+    isFeatured: true,
+    homepageSummary:
+      "A sans-serif typeface derived from Noto Sans, designed for personal branding.",
   },
   {
     title: "Tooi Programming Language",
@@ -81,6 +92,9 @@ export const allProjectsData: ProjectDataItem[] = [
         </ul>
         <p>Parser development is in progress, with plans for a semantic analyzer, interpreter, and standard library.</p>
       `,
+    isFeatured: true,
+    homepageSummary:
+      "A toy programming language & its interpreter, currently under early development.",
   },
   {
     title: "v5Embark",

@@ -6,6 +6,8 @@ export interface TimelineEventItem {
   title: string;
   category: "Experiences" | "Honors";
   description?: string; // HTML string
+  isHighlight?: boolean;
+  highlightSummary?: string;
 }
 
 export const allTimelineEvents: TimelineEventItem[] = [
@@ -17,6 +19,7 @@ export const allTimelineEvents: TimelineEventItem[] = [
     title: "NLP Research Internship",
     category: "Experiences",
     description: `<p>Completed a research internship at Westlake University NLP Lab, focusing on LLM prompting and reasoning under Prof. Yue Zhang.</p>`,
+    isHighlight: true,
   },
   {
     date: "2024-06",
@@ -29,6 +32,7 @@ export const allTimelineEvents: TimelineEventItem[] = [
     date: "2024-08",
     title: "Team V5++ Leader",
     category: "Experiences",
+    isHighlight: true,
     description: `<p>Took on a leadership role for the Team V5++ of the NPU Soccer Robot Innovation Base, overseeing operations and technical direction.</p>`,
   },
   {
@@ -49,6 +53,7 @@ export const allTimelineEvents: TimelineEventItem[] = [
     date: "2024-11",
     title: "China National Scholarship",
     category: "Honors",
+    isHighlight: true,
     description: `<p>Awarded the prestigious China National Scholarship for academic excellence.</p>`,
   },
   {

@@ -1,20 +1,36 @@
 ---
 // Content for the "Highlights & Updates" section
-import { allTimelineEvents } from "../../../data/timelineEvents"; // Adjusted path
+import { allTimelineEvents, type TimelineEventItem } from "../../../data/timelineEvents";
+import Button from "../../common/Button.astro";
+const numberOfHighlightsToShow = 3; // Max number of highlights to show
 
-// TODO: Logic to select 2-3 most recent or important highlights
-const highlights = allTimelineEvents.slice(0, 3);
+// 1. Filter events marked as highlights
+const allHighlights: TimelineEventItem[] = allTimelineEvents.filter((event) => event.isHighlight);
+
+// 2. Sort highlights by date descending (latest first)
+//    Using getTime() for robust comparison
+allHighlights.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+
+// 3. Slice to get the latest N highlights
+const highlightsToShow: TimelineEventItem[] = allHighlights.slice(0, numberOfHighlightsToShow);
+
 const timelineUrl = "/timeline";
 
-function formatEventDate(dateStr) {
+// Improved date formatting function (example)
+function formatEventDate(dateStr: string): string {
   if (!dateStr) return "";
   try {
-    const [year, month] = dateStr.split("-");
-    const date = new Date(parseInt(year), parseInt(month) - 1);
-    return date.toLocaleDateString("en-US", { year: "numeric", month: "short" });
+    // Parse YYYY-MM. Assumes UTC for consistency if timezone matters.
+    const [year, month] = dateStr.split("-").map(Number);
+    const date = new Date(Date.UTC(year, month - 1)); // Use UTC
+    return date.toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "long",
+      timeZone: "UTC", // Specify timezone for consistent output
+    });
   } catch (e) {
-    console.error("Error parsing date:", e);
-    return dateStr;
+    console.error(`Error parsing date string "${dateStr}":`, e);
+    return dateStr; // Fallback to original string on error
   }
 }
 ---
@@ -22,19 +38,114 @@ function formatEventDate(dateStr) {
 <h2 slot="title" class="about-title scroll-target-title">Highlights & Updates</h2>
 
 <div class="about-content scroll-target-content">
-  <ul class="highlights-list">
-    {
-      highlights.map((event) => (
-        <li class="highlight-item">
-          <span class="highlight-date">{formatEventDate(event.date)}:</span>
-          <span class="highlight-title">{event.title}</span>
-        </li>
-      ))
-    }
-  </ul>
-  <a href={timelineUrl} class="cta-link">View Full Timeline &rarr;</a>
   {
-    /* Add specific styles for .highlights-list, .highlight-item, etc. here if needed,
-      or define them globally in SectionWrapper with :global() */
+    highlightsToShow.length > 0 ? (
+      <ul class="highlights-list-enhanced">
+        {highlightsToShow.map((event) => (
+          <li class="highlight-item-enhanced">
+            <div class="highlight-meta">
+              <time datetime={event.date} class="highlight-date">
+                {formatEventDate(event.date)}
+              </time>
+            </div>
+            <div class="highlight-body">
+              <h4 class="highlight-title">{event.title}</h4>
+              {/* Use highlightSummary if available, fallback to description */}
+              {event.highlightSummary ? (
+                <p class="highlight-summary">{event.highlightSummary}</p>
+              ) : event.description ? (
+                <div class="highlight-description" set:html={event.description} />
+              ) : null}
+            </div>
+          </li>
+        ))}
+      </ul>
+    ) : (
+      <p>No recent highlights available. Check back soon!</p> // Fallback message
+    )
   }
+
+  <div class="button-group">
+    <Button class="button" href={timelineUrl} text="View Full Timeline" wrapperClass="cta-link" />
+  </div>
 </div>
+
+<style>
+  .highlights-list-enhanced {
+    list-style: none;
+    padding-left: 0;
+    margin-top: 0; /* Remove potential default margin */
+  }
+
+  .highlight-item-enhanced {
+    margin-bottom: 2.5rem;
+    padding-bottom: 2.5rem;
+    border-bottom: 1px solid var(--theme-divider-color);
+  }
+
+  .highlight-item-enhanced:last-child {
+    margin-bottom: 0;
+    padding-bottom: 0;
+    border-bottom: none;
+  }
+
+  .highlight-meta {
+    margin-bottom: 0.5rem;
+  }
+
+  .highlight-date {
+    font-family: var(--font-family-sans);
+    font-size: 0.9rem;
+    line-height: 1.6;
+    display: block;
+  }
+
+  .highlight-body {
+  }
+
+  .highlight-title {
+    font-size: 1.15rem;
+    font-weight: 600;
+    margin: 0 0 0.5rem 0;
+    line-height: 1.5;
+  }
+
+  .highlight-summary,
+  .highlight-description :global(p) {
+    font-size: 1rem;
+    color: var(--theme-text);
+    margin: 0;
+    line-height: 1.7;
+  }
+
+  .highlight-description {
+    margin: 0;
+  }
+  .highlight-description :global(ul) {
+    padding-left: 1.2em;
+    margin-top: 0.5em;
+    list-style: disc;
+  }
+  .button-group {
+    display: flex;
+    gap: 1rem;
+    margin-top: 4rem;
+  }
+
+  /* --- Responsive layout for wider screens --- */
+  @media (min-width: 640px) {
+    .highlight-item-enhanced {
+      display: flex;
+      gap: 1.5rem;
+    }
+
+    .highlight-meta {
+      flex: 0 0 80px;
+      margin-bottom: 0;
+    }
+
+    .highlight-body {
+      flex: 1 1 auto;
+    }
+  }
+</style>
