@@ -52,7 +52,7 @@ function formatEventDate(dateStr: string): string {
               <h4 class="highlight-title">{event.title}</h4>
               {/* Use highlightSummary if available, fallback to description */}
               {event.highlightSummary ? (
-                <p class="highlight-summary">{event.highlightSummary}</p>
+                <p class="highlight-summary" set:html={event.highlightSummary} />
               ) : event.description ? (
                 <div class="highlight-description" set:html={event.description} />
               ) : null}

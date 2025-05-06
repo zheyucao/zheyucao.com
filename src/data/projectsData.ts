@@ -43,7 +43,8 @@ export const allProjectsData: ProjectDataItem[] = [
         </ul>
       `,
     isFeatured: true,
-    homepageSummary: "A simple Operating System made from scratch in C and Assembly.",
+    homepageSummary:
+      "A simple <strong>Operating System</strong> made from scratch in <em>C</em> and <em>Assembly</em>.",
   },
   {
     title: "zheyucao.com",
@@ -58,7 +59,8 @@ export const allProjectsData: ProjectDataItem[] = [
         <p>Features dynamic background effects, responsive design, smooth transitions, and content showcasing timeline, projects, and resume.</p>
       `, // More concise description
     isFeatured: true,
-    homepageSummary: "My personal portfolio website you're currently viewing, built with Astro.",
+    homepageSummary:
+      "My personal <strong>portfolio website</strong> you're currently viewing, built with <em>Astro</em>.",
   },
   {
     title: "Angine Sans",
@@ -67,12 +69,12 @@ export const allProjectsData: ProjectDataItem[] = [
     imageSrc: "/images/projects/angine_sans.png",
     imageAlt: "Angine Sans",
     description: `
-          <p>An open-source custom sans-serif typeface derived from Noto Sans.</p>
+          <p>An open-source <strong>sans-serif typeface</strong> derived from Noto Sans.</p>
           <p>Designed initially for personal use and branding, and shared under the SIL Open Font License 1.1.</p>
       `,
     isFeatured: true,
     homepageSummary:
-      "A sans-serif typeface derived from Noto Sans, designed for personal branding.",
+      "A <strong>sans-serif typeface</strong> derived from Noto Sans, designed for personal branding.",
   },
   {
     title: "Tooi Programming Language",
@@ -94,7 +96,7 @@ export const allProjectsData: ProjectDataItem[] = [
       `,
     isFeatured: true,
     homepageSummary:
-      "A toy programming language & its interpreter, currently under early development.",
+      "A toy <strong>programming language</strong> & its <strong>interpreter</strong>, currently under early development.",
   },
   {
     title: "v5Embark",

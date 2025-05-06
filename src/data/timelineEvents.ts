@@ -18,10 +18,9 @@ export const allTimelineEvents: TimelineEventItem[] = [
     dateRange: "July 2024 – September 2024",
     title: "NLP Research Internship",
     category: "Experiences",
-    description: `<p>Completed a research internship at Westlake University NLP Lab, focusing on LLM prompting and reasoning under Prof. Yue Zhang.</p>`,
+    description: `<p>Completed a research internship at Westlake University NLP Lab, focusing on LLM prompting and reasoning under <a href="https://frcchang.github.io/" target="_blank">Prof. Yue Zhang</a>.</p>`,
     isHighlight: true,
-    highlightSummary:
-      "Research internship at Westlake University NLP Lab, focusing on LLM prompting and reasoning under Prof. Yue Zhang.",
+    highlightSummary: `Research internship at <strong>Westlake University NLP Lab</strong>, focusing on <em>LLM prompting</em> and <em>reasoning</em> under <a href="https://frcchang.github.io/" target="_blank">Prof. Yue Zhang</a>.`,
   },
   {
     date: "2024-06",
@@ -36,13 +35,14 @@ export const allTimelineEvents: TimelineEventItem[] = [
     category: "Experiences",
     isHighlight: true,
     description: `<p>Took on a leadership role for the Team V5++ of the NPU Soccer Robot Innovation Base, overseeing operations and technical direction.</p>`,
-    highlightSummary: "Became the leader of Team V5++ of NPU Soccer Robot Innovation Base.",
+    highlightSummary:
+      "Became the <strong>leader</strong> of <em>Team V5++</em> of NPU Soccer Robot Innovation Base.",
   },
   {
     date: "2023-05",
     title: "Joined Team V5++",
     category: "Experiences",
-    description: `<p>Joined the Team V5++ of the NPU Soccer Robot Innovation Base, focusing on Robotic Vision.</p>`,
+    description: `<p>Joined the <strong>Team V5++</strong> of the NPU Soccer Robot Innovation Base, focusing on <em>Robotic Vision</em>.</p>`,
   },
   {
     date: "2022-09",
@@ -58,7 +58,8 @@ export const allTimelineEvents: TimelineEventItem[] = [
     category: "Honors",
     isHighlight: true,
     description: `<p>Awarded the prestigious China National Scholarship for academic excellence.</p>`,
-    highlightSummary: "Awarded the prestigious China National Scholarship for academic excellence.",
+    highlightSummary:
+      "Awarded the prestigious <strong>China National Scholarship</strong> for academic excellence.",
   },
   {
     date: "2024-11",

@@ -28,7 +28,7 @@ const projectUrl = `/projects?scrollTo=${slug}`;
 <a href={projectUrl} class="featured-project-card">
   <div class="card-content-wrapper">
     <h4>{title}</h4>
-    <p class="summary">{homepageSummary}</p>
+    <p class="summary" set:html={homepageSummary} />
     {
       githubUrl && (
         <div class="github-icon-link-wrapper" aria-hidden="true">
