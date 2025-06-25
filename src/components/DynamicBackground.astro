@@ -78,6 +78,23 @@
     const offsetLerpFactor = 0.05;
     const offsetScale = -0.03;
 
+    // --- Cached container dimensions ---
+    let cachedContainerRect = { width: 0, height: 0, left: 0, top: 0 };
+    let needsRectUpdate = true;
+
+    function updateCachedRect() {
+      if (svgContainer && needsRectUpdate) {
+        const rect = svgContainer.getBoundingClientRect();
+        cachedContainerRect = {
+          width: rect.width,
+          height: rect.height,
+          left: rect.left,
+          top: rect.top,
+        };
+        needsRectUpdate = false;
+      }
+    }
+
     // --- FPS Monitoring & Performance Adjustment ---
     const initialLevel = isMobileDevice ? 1 : 3; // Mobile starts at lowest, others default to Medium
     let currentPerformanceLevel = initialLevel;
@@ -414,6 +431,11 @@
           // Increment deformation time
           this.deformationTime += 1;
 
+          // Cache previous position and angle for comparison
+          const prevX = this.position.x;
+          const prevY = this.position.y;
+          const prevAngle = this.angle;
+
           // Only recalculate points and path if shape changing is enabled
           if (config.enableShapeChanging) {
             const currentPoints: Vector[] = [];
@@ -451,11 +473,14 @@
           if (config.enableMouseInteraction && mousePos) {
             const dx = this.position.x - mousePos.x;
             const dy = this.position.y - mousePos.y;
-            const dist = Math.sqrt(dx * dx + dy * dy);
+            const distSquared = dx * dx + dy * dy;
 
             // Use a slightly larger radius for interaction check
             const influenceDist = config.mouseInfluenceRadius + this.radius * 1.2;
-            if (dist < influenceDist) {
+            const influenceDistSquared = influenceDist * influenceDist;
+
+            if (distSquared < influenceDistSquared && distSquared > 0) {
+              const dist = Math.sqrt(distSquared); // Only calculate sqrt when interaction is active
               // Modify force calculation for stronger effect when closer
               const force = ((influenceDist - dist) / influenceDist) ** 1.5; // Added exponent
               const angle = Math.atan2(dy, dx);
@@ -485,10 +510,12 @@
 
               const dx = otherBlob.position.x - this.position.x;
               const dy = otherBlob.position.y - this.position.y;
-              const dist = Math.sqrt(dx * dx + dy * dy);
+              const distSquared = dx * dx + dy * dy; // Use squared distance to avoid sqrt
               const minDist = (this.radius + otherBlob.radius) * 0.5; // Allow some overlap
+              const minDistSquared = minDist * minDist;
 
-              if (dist < minDist) {
+              if (distSquared < minDistSquared && distSquared > 0) {
+                const dist = Math.sqrt(distSquared); // Only calculate sqrt when collision detected
                 const overlap = minDist - dist;
                 const angle = Math.atan2(dy, dx);
                 // Calculate push force - stronger for more overlap
@@ -543,7 +570,12 @@
             Math.abs(this.velocity.y) < staticThreshold &&
             Math.abs(this.angularVelocity) < staticThreshold;
 
-          if (!isStatic) {
+          // Only update transform if position or angle changed significantly
+          const positionChanged =
+            Math.abs(this.position.x - prevX) > 0.1 || Math.abs(this.position.y - prevY) > 0.1;
+          const angleChanged = Math.abs(this.angle - prevAngle) > 0.01;
+
+          if (!isStatic && (positionChanged || angleChanged)) {
             this.pathElement.setAttribute(
               "transform",
               `translate(${this.position.x}, ${this.position.y}) rotate(${this.angle})`
@@ -632,8 +664,9 @@
       }
 
       // --- Existing Animation Logic ---
-      const { width: containerWidth, height: containerHeight } =
-        svgContainer!.getBoundingClientRect();
+      updateCachedRect(); // Ensure we have current dimensions
+      const containerWidth = cachedContainerRect.width;
+      const containerHeight = cachedContainerRect.height;
 
       // Update Background Offset
       if (svgGroup) {
@@ -648,7 +681,11 @@
 
     // --- Event Listeners ---
     let mouseThrottleTimeout: number | null = null;
-    const mouseThrottleDelay = 16; // ~60FPS (1000ms/60fps ≈ 16.67ms)
+
+    // Add resize event listener to invalidate cached rect
+    window.addEventListener("resize", () => {
+      needsRectUpdate = true;
+    });
 
     window.addEventListener("mousemove", (event) => {
       if (config.enableMouseInteraction) {
@@ -659,14 +696,14 @@
 
         // Throttle mouse position updates
         mouseThrottleTimeout = requestAnimationFrame(() => {
-          const rect = svgContainer!.getBoundingClientRect();
+          updateCachedRect(); // Update cached rect if needed
           const mouseX = event.clientX;
           const mouseY = event.clientY;
 
-          // Update individual blob interaction position
+          // Update individual blob interaction position using cached rect
           mousePos = {
-            x: mouseX - rect.left,
-            y: mouseY - rect.top,
+            x: mouseX - cachedContainerRect.left,
+            y: mouseY - cachedContainerRect.top,
           };
 
           // Update target offset for background movement
@@ -689,6 +726,21 @@
     // --- Start --- Initialization and start animation ---
     initBlobs();
     requestAnimationFrame(animate); // Initial call to start the loop
+
+    // --- Cleanup function to prevent memory leaks ---
+    function cleanup() {
+      if (mouseThrottleTimeout) {
+        cancelAnimationFrame(mouseThrottleTimeout);
+        mouseThrottleTimeout = null;
+      }
+      // Clear blobs array
+      blobs.length = 0;
+      mousePos = null;
+    }
+
+    // Cleanup on page unload (Astro's view transitions)
+    document.addEventListener("astro:before-preparation", cleanup);
+    document.addEventListener("beforeunload", cleanup);
   } else {
     console.error("Dynamic background SVG container not found.");
   }
