@@ -647,23 +647,34 @@
     }
 
     // --- Event Listeners ---
+    let mouseThrottleTimeout: number | null = null;
+    const mouseThrottleDelay = 16; // ~60FPS (1000ms/60fps ≈ 16.67ms)
+
     window.addEventListener("mousemove", (event) => {
       if (config.enableMouseInteraction) {
-        const rect = svgContainer!.getBoundingClientRect();
-        const mouseX = event.clientX;
-        const mouseY = event.clientY;
+        // Cancel previous throttled call if exists
+        if (mouseThrottleTimeout) {
+          cancelAnimationFrame(mouseThrottleTimeout);
+        }
 
-        // Update individual blob interaction position
-        mousePos = {
-          x: mouseX - rect.left,
-          y: mouseY - rect.top,
-        };
+        // Throttle mouse position updates
+        mouseThrottleTimeout = requestAnimationFrame(() => {
+          const rect = svgContainer!.getBoundingClientRect();
+          const mouseX = event.clientX;
+          const mouseY = event.clientY;
 
-        // Update target offset for background movement
-        const centerX = window.innerWidth / 2;
-        const centerY = window.innerHeight / 2;
-        targetOffset.x = (mouseX - centerX) * offsetScale;
-        targetOffset.y = (mouseY - centerY) * offsetScale;
+          // Update individual blob interaction position
+          mousePos = {
+            x: mouseX - rect.left,
+            y: mouseY - rect.top,
+          };
+
+          // Update target offset for background movement
+          const centerX = window.innerWidth / 2;
+          const centerY = window.innerHeight / 2;
+          targetOffset.x = (mouseX - centerX) * offsetScale;
+          targetOffset.y = (mouseY - centerY) * offsetScale;
+        });
       }
     });
 
