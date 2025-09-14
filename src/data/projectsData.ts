@@ -49,7 +49,7 @@ export const allProjectsData: ProjectDataItem[] = [
   {
     title: "zheyucao.com",
     timeframe: "April 2025",
-    githubUrl: "https://github.com/zheyu-cao/zheyucao.com",
+    githubUrl: "https://github.com/zheyucao/zheyucao.com",
     projectUrl: "https://zheyucao.com",
     techStack: ["Astro", "TypeScript"], // Core framework, lang, animation lib
     imageSrc: "/images/projects/portfolio.png", // Placeholder path
