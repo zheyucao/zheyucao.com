@@ -13,6 +13,15 @@ export interface TimelineEventItem {
 export const allTimelineEvents: TimelineEventItem[] = [
   // Experiences (Sorted by end date implicitly for data entry)
 
+{
+    date: "2025-10",
+    dateRange: "October 2025 – Present",
+    title: "Embodied AI Research Internship",
+    category: "Experiences",
+    description: `<p>Research internship at Institute of Artificial Intelligence, China Telecom (TeleAI) focusing on embodied AI.</p>`,
+    isHighlight: true,
+    highlightSummary: `Research internship at <strong>TeleAI</strong> focusing on <em>embodied AI</em>.`,
+  },
   {
     date: "2024-09",
     dateRange: "July 2024 – September 2024",
