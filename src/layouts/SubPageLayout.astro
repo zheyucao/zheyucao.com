@@ -12,11 +12,16 @@ const { title } = Astro.props;
 <Layout title={title} showIndicatorOverride={false}>
   <main class="subpage-main">
     <div class="subpage-header">
-      <span class="back-link-wrapper page-load-initial-state">
-        <a href="/" class="back-link">
-          <Icon name="ri:arrow-left-line" class="back-link-icon" />
-        </a>
-      </span>
+      <div class="header-actions-wrapper">
+        <span class="back-link-wrapper page-load-initial-state">
+          <a href="/" class="back-link">
+            <Icon name="ri:arrow-left-line" class="back-link-icon" />
+          </a>
+        </span>
+        <div class="page-actions page-load-initial-state">
+          <slot name="actions" />
+        </div>
+      </div>
       <h1 class="subpage-title page-load-initial-state">{title}</h1>
     </div>
     <div class="subpage-content page-load-initial-state">
@@ -36,6 +41,12 @@ const { title } = Astro.props;
     margin-bottom: 3rem;
     padding-bottom: 1rem;
   }
+  .header-actions-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+  }
   .back-link-wrapper {
     display: flex; /* Change from block to flex */
     align-items: center; /* Vertically center */
@@ -44,10 +55,15 @@ const { title } = Astro.props;
     width: 2.4rem;
     border-radius: 8px;
     border: 1px solid var(--button-border-color);
-    margin-bottom: 1.5rem;
+    /* margin-bottom removed as it's handled by wrapper */
     transition:
       border-color 0.2s ease,
       background-color 0.2s ease;
+  }
+  .page-actions {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
   }
 
   .back-link-wrapper:hover {
@@ -100,5 +116,8 @@ const { title } = Astro.props;
   }
   .subpage-content.page-load-initial-state {
     animation: pageLoadAnimate 0.8s ease-out 0.2s forwards;
+  }
+  .page-actions.page-load-initial-state {
+    animation: pageLoadAnimate 0.8s ease-out 0.1s forwards;
   }
 </style>

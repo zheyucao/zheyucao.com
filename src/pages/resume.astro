@@ -1,68 +1,75 @@
 ---
 import SubPageLayout from "../layouts/SubPageLayout.astro";
-import Education from "../components/resume/Education.astro";
-import Experience from "../components/resume/Experience.astro";
-import Skills from "../components/resume/Skills.astro";
-import Awards from "../components/resume/Awards.astro";
-import ContactInfo from "../components/resume/ContactInfo.astro";
-import Profile from "../components/resume/Profile.astro";
-import Projects from "../components/resume/Projects.astro";
+import ResumeSectionRenderer from "../components/resume/ResumeSectionRenderer.astro";
 import Button from "../components/common/Button.astro";
 import { resumeData } from "../data/resumeData";
 
-const { download } = resumeData;
+const { download, mainColumn, sidebar } = resumeData;
 ---
 
 <SubPageLayout title="Résumé">
   <Button
+    slot="actions"
     href={download.href}
     text={download.text}
+    style="primary"
     download={download.filename}
     icon="↓"
     iconPosition="left"
     target="_blank"
     rel="noopener noreferrer"
-    wrapperClass="resume-page-download"
+    noMargin={true}
   />
-  <div class="resume-columns-wrapper">
-    <div class="resume-main-column">
-      <Profile />
-      <Education />
-      <Awards />
-      <Experience />
-      <Projects />
+
+  <div class="resume-container">
+    <div class="main-column">
+      {mainColumn.map((section) => <ResumeSectionRenderer section={section} />)}
     </div>
-    <div class="resume-sidebar">
-      <Skills />
-      <ContactInfo />
-    </div>
+
+    <aside class="sidebar">
+      {sidebar.map((section) => <ResumeSectionRenderer section={section} />)}
+    </aside>
   </div>
 </SubPageLayout>
 
 <style>
-  /* --- Column Layout Styles --- */
-  .resume-columns-wrapper {
-    display: flex;
-    flex-direction: row;
-    gap: 5vw;
+  .resume-container {
+    display: grid;
+    grid-template-columns: 1fr 300px;
+    gap: 4rem;
+    max-width: 1200px;
+    margin: 0 auto;
   }
-  .resume-main-column {
-    flex: 5;
-    min-width: 0;
-    font-size: 1.1rem; /* Keep increased font size */
+
+  .main-column {
+    min-width: 0; /* Prevent overflow in grid items */
   }
-  .resume-sidebar {
-    flex: 2;
-    min-width: 0;
-    font-size: 1.1rem; /* Keep increased font size */
+
+  .sidebar {
+    position: sticky;
+    top: 2rem;
+    height: fit-content;
   }
+
+  .download-section {
+    margin-bottom: 3rem;
+  }
+
   @media (max-width: 900px) {
-    .resume-columns-wrapper {
-      flex-direction: column;
-      gap: 0;
+    .resume-container {
+      grid-template-columns: 1fr;
+      gap: 3rem;
     }
-    .resume-sidebar {
-      margin-top: 0;
+
+    .sidebar {
+      position: static;
+      order: -1; /* Move sidebar (download button & contact) to top on mobile */
     }
+
+    /* But maybe we want contact info at bottom on mobile? 
+       For now, let's keep it simple. The user can reorder in data if needed. 
+       Actually, typically download is top, contact is top or bottom. 
+       With the current data structure, sidebar has both. 
+    */
   }
 </style>

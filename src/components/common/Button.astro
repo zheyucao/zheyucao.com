@@ -9,6 +9,7 @@ interface Props extends HTMLAttributes<"a"> {
   icon?: string | null; // Optional icon character or class, defaults to null
   wrapperClass?: string; // Optional class for the wrapper div
   iconPosition?: "left" | "right"; // Optional icon position, defaults to left
+  noMargin?: boolean; // Optional: remove bottom margin
 }
 
 const {
@@ -19,6 +20,7 @@ const {
   class: className, // User can pass additional classes to the <a> tag
   wrapperClass, // Class for the div
   iconPosition = "left", // Default to left
+  noMargin = false,
   ...rest // Pass other attributes like target, rel
 } = Astro.props;
 
@@ -26,7 +28,7 @@ const {
 const downloadAttr = download === "" ? true : download;
 ---
 
-<div class:list={["button-wrapper", wrapperClass]}>
+<div class:list={["button-wrapper", wrapperClass, { "no-margin": noMargin }]}>
   <a href={href} download={downloadAttr} class:list={["button button-link", className]} {...rest}>
     {/* Add specific class to span based on position */}
     {
@@ -48,6 +50,9 @@ const downloadAttr = download === "" ? true : download;
   .button-wrapper {
     margin-bottom: 1.5rem;
     text-align: left;
+  }
+  .button-wrapper.no-margin {
+    margin-bottom: 0;
   }
 
   .button.button-link {

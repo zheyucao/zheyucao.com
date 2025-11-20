@@ -1,13 +1,22 @@
 ---
-import { resumeData } from "../../data/resumeData";
-const { skills } = resumeData;
+export interface SkillCategory {
+  name: string;
+  items: string[];
+}
+
+interface Props {
+  title: string;
+  categories: SkillCategory[];
+}
+
+const { title, categories } = Astro.props;
 ---
 
 <section class="resume-section scroll-reveal-animate">
-  <h2>Skills</h2>
+  <h2>{title}</h2>
   <div class="skills-grid">
     {
-      skills.map((category) => (
+      categories.map((category) => (
         <div class="skill-category">
           <h3>{category.name}</h3>
           <ul>
@@ -34,8 +43,8 @@ const { skills } = resumeData;
   }
   .skills-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); /* Responsive grid */
-    gap: 2rem; /* Space between columns and rows */
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: 2rem;
   }
   .skill-category h3 {
     font-size: 1.4rem;
@@ -52,6 +61,6 @@ const { skills } = resumeData;
   }
   .skill-category li {
     margin-bottom: 0.4rem;
-    color: var(--text-muted); /* Slightly muted color for skill items */
+    color: var(--text-muted);
   }
 </style>

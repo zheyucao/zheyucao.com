@@ -1,0 +1,102 @@
+---
+export interface EntryItem {
+  title: string;
+  subtitle?: string;
+  date?: string;
+  details?: string[];
+}
+
+interface Props {
+  title: string;
+  entries: EntryItem[];
+}
+
+const { title, entries } = Astro.props;
+---
+
+<section class="resume-section scroll-reveal-animate">
+  <h2>{title}</h2>
+  {
+    entries.map((entry) => (
+      <div class="entry-item">
+        <div class="header">
+          <span class="title" set:html={entry.title} />
+          {entry.subtitle && <span class="subtitle" set:html={entry.subtitle} />}
+          {entry.date && <span class="date">{entry.date}</span>}
+        </div>
+        {entry.details && (
+          <ul class="details">
+            {entry.details.map((detail) => (
+              <li set:html={detail} />
+            ))}
+          </ul>
+        )}
+      </div>
+    ))
+  }
+</section>
+
+<style>
+  .resume-section {
+    margin-bottom: 4rem;
+  }
+  h2 {
+    font-size: clamp(1.8rem, 1.5rem + 1.5vw, 2.8rem);
+    margin-bottom: 2rem;
+    font-weight: 600;
+    border-bottom: 1px solid var(--text-muted);
+    padding-bottom: 0.5rem;
+  }
+  .entry-item {
+    margin-bottom: 2.5rem;
+  }
+  .entry-item:last-child {
+    margin-bottom: 0;
+  }
+  .header {
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    margin-bottom: 0.8rem;
+    font-size: 1.2rem;
+    align-items: baseline;
+  }
+  .title {
+    font-weight: bold;
+    margin-right: 0.5rem;
+  }
+  .subtitle {
+    margin-right: auto; /* Push date to the right */
+  }
+  .date {
+    font-family: var(--font-family-sans);
+    color: var(--text-muted);
+    font-size: 1rem;
+    white-space: nowrap;
+    margin-left: 1rem;
+  }
+  .details {
+    list-style: disc;
+    padding-left: 1.5rem;
+    margin-left: 0;
+    font-size: 1.1rem;
+    line-height: 1.8;
+  }
+  .details li {
+    margin-bottom: 0.3rem;
+  }
+
+  @media (max-width: 600px) {
+    .header {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+    .date {
+      margin-left: 0;
+      margin-top: 0.3rem;
+    }
+    .subtitle {
+      margin-right: 0;
+    }
+  }
+</style>

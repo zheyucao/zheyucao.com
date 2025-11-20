@@ -1,16 +1,15 @@
 ---
-import { resumeData } from "../../data/resumeData";
-const { profile } = resumeData;
+interface Props {
+  title: string;
+  content: string[]; // Array of paragraphs (HTML allowed)
+}
+
+const { title, content } = Astro.props;
 ---
 
 <section class="resume-section scroll-reveal-animate">
-  <h2>Profile</h2>
-  <p>
-    I'm <strong>{profile.name}</strong>, a fourth-year undergraduate student at
-    <strong>{profile.university}</strong>, majoring in
-    <strong>{profile.major}</strong>.
-  </p>
-  {profile.description.map((desc) => <p set:html={desc} />)}
+  <h2>{title}</h2>
+  {content.map((paragraph) => <p set:html={paragraph} />)}
 </section>
 
 <style>
@@ -27,5 +26,9 @@ const { profile } = resumeData;
   p {
     line-height: 1.6;
     font-size: 1.1rem;
+    margin-bottom: 1rem;
+  }
+  p:last-child {
+    margin-bottom: 0;
   }
 </style>
