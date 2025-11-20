@@ -9,9 +9,7 @@ const { greeting, name, description } = heroEntry.data;
   <div class="hero-content">
     <div class="hero-greeting">{greeting}</div>
     <div class="hero-name">{name}</div>
-    <div class="hero-description">
-      One who <em>discovers</em>, <em>devises</em> and <em>devotes</em>.
-    </div>
+    <div class="hero-description" set:html={description} />
   </div>
   <!-- Scroll Down Icon Removed -->
 </section>
