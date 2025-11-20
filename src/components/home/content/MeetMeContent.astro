@@ -1,11 +1,20 @@
 ---
 // Content for the "Meet me!" section
-import { getEntry } from "astro:content";
 import Button from "../../common/Button.astro";
 
-const meetMeEntry = await getEntry("sections", "meet-me");
-const { title, cta } = meetMeEntry.data;
-const { Content } = await meetMeEntry.render();
+interface Props {
+  data: {
+    title: string;
+    cta: {
+      text: string;
+      href: string;
+    };
+    Content: any;
+  };
+}
+
+const { data } = Astro.props;
+const { title, cta, Content } = data;
 ---
 
 <h2 slot="title" class="about-title scroll-target-title">{title}</h2>

@@ -1,31 +1,26 @@
 ---
 // Content for the "Highlights & Updates" section
-import { getCollection, getEntry } from "astro:content";
 import Button from "../../common/Button.astro";
 import RichText from "../../common/RichText.astro";
 
-const sectionEntry = await getEntry("sections", "highlights");
-const { title, cta, fallback } = sectionEntry.data;
-const numberOfHighlightsToShow = 3; // Max number of highlights to show
+interface Props {
+  data: {
+    section: {
+      title: string;
+      cta: {
+        text: string;
+        href: string;
+      };
+      fallback: string;
+    };
+    events: any[];
+  };
+}
 
-// 1. Fetch and filter events marked as highlights
-const allEvents = await getCollection("timeline");
-const allHighlights = allEvents.filter((event) => event.data.isHighlight);
-
-// 2. Sort highlights by date descending (latest first)
-//    Using getTime() for robust comparison
-allHighlights.sort((a, b) => new Date(b.data.date).getTime() - new Date(a.data.date).getTime());
-
-// 3. Slice to get the latest N highlights
-const rawHighlightsToShow = allHighlights.slice(0, numberOfHighlightsToShow);
-
-// 4. Render content for the selected highlights
-const highlightsToShow = await Promise.all(
-  rawHighlightsToShow.map(async (event) => {
-    const { Content } = await event.render();
-    return { ...event, Content };
-  })
-);
+const { data } = Astro.props;
+const { section, events } = data;
+const { title, cta, fallback } = section;
+const highlightsToShow = events;
 
 // Improved date formatting function (example)
 function formatEventDate(dateStr: string): string {

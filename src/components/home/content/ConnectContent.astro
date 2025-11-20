@@ -1,13 +1,22 @@
 ---
 // Content for the "Keep in touch" section
-import { getEntry } from "astro:content";
 import Button from "../../common/Button.astro";
 import { Icon } from "astro-icon/components";
 import { siteConfig } from "../../../config";
 
-const connectEntry = await getEntry("sections", "connect");
-const { title, cta } = connectEntry.data;
-const { Content } = await connectEntry.render();
+interface Props {
+  data: {
+    title: string;
+    cta: {
+      text: string;
+      href: string;
+    };
+    Content: any;
+  };
+}
+
+const { data } = Astro.props;
+const { title, cta, Content } = data;
 const { social } = siteConfig;
 ---
 

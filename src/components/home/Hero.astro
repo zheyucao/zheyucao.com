@@ -1,8 +1,14 @@
 ---
-import { getEntry } from "astro:content";
+interface Props {
+  data: {
+    greeting: string;
+    name: string;
+    description: string;
+  };
+}
 
-const heroEntry = await getEntry("sections", "hero");
-const { greeting, name, description } = heroEntry.data;
+const { data } = Astro.props;
+const { greeting, name, description } = data;
 ---
 
 <section class="hero-section">

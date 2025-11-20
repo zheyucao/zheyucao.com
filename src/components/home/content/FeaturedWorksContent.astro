@@ -1,15 +1,25 @@
 ---
 // Content for the "Featured Works" section
-import { getCollection, getEntry } from "astro:content";
 import FeaturedProjectCard from "../FeaturedProjectCard.astro";
 import Button from "../../common/Button.astro";
 
-const sectionEntry = await getEntry("sections", "featured-works");
-const { title, cta } = sectionEntry.data;
+interface Props {
+  data: {
+    section: {
+      title: string;
+      cta: {
+        text: string;
+        href: string;
+      };
+    };
+    projects: any[];
+  };
+}
 
-// Filter projects marked as featured
-const allProjects = await getCollection("projects");
-const featuredProjects = allProjects.filter((project) => project.data.isFeatured);
+const { data } = Astro.props;
+const { section, projects } = data;
+const { title, cta } = section;
+const featuredProjects = projects;
 ---
 
 <h2 slot="title" class="about-title scroll-target-title">{title}</h2>
