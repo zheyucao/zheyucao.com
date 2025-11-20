@@ -1,22 +1,31 @@
 ---
 // Content for the "Highlights & Updates" section
-import { allTimelineEvents, type TimelineEventItem } from "../../../data/timelineEvents";
+import { getCollection, getEntry } from "astro:content";
 import Button from "../../common/Button.astro";
-import { homeContent } from "../../../data/siteContent";
 import RichText from "../../common/RichText.astro";
 
-const { title, cta, fallback } = homeContent.highlights;
+const sectionEntry = await getEntry("sections", "highlights");
+const { title, cta, fallback } = sectionEntry.data;
 const numberOfHighlightsToShow = 3; // Max number of highlights to show
 
-// 1. Filter events marked as highlights
-const allHighlights: TimelineEventItem[] = allTimelineEvents.filter((event) => event.isHighlight);
+// 1. Fetch and filter events marked as highlights
+const allEvents = await getCollection("timeline");
+const allHighlights = allEvents.filter((event) => event.data.isHighlight);
 
 // 2. Sort highlights by date descending (latest first)
 //    Using getTime() for robust comparison
-allHighlights.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+allHighlights.sort((a, b) => new Date(b.data.date).getTime() - new Date(a.data.date).getTime());
 
 // 3. Slice to get the latest N highlights
-const highlightsToShow: TimelineEventItem[] = allHighlights.slice(0, numberOfHighlightsToShow);
+const rawHighlightsToShow = allHighlights.slice(0, numberOfHighlightsToShow);
+
+// 4. Render content for the selected highlights
+const highlightsToShow = await Promise.all(
+  rawHighlightsToShow.map(async (event) => {
+    const { Content } = await event.render();
+    return { ...event, Content };
+  })
+);
 
 // Improved date formatting function (example)
 function formatEventDate(dateStr: string): string {
@@ -46,22 +55,22 @@ function formatEventDate(dateStr: string): string {
         {highlightsToShow.map((event) => (
           <li class="highlight-item-enhanced">
             <div class="highlight-meta">
-              <time datetime={event.date} class="highlight-date">
-                {formatEventDate(event.date)}
+              <time datetime={event.data.date} class="highlight-date">
+                {formatEventDate(event.data.date)}
               </time>
             </div>
             <div class="highlight-body">
-              <h4 class="highlight-title">{event.title}</h4>
-              {/* Use highlightSummary if available, fallback to description */}
-              {event.highlightSummary ? (
+              <h4 class="highlight-title">{event.data.title}</h4>
+              {/* Use highlightSummary if available, fallback to description (Content) */}
+              {event.data.highlightSummary ? (
                 <div class="highlight-summary">
-                  <RichText content={event.highlightSummary} />
+                  <RichText content={event.data.highlightSummary} />
                 </div>
-              ) : event.description ? (
+              ) : (
                 <div class="highlight-description">
-                  <RichText content={event.description} />
+                  <event.Content />
                 </div>
-              ) : null}
+              )}
             </div>
           </li>
         ))}

@@ -1,18 +1,22 @@
 ---
 // Content for the "Keep in touch" section
+import { getEntry } from "astro:content";
 import Button from "../../common/Button.astro";
 import { Icon } from "astro-icon/components";
-import { homeContent } from "../../../data/siteContent";
 import { siteConfig } from "../../../config";
 
-const { title, paragraphs, cta } = homeContent.connect;
+const connectEntry = await getEntry("sections", "connect");
+const { title, cta } = connectEntry.data;
+const { Content } = await connectEntry.render();
 const { social } = siteConfig;
 ---
 
 <h2 slot="title" class="about-title scroll-target-title">{title}</h2>
 
 <div class="about-content scroll-target-content">
-  {paragraphs.map((paragraph) => <p>{paragraph}</p>)}
+  <div class="rich-text">
+    <Content />
+  </div>
 
   <div class="connect-icon-links">
     <a href={social.email} title="Send me an email" aria-label="Email">

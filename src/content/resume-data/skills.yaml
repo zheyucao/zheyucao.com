@@ -1,0 +1,15 @@
+id: skills
+title: Skills
+content:
+  - name: Languages
+    items: ["C", "C++", "Python", "JavaScript", "TypeScript"]
+  - name: Tools & DevOps
+    items: ["Git", "Docker", "Nginx", "CMake", "LaTeX"]
+  - name: Web Development
+    items: ["React", "Tailwind CSS", "Flask", "Astro"]
+  - name: Vision
+    items: ["OpenCV"]
+  - name: Robotics
+    items: ["ROS", "Gazebo", "Rviz"]
+  - name: AI
+    items: ["PyTorch", "NumPy", "Scikit-learn"]

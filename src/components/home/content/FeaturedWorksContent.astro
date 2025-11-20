@@ -1,26 +1,15 @@
 ---
 // Content for the "Featured Works" section
-import { allProjectsData, type ProjectDataItem } from "../../../data/projectsData";
+import { getCollection, getEntry } from "astro:content";
 import FeaturedProjectCard from "../FeaturedProjectCard.astro";
 import Button from "../../common/Button.astro";
-import { homeContent } from "../../../data/siteContent";
 
-const { title, cta } = homeContent.featuredWorks;
+const sectionEntry = await getEntry("sections", "featured-works");
+const { title, cta } = sectionEntry.data;
 
 // Filter projects marked as featured
-const featuredProjects: ProjectDataItem[] = allProjectsData.filter((project) => project.isFeatured);
-
-// Simple slugify function (consider a more robust library for complex cases)
-function slugify(text: string): string {
-  return text
-    .toString()
-    .toLowerCase()
-    .replace(/\s+/g, "-") // Replace spaces with -
-    .replace(/[^\w-]+/g, "") // Remove all non-word chars (removed \ before -)
-    .replace(/--+/g, "-") // Replace multiple - with single - (removed \ before -)
-    .replace(/^-+/, "") // Trim - from start of text
-    .replace(/-+$/, ""); // Trim - from end of text
-}
+const allProjects = await getCollection("projects");
+const featuredProjects = allProjects.filter((project) => project.data.isFeatured);
 ---
 
 <h2 slot="title" class="about-title scroll-target-title">{title}</h2>
@@ -28,14 +17,13 @@ function slugify(text: string): string {
 <div class="about-content scroll-target-content featured-works-container">
   {
     featuredProjects.map((project) => {
-      const slug = slugify(project.title);
       return (
         <FeaturedProjectCard
-          title={project.title}
-          homepageSummary={project.homepageSummary}
-          imageAlt={project.imageAlt}
-          githubUrl={project.githubUrl}
-          slug={slug}
+          title={project.data.title}
+          homepageSummary={project.data.homepageSummary}
+          imageAlt={project.data.imageAlt}
+          githubUrl={project.data.githubUrl}
+          slug={project.slug}
         />
       );
     })

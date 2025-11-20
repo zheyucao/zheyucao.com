@@ -1,11 +1,8 @@
 ---
 import SubPageLayout from "../layouts/SubPageLayout.astro";
 import TimelineEvent from "../components/timeline/TimelineEvent.astro";
-import { allTimelineEvents } from "../data/timelineEvents";
+import { getCollection } from "astro:content";
 import "../styles/timeline.css";
-
-// Use the imported data
-// const allEvents = allTimelineEvents; // Replaced by mapped version below
 
 // Pre-render Markdown for client-side usage
 import MarkdownIt from "markdown-it";
@@ -16,9 +13,12 @@ const md = new MarkdownIt({
   breaks: true,
 });
 
-const allEvents = allTimelineEvents.map((event) => ({
-  ...event,
-  renderedDescription: event.description ? md.render(event.description) : "",
+// Fetch and process data
+const rawEvents = await getCollection("timeline");
+const allEvents = rawEvents.map((event) => ({
+  ...event.data,
+  description: event.body, // Pass raw body as description
+  renderedDescription: event.body ? md.render(event.body) : "",
 }));
 
 // Calculate unique categories based on actual data
@@ -26,7 +26,7 @@ const categories = [...new Set(allEvents.map((event) => event.category).filter(B
 
 // Initial sort for SSR
 let initialSortOrder = "newest"; // Default
-let initialFilteredEvents = allTimelineEvents.sort((a, b) =>
+let initialFilteredEvents = allEvents.sort((a, b) =>
   initialSortOrder === "newest"
     ? new Date(b.date).getTime() - new Date(a.date).getTime()
     : new Date(a.date).getTime() - new Date(b.date).getTime()

@@ -65,6 +65,14 @@ const resume_education = defineCollection({
     }),
 });
 
+const resume_projects = defineCollection({
+    type: 'content',
+    schema: z.object({
+        title: z.string(),
+        date: z.string(),
+    }),
+});
+
 const resume_profile = defineCollection({
     type: 'content',
     schema: z.object({
@@ -108,12 +116,33 @@ const resume_data = defineCollection({
     ]),
 });
 
+const contact = defineCollection({
+    type: 'data',
+    schema: z.object({
+        intro: z.array(z.string()),
+        sections: z.record(z.object({
+            title: z.string(),
+            description: z.string().optional(),
+            items: z.array(z.object({
+                icon: z.string(),
+                label: z.string().optional(),
+                href: z.string().optional(),
+                target: z.string().optional(),
+                rel: z.string().optional(),
+                description: z.string().optional(),
+            })),
+        })),
+    }),
+});
+
 export const collections = {
     projects,
     timeline,
     sections,
     'resume-experience': resume_experience,
     'resume-education': resume_education,
+    'resume-projects': resume_projects,
     'resume-profile': resume_profile,
     'resume-data': resume_data,
+    contact,
 };

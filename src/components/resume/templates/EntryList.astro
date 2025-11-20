@@ -6,6 +6,7 @@ export interface EntryItem {
   subtitle?: string;
   date?: string;
   details?: string[];
+  Content?: any;
 }
 
 interface Props {
@@ -32,11 +33,15 @@ const { title, entries } = Astro.props;
           )}
           {entry.date && <span class="date">{entry.date}</span>}
         </div>
-        {entry.details && (
+        {entry.Content ? (
+          <div class="details">
+            <entry.Content />
+          </div>
+        ) : entry.details ? (
           <div class="details">
             <RichText content={entry.details} />
           </div>
-        )}
+        ) : null}
       </div>
     ))
   }

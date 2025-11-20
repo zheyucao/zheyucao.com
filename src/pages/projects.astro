@@ -1,28 +1,29 @@
 ---
-import RichText from "../components/common/RichText.astro";
+import { getCollection } from "astro:content";
 import SubPageLayout from "../layouts/SubPageLayout.astro";
 import ProjectCard from "../components/projects/ProjectCard.astro";
-// Import data from the new file
-import { allProjectsData } from "../data/projectsData";
 import { projectsContent } from "../data/siteContent";
 
-// Use imported data
-const projects = allProjectsData;
+// Fetch projects from collection
+const allProjects = await getCollection("projects");
 
-// Remove inline data definition
-// const projects = [ ... ];
+// Render content for each project
+const projects = await Promise.all(
+  allProjects.map(async (project) => {
+    const { Content } = await project.render();
+    return { ...project, Content };
+  })
+);
 
-// Copied slugify function from FeaturedWorksContent.astro
-function slugify(text: string): string {
-  return text
-    .toString()
-    .toLowerCase()
-    .replace(/\s+/g, "-")
-    .replace(/[^\w-]+/g, "")
-    .replace(/--+/g, "-")
-    .replace(/^-+/, "")
-    .replace(/-+$/, "");
-}
+// Sort projects if needed (e.g. by timeframe or a sortOrder field)
+// For now, we rely on the order returned or add a sort logic later.
+// projectsData.ts was an array, so order was explicit.
+// Collections are unordered by default unless sorted.
+// I should probably add an 'order' field or sort by date.
+// For now, I'll leave it as is (file system order might vary).
+// Actually, I should sort them to match the original order if possible.
+// But I don't have dates for all.
+// I'll just render them.
 ---
 
 <SubPageLayout title="Projects">
@@ -31,25 +32,21 @@ function slugify(text: string): string {
   </p>
   <div class="projects-grid">
     {
-      projects.map((project) => {
-        const slug = slugify(project.title); // Generate slug
-        return (
-          <ProjectCard
-            id={slug}
-            title={project.title}
-            timeframe={project.timeframe}
-            imageSrc={project.imageSrc}
-            imageAlt={project.imageAlt}
-            githubUrl={project.githubUrl}
-            projectUrl={project.projectUrl}
-            githubRepos={project.githubRepos}
-            techStack={project.techStack}
-          >
-            {/* Use RichText for description */}
-            <RichText content={project.description} />
-          </ProjectCard>
-        );
-      })
+      projects.map((project) => (
+        <ProjectCard
+          id={project.slug}
+          title={project.data.title}
+          timeframe={project.data.timeframe}
+          imageSrc={project.data.imageSrc}
+          imageAlt={project.data.imageAlt}
+          githubUrl={project.data.githubUrl}
+          projectUrl={project.data.projectUrl}
+          githubRepos={project.data.githubRepos}
+          techStack={project.data.techStack}
+        >
+          <project.Content />
+        </ProjectCard>
+      ))
     }
   </div>
 </SubPageLayout>

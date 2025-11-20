@@ -2,9 +2,10 @@
 import SubPageLayout from "../layouts/SubPageLayout.astro";
 import { Icon } from "astro-icon/components";
 import RichText from "../components/common/RichText.astro";
-import { contactData } from "../data/contactData";
+import { getEntry } from "astro:content";
 
-const { intro, sections } = contactData;
+const contactEntry = await getEntry("contact", "info");
+const { intro, sections } = contactEntry.data;
 ---
 
 <SubPageLayout title="Contact">

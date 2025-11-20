@@ -1,16 +1,16 @@
 ---
-import RichText from "../common/RichText.astro";
-import { homeContent } from "../../data/siteContent";
+import { getEntry } from "astro:content";
 
-const { greeting, name, description } = homeContent.hero;
+const heroEntry = await getEntry("sections", "hero");
+const { greeting, name, description } = heroEntry.data;
 ---
 
 <section class="hero-section">
-  <div class="hero-text">
-    <div class="greeting">{greeting}</div>
+  <div class="hero-content">
+    <div class="hero-greeting">{greeting}</div>
     <div class="hero-name">{name}</div>
     <div class="hero-description">
-      <RichText content={description} />
+      One who <em>discovers</em>, <em>devises</em> and <em>devotes</em>.
     </div>
   </div>
   <!-- Scroll Down Icon Removed -->
@@ -46,12 +46,13 @@ const { greeting, name, description } = homeContent.hero;
     box-sizing: border-box;
   }
 
-  .hero-text {
+  .hero-content {
     max-width: 80%;
     transform: translateY(-5vh);
   }
 
-  .greeting {
+  .hero-greeting {
+    font-family: var(--font-family-serif);
     font-size: clamp(1.5rem, 1.5rem + 2vw, 4rem);
     /* font-style: italic; */
     color: var(--text-muted);
@@ -63,14 +64,18 @@ const { greeting, name, description } = homeContent.hero;
   }
 
   .hero-name {
+    font-family: var(--font-family-serif);
+    color: var(--text-color);
     font-size: clamp(3rem, 4rem + 4vw, 8rem);
     font-weight: 400;
     line-height: 1;
+    margin: 0;
     opacity: 0;
     animation: unblurFadeIn 2s ease-out 0.5s forwards;
   }
 
   .hero-description {
+    color: var(--text-color);
     font-family: var(--font-family-serif);
     font-size: clamp(1.5rem, 1rem + 1vw, 2rem);
     font-weight: 400;
@@ -82,8 +87,7 @@ const { greeting, name, description } = homeContent.hero;
     animation: unblurFadeIn 2s ease-out 0.8s forwards;
   }
 
-  .hero-description :global(em) {
+  .hero-description em {
     font-weight: 600;
-    font-style: normal;
   }
 </style>
