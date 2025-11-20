@@ -7,6 +7,8 @@ interface Props {
 }
 
 const { title } = Astro.props;
+// The "actions" slot allows pages to add custom buttons to the header action bar.
+// Example: <Button slot="actions" ... /> in the page file.
 ---
 
 <Layout title={title} showIndicatorOverride={false}>

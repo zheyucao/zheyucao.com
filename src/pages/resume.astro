@@ -4,16 +4,16 @@ import ResumeSectionRenderer from "../components/resume/ResumeSectionRenderer.as
 import Button from "../components/common/Button.astro";
 import { resumeData } from "../data/resumeData";
 
-const { download, mainColumn, sidebar } = resumeData;
+const { mainColumn, sidebar } = resumeData;
 ---
 
 <SubPageLayout title="Résumé">
   <Button
     slot="actions"
-    href={download.href}
-    text={download.text}
+    href="https://assets.zheyucao.com/resume.pdf"
+    text="PDF (Chinese)"
     style="primary"
-    download={download.filename}
+    download="Zheyu_Cao_Resume_ZH.pdf"
     icon="↓"
     iconPosition="left"
     target="_blank"

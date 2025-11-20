@@ -18,11 +18,16 @@ This is the source code for the zheyucao.com personal website, built with Astro.
 - **src/layouts/**: Page layouts.
   - `Layout.astro`: Main layout.
   - `SubPageLayout.astro`: Layout for sub-pages.
-- **src/data/**: Structured data for projects and timeline events.
-  - `projectsData.ts`: Data for projects.
-  - `timelineEvents.ts`: Data for timeline events.
+- **src/data/**: Centralized data for site content.
+  - `config.ts`: Global site configuration (metadata, navigation, social links).
+  - `siteContent.ts`: Text content for the homepage and general sections.
+  - `resumeData.ts`: Structured data for the resume page (experience, education, skills, etc.).
+  - `contactData.ts`: Contact information and social links.
+  - `projectsData.ts`: Data for the projects portfolio.
+  - `timelineEvents.ts`: Data for the timeline page.
 - **src/styles/**: CSS styles.
-  - `timeline.css`: Styles for the timeline page.
+  - `global.css`: Global styles, variables, and animations.
+  - `timeline.css`: Specific styles for the timeline.
 - **public/**: Static assets.
   - `images/`: Images used in the website.
   - `favicon.png`: Favicon for the website.
@@ -33,14 +38,22 @@ This is the source code for the zheyucao.com personal website, built with Astro.
 - **Home Page**: Features a hero section, about section, projects preview, and contact section.
 - **Projects Page**: Displays a full list of projects.
 - **Timeline Page**: Shows a timeline of events.
-- **Resume Page**: Dedicated page for the resume.
-- **Contact Page**: Contact information.
+- **Resume Page**: Fully data-driven resume with generic templates for easy customization.
+- **Contact Page**: Contact information with categorized sections.
 - **Animations**: Uses GSAP for animations, including scroll-triggered effects.
+- **Data-Driven Architecture**: All content is managed through structured data files for easy updates.
 
 ## Content Management
 
-- Projects and timeline events are managed through structured data files in `src/data/`.
-- Future plans include using Astro Content Collections for more dynamic content management.
+This project uses a data-driven architecture to separate content from code, making it easy to update and maintain.
+
+- **Global Config**: `src/config.ts` handles site-wide settings like title, description, and navigation links.
+- **Page Content**:
+  - **Home**: Managed via `src/data/siteContent.ts`.
+  - **Resume**: Fully data-driven via `src/data/resumeData.ts`. The resume page uses a generic rendering system (`ResumeSectionRenderer`) that takes this data and renders the appropriate templates (`EntryList`, `SkillGrid`, `TextSection`, `ContactList`).
+  - **Contact**: Managed via `src/data/contactData.ts`.
+  - **Projects & Timeline**: Managed via `src/data/projectsData.ts` and `src/data/timelineEvents.ts`.
+- **Customization**: To update the site's text or data, simply modify the corresponding file in `src/data/`. No need to touch the Astro components for content updates.
 
 ## Development
 

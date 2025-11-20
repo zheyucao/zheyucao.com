@@ -9,11 +9,6 @@ export interface ResumeSection {
 }
 
 export const resumeData = {
-    download: {
-        text: "PDF (Chinese)",
-        href: "https://assets.zheyucao.com/resume.pdf",
-        filename: "Zheyu_Cao_Resume_ZH.pdf",
-    },
     mainColumn: [
         {
             id: "profile",
