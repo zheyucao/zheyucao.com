@@ -8,13 +8,16 @@ import ContactInfo from "../components/resume/ContactInfo.astro";
 import Profile from "../components/resume/Profile.astro";
 import Projects from "../components/resume/Projects.astro";
 import Button from "../components/common/Button.astro";
+import { resumeData } from "../data/resumeData";
+
+const { download } = resumeData;
 ---
 
 <SubPageLayout title="Résumé">
   <Button
-    href="https://assets.zheyucao.com/resume.pdf"
-    text="Download Résumé PDF (in Chinese)"
-    download="Zheyu_Cao_Resume_ZH.pdf"
+    href={download.href}
+    text={download.text}
+    download={download.filename}
     icon="↓"
     iconPosition="left"
     target="_blank"

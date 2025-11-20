@@ -1,46 +1,42 @@
 ---
 // Component: src/components/Footer.astro
+import { siteConfig } from "../config";
+
 const currentYear = new Date().getFullYear();
+const { metadata, navigation, social } = siteConfig;
 ---
 
 <footer class="site-footer">
   <div class="footer-content">
     <div class="footer-column footer-column-1">
-      <h4>Zheyu Cao</h4>
+      <h4>{metadata.author}</h4>
       <p class="footer-description">
-        Currently a fourth-year student at Northwestern Polytechnical University, pursuing a
-        Bachelor's degree in Computer Science and Technology.
+        {metadata.description}
       </p>
-      <p class="copyright">&copy; {currentYear} Zheyu Cao. All rights reserved.</p>
+      <p class="copyright">&copy; {currentYear} {metadata.author}. All rights reserved.</p>
     </div>
     <div class="footer-column footer-column-2">
       <h4>Links</h4>
       <ul>
-        <li><a href="/" data-astro-prefetch>Home</a></li>
-        <li><a href="/timeline" data-astro-prefetch>Timeline</a></li>
-        <li><a href="/projects" data-astro-prefetch>Projects</a></li>
-        <li><a href="/resume" data-astro-prefetch>Résumé</a></li>
-        <li><a href="/contact" data-astro-prefetch>Contact</a></li>
+        {
+          navigation.items.map((item) => (
+            <li>
+              <a href={item.href} data-astro-prefetch>
+                {item.name}
+              </a>
+            </li>
+          ))
+        }
       </ul>
     </div>
     <div class="footer-column footer-column-3">
       <h4>Connect</h4>
       <ul>
         <li>
-          <a
-            class="link"
-            href="https://github.com/zheyucao"
-            target="_blank"
-            rel="noopener noreferrer">GitHub</a
-          >
+          <a class="link" href={social.github} target="_blank" rel="noopener noreferrer">GitHub</a>
         </li>
         <li>
-          <a
-            class="link"
-            href="mailto:zheyucao2004@gmail.com"
-            target="_blank"
-            rel="noopener noreferrer">Email</a
-          >
+          <a class="link" href={social.email} target="_blank" rel="noopener noreferrer">Email</a>
         </li>
       </ul>
     </div>

@@ -3,6 +3,7 @@ import SubPageLayout from "../layouts/SubPageLayout.astro";
 import ProjectCard from "../components/projects/ProjectCard.astro";
 // Import data from the new file
 import { allProjectsData } from "../data/projectsData";
+import { projectsContent } from "../data/siteContent";
 
 // Use imported data
 const projects = allProjectsData;
@@ -25,8 +26,7 @@ function slugify(text: string): string {
 
 <SubPageLayout title="Projects">
   <p class="page-intro">
-    Here are some of the projects I've worked on. You can find more details and other experiments on
-    my GitHub profiles.
+    {projectsContent.intro}
   </p>
   <div class="projects-grid">
     {

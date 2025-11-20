@@ -1,19 +1,16 @@
 ---
-// src/components/resume/Profile.astro
+import { resumeData } from "../../data/resumeData";
+const { profile } = resumeData;
 ---
 
 <section class="resume-section scroll-reveal-animate">
   <h2>Profile</h2>
   <p>
-    I'm <strong>Zheyu Cao</strong>, a fourth-year undergraduate student at
-    <strong>Northwestern Polytechnical University</strong>, majoring in
-    <strong>Computer Science and Technology</strong>.
+    I'm <strong>{profile.name}</strong>, a fourth-year undergraduate student at
+    <strong>{profile.university}</strong>, majoring in
+    <strong>{profile.major}</strong>.
   </p>
-  <p>
-    I'm deeply interested in <strong>frontend development</strong>,
-    <strong>artificial intelligence</strong>, and <strong>linguistics</strong>. I love exploring and
-    learning cool new things, especially where technology meets aesthetics.
-  </p>
+  {profile.description.map((desc) => <p set:html={desc} />)}
 </section>
 
 <style>

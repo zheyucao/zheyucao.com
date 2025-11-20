@@ -1,37 +1,24 @@
 ---
-// src/components/resume/ContactInfo.astro
-import { Icon } from "astro-icon/components"; // Import Icon component
+import { Icon } from "astro-icon/components";
+import { resumeData } from "../../data/resumeData";
+const { contact } = resumeData;
 ---
 
 <section class="resume-section scroll-reveal-animate">
   <h2>Contact</h2>
   <ul class="contact-list">
-    <li>
-      <Icon name="ri:phone-line" class="contact-icon" />
-      <a href="tel:+8617731343445">+86 177 3134 3445</a>
-    </li>
-    <li>
-      <Icon name="ri:mail-line" class="contact-icon" />
-      <a href="mailto:zheyucao2004@gmail.com">zheyucao2004@gmail.com</a>
-    </li>
-    <li>
-      <Icon name="ri:planet-line" class="contact-icon" />
-      <a href="https://zheyucao.com" target="_blank" rel="noopener noreferrer">zheyucao.com</a>
-    </li>
-    <li>
-      <Icon name="ri:github-line" class="contact-icon" />
-      <a href="https://github.com/zheyucao" target="_blank" rel="noopener noreferrer"
-        >github.com/zheyucao</a
-      >
-    </li>
-    <li>
-      <Icon name="ri:wechat-line" class="contact-icon" />
-      <span>aktsnnm</span>
-    </li>
-    <li>
-      <Icon name="ri:qq-line" class="contact-icon" />
-      <span>1060864974</span>
-    </li>
+    {
+      contact.map((item) => (
+        <li>
+          <Icon name={item.icon} class="contact-icon" />
+          {item.href ? (
+            <a href={item.href} target={item.target} rel={item.rel} set:html={item.label} />
+          ) : (
+            <span set:html={item.label} />
+          )}
+        </li>
+      ))
+    }
   </ul>
 </section>
 

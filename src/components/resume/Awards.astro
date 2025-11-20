@@ -1,72 +1,21 @@
 ---
-// No props needed
+import { resumeData } from "../../data/resumeData";
+const { awards } = resumeData;
 ---
 
 <section class="resume-section scroll-reveal-animate">
   <h2>Honors & Awards</h2>
 
-  <div class="award-entry">
-    <div class="header">
-      <span class="institution"><strong>China National Scholarship</strong></span>
-      <span class="date">November 2024</span>
-    </div>
-  </div>
-
-  <div class="award-entry">
-    <div class="header">
-      <span class="institution"
-        >NPU <strong>Outstanding Student & First-Class Scholarship</strong></span
-      >
-      <span class="date">November 2024</span>
-    </div>
-  </div>
-
-  <div class="award-entry">
-    <div class="header">
-      <span class="institution"
-        >NPU <strong>Outstanding Student & Second-Class Scholarship</strong></span
-      >
-      <span class="date">November 2023</span>
-    </div>
-  </div>
-
-  <div class="award-entry">
-    <div class="header">
-      <span class="institution">China Robot Contest: <strong>National First Prize</strong></span>
-      <span class="date">November 2024</span>
-    </div>
-  </div>
-
-  <div class="award-entry">
-    <div class="header">
-      <span class="institution">China Robot Contest: <strong>National First Prize</strong></span>
-      <span class="date">May 2024</span>
-    </div>
-  </div>
-
-  <div class="award-entry">
-    <div class="header">
-      <span class="institution">China Robot Contest: <strong>National Second Prize</strong></span>
-      <span class="date">October 2023</span>
-    </div>
-  </div>
-
-  <div class="award-entry">
-    <div class="header">
-      <span class="institution"
-        >China Robot Championship: <strong>National First Prize</strong></span
-      >
-      <span class="date">October 2024</span>
-    </div>
-  </div>
-
-  <div class="award-entry">
-    <div class="header">
-      <span class="institution"
-        >Other national, provincial, and university-level awards and honors.</span
-      >
-    </div>
-  </div>
+  {
+    awards.map((award) => (
+      <div class="award-entry">
+        <div class="header">
+          <span class="institution" set:html={award.title} />
+          {award.date && <span class="date">{award.date}</span>}
+        </div>
+      </div>
+    ))
+  }
 </section>
 
 <style>

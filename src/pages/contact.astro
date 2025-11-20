@@ -1,64 +1,38 @@
 ---
 import SubPageLayout from "../layouts/SubPageLayout.astro";
-import { Icon } from "astro-icon/components"; // Import Icon component
+import { Icon } from "astro-icon/components";
+import { contactData } from "../data/contactData";
+
+const { intro, sections } = contactData;
 ---
 
 <SubPageLayout title="Contact">
   <div class="contact-content">
-    <p class="intro-text">Feel free to reach out!</p>
-    <p class="intro-text">Emails are preferred and will be responded to within one working day.</p>
+    {intro.map((text) => <p class="intro-text">{text}</p>)}
 
-    {/* Section 1: Primary Contact */}
-    <h3 class="contact-section-title">Primary Contact</h3>
-    <p class="section-description">For academic or direct inquiries:</p>
-    <ul class="contact-list">
-      <li>
-        <Icon name="ri:mail-line" class="contact-icon" />
-        <a href="mailto:zheyucao2004@gmail.com">zheyucao2004@gmail.com</a> &nbsp;(Academic)
-      </li>
-      <li>
-        <Icon name="ri:mail-line" class="contact-icon" />
-        <a href="mailto:hi@zheyucao.com">hi@zheyucao.com</a> &nbsp;(Personal)
-      </li>
-      <li>
-        <Icon name="ri:github-line" class="contact-icon" />
-        <a href="https://github.com/zheyucao" target="_blank" rel="noopener noreferrer"
-          >github.com/zheyucao</a
-        >
-      </li>
-      <li>
-        <Icon name="ri:wechat-line" class="contact-icon" />
-        <span>aktsnnm</span>
-      </li>
-      <li>
-        <Icon name="ri:qq-line" class="contact-icon" />
-        <span>1060864974</span>
-      </li>
-      <li>
-        <Icon name="ri:planet-line" class="contact-icon" />
-        <a href="https://zheyucao.com" target="_blank" rel="noopener noreferrer"
-          >https://zheyucao.com</a
-        >
-      </li>
-    </ul>
-
-    {/* Section 2: Online Alias / Personal */}
-    <h3 class="contact-section-title">Online Presence</h3>
-    <p class="section-description">
-      I also go by <strong>Angine</strong> online. You can find me through:
-    </p>
-    <ul class="contact-list">
-      <li>
-        <Icon name="ri:mail-line" class="contact-icon" />
-        <a href="mailto:me@angine.tech">me@angine.tech</a>
-      </li>
-      <li>
-        <Icon name="ri:github-line" class="contact-icon" />
-        <a href="https://github.com/angine04" target="_blank" rel="noopener noreferrer"
-          >github.com/angine04</a
-        >
-      </li>
-    </ul>
+    {
+      Object.values(sections).map((section) => (
+        <>
+          <h3 class="contact-section-title">{section.title}</h3>
+          {section.description && <p class="section-description" set:html={section.description} />}
+          <ul class="contact-list">
+            {section.items.map((item) => (
+              <li>
+                <Icon name={item.icon} class="contact-icon" />
+                {item.href ? (
+                  <>
+                    <a href={item.href} target={item.target} rel={item.rel} set:html={item.label} />
+                    {item.description && <span>&nbsp;{item.description}</span>}
+                  </>
+                ) : (
+                  <span set:html={item.label} />
+                )}
+              </li>
+            ))}
+          </ul>
+        </>
+      ))
+    }
   </div>
 </SubPageLayout>
 

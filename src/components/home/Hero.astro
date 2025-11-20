@@ -1,14 +1,14 @@
 ---
-// Component: src/components/home/Hero.astro
+import { homeContent } from "../../data/siteContent";
+
+const { greeting, name, description } = homeContent.hero;
 ---
 
 <section class="hero-section">
   <div class="hero-text">
-    <div class="greeting">Hello, I'm</div>
-    <div class="hero-name">Zheyu Cao</div>
-    <div class="hero-description">
-      One who <em>discovers</em>, <em>devises</em> and <em>devotes</em>.
-    </div>
+    <div class="greeting">{greeting}</div>
+    <div class="hero-name">{name}</div>
+    <div class="hero-description" set:html={description} />
   </div>
   <!-- Scroll Down Icon Removed -->
 </section>

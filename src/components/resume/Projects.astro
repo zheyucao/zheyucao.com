@@ -1,91 +1,27 @@
 ---
-// No props needed
+import { resumeData } from "../../data/resumeData";
+const { projects } = resumeData;
 ---
 
 <section class="resume-section scroll-reveal-animate">
   <h2>Projects</h2>
-  <div class="project-entry">
-    <div class="header">
-      <span class="institution"
-        ><strong>uniOS Project, NPU Operating System Pilot Course</strong></span
-      >
-    </div>
-    <span class="date">September 2024 – January 2025</span>
-    <ul class="details">
-      <li>
-        Independently completed course labs, including Bootloader, Paging, Process Scheduling,
-        Syscalls, etc.
-      </li>
-      <li>
-        Implemented graphics system for uniOS (2-person team).
-        <ul>
-          <li>Responsible for system design, hardware drivers and composition layer.</li>
-          <li>Implemented antialiasing, dirty region detection, alpha blending, etc.</li>
-          <li>Designed and implemented a simple window manager and GUI for uniOS.</li>
-          <li>
-            GitHub Repository: <a href="https://github.com/angine04/unios" target="_blank"
-              >https://github.com/angine04/unios</a
-            >.
-          </li>
+  {
+    projects.map((project) => (
+      <div class="project-entry">
+        <div class="header">
+          <span class="institution">
+            <strong>{project.title}</strong>
+          </span>
+        </div>
+        <span class="date">{project.date}</span>
+        <ul class="details">
+          {project.details.map((detail) => (
+            <li set:html={detail} />
+          ))}
         </ul>
-      </li>
-    </ul>
-  </div>
-
-  <div class="project-entry">
-    <div class="header">
-      <span class="institution"><strong>zheyucao.com</strong></span>
-    </div>
-    <span class="date">April 2025</span>
-    <ul class="details">
-      <li>This website you're currently viewing.</li>
-      <li>
-        Designed and built by me for myself. It is built using:
-        <ul>
-          <li>Astro (framework)</li>
-          <li>TypeScript (programming language)</li>
-          <li>Plain CSS (styling)</li>
-          <li>GSAP (animations)</li>
-          <li>Node.js & pnpm (environment & package management)</li>
-          <li>Github Pages (hosting)</li>
-        </ul>
-        <li>
-          GitHub Repository: <a href="https://github.com/zheyucao/zheyucao.com" target="_blank"
-            >https://github.com/zheyucao/zheyucao.com</a
-          >.
-        </li>
-      </li>
-    </ul>
-  </div>
-
-  <!-- <div class="project-entry">
-    <div class="header">
-      <span class="institution"><strong>v5Embark & v5Beacon</strong></span>
-      <span class="date">March 2025</span>
-    </div>
-    <ul class="details">
-      <li>A pair of services for the Team V5++.</li>
-      <li>v5Embark: Facilitates new member registration and information collection.</li>
-      <li>v5Beacon: A central portal providing access to all team services.</li>
-      <li>Both built using Next.js.</li>
-      <li>
-        GitHub Repository:
-
-        <ul>
-          <li>
-            <a href="https://github.com/angine04/v5Embark" target="_blank"
-              >https://github.com/angine04/v5Embark</a
-            >.
-          </li>
-          <li>
-            <a href="https://github.com/angine04/v5Beacon" target="_blank"
-              >https://github.com/angine04/v5Beacon</a
-            >.
-          </li>
-        </ul>
-      </li>
-    </ul>
-  </div> -->
+      </div>
+    ))
+  }
 
   <p class="more-projects-link">
     For more projects, check the <a href="/projects">Projects page</a>.

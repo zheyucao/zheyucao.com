@@ -1,56 +1,27 @@
 ---
-// No props needed
+import { resumeData } from "../../data/resumeData";
+const { experience } = resumeData;
 ---
 
 <section class="resume-section scroll-reveal-animate">
   <h2>Experience</h2>
-  <div class="experience-entry">
-    <div class="header">
-      <span class="institution"><strong>Westlake University NLP Lab</strong> - Research Intern</span
-      >
-    </div>
-    <span class="date">July 2024 – September 2024</span>
-    <ul class="details">
-      <li>
-        Supervisor: <strong
-          ><a href="https://frcchang.github.io/" target="_blank">Prof. Yue Zhang</a></strong
-        >.
-      </li>
-      <li>Focus: LLM Prompting, Reasoning, Chain of Thought.</li>
-      <!-- Add more details here if available -->
-    </ul>
-  </div>
-
-  <div class="experience-entry">
-    <div class="header">
-      <span class="institution"><strong>Team V5++, NPU Soccer Robot Base</strong> - Leader</span>
-    </div>
-    <span class="date">May 2023 – July 2025</span>
-    <ul class="details">
-      <li>Managed team operations, served as Technical Director and led recruitment.</li>
-      <li>Led design and implementation of 2023-2025 recruitment technical exams.</li>
-      <li>Maintained team DevOps (cloud storage, LLM chatbot, code hosting, etc.).</li>
-      <li>Team awarded <strong>Model Team of NPU</strong> (2022).</li>
-    </ul>
-  </div>
-
-  <div class="experience-entry">
-    <div class="header">
-      <span class="institution"
-        ><strong>College Innovation & Entrepreneurship Training Program</strong> - Member</span
-      >
-    </div>
-    <span class="date">September 2023 – June 2024</span>
-    <ul class="details">
-      <li>
-        <strong>National project</strong>, completed with <strong>Good standing</strong> (2024).
-      </li>
-      <li>
-        Project: UAV Camouflage Object Recognition Based on Hyperspectral Image Reconstruction.
-      </li>
-      <li>Contributed to UAV joint control development.</li>
-    </ul>
-  </div>
+  {
+    experience.map((exp) => (
+      <div class="experience-entry">
+        <div class="header">
+          <span class="institution">
+            <strong>{exp.institution}</strong> - {exp.role}
+          </span>
+        </div>
+        <span class="date">{exp.date}</span>
+        <ul class="details">
+          {exp.details.map((detail) => (
+            <li set:html={detail} />
+          ))}
+        </ul>
+      </div>
+    ))
+  }
 </section>
 
 <style>

@@ -2,6 +2,9 @@
 // Content for the "Highlights & Updates" section
 import { allTimelineEvents, type TimelineEventItem } from "../../../data/timelineEvents";
 import Button from "../../common/Button.astro";
+import { homeContent } from "../../../data/siteContent";
+
+const { title, cta, fallback } = homeContent.highlights;
 const numberOfHighlightsToShow = 3; // Max number of highlights to show
 
 // 1. Filter events marked as highlights
@@ -13,8 +16,6 @@ allHighlights.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTi
 
 // 3. Slice to get the latest N highlights
 const highlightsToShow: TimelineEventItem[] = allHighlights.slice(0, numberOfHighlightsToShow);
-
-const timelineUrl = "/timeline";
 
 // Improved date formatting function (example)
 function formatEventDate(dateStr: string): string {
@@ -35,7 +36,7 @@ function formatEventDate(dateStr: string): string {
 }
 ---
 
-<h2 slot="title" class="about-title scroll-target-title">Highlights & Updates</h2>
+<h2 slot="title" class="about-title scroll-target-title">{title}</h2>
 
 <div class="about-content scroll-target-content">
   {
@@ -61,12 +62,12 @@ function formatEventDate(dateStr: string): string {
         ))}
       </ul>
     ) : (
-      <p>No recent highlights available. Check back soon!</p> // Fallback message
+      <p>{fallback}</p>
     )
   }
 
   <div class="button-group">
-    <Button class="button" href={timelineUrl} text="Explore My Journey" wrapperClass="cta-link" />
+    <Button class="button" href={cta.href} text={cta.text} wrapperClass="cta-link" />
   </div>
 </div>
 

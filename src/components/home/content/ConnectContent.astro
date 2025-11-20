@@ -1,31 +1,25 @@
 ---
 // Content for the "Keep in touch" section
-import Button from "../../common/Button.astro"; // Import Button component
-import { Icon } from "astro-icon/components"; // Import Icon component
+import Button from "../../common/Button.astro";
+import { Icon } from "astro-icon/components";
+import { homeContent } from "../../../data/siteContent";
+import { siteConfig } from "../../../config";
 
-const email = "zheyucao2004@gmail.com";
-const githubUrl = "https://github.com/zheyucao";
-const contactUrl = "/contact";
+const { title, paragraphs, cta } = homeContent.connect;
+const { social } = siteConfig;
 ---
 
-<h2 slot="title" class="about-title scroll-target-title">Keep in touch</h2>
+<h2 slot="title" class="about-title scroll-target-title">{title}</h2>
 
 <div class="about-content scroll-target-content">
-  <p>
-    Being an researcher in AI, I am keen to connect with professors and researchers regarding
-    studies or collaboration, and with recruiters about future opportunities.
-  </p>
-  <p>
-    Beyond that, I look forward to making friends from all walks of life. Please feel free to reach
-    out!
-  </p>
+  {paragraphs.map((paragraph) => <p>{paragraph}</p>)}
 
   <div class="connect-icon-links">
-    <a href={`mailto:${email}`} title="Send me an email" aria-label="Email">
+    <a href={social.email} title="Send me an email" aria-label="Email">
       <Icon name="ri:mail-line" size={24} aria-hidden="true" />
     </a>
     <a
-      href={githubUrl}
+      href={social.github}
       target="_blank"
       rel="noopener noreferrer"
       title="View my GitHub profile"
@@ -38,7 +32,7 @@ const contactUrl = "/contact";
 
   {/* Button for full contact page */}
   <div class="button-group">
-    <Button class="button" href={contactUrl} text="See All Contact Info" wrapperClass="cta-link" />
+    <Button class="button" href={cta.href} text={cta.text} wrapperClass="cta-link" />
   </div>
 </div>
 

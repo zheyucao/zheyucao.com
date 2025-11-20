@@ -1,12 +1,14 @@
 ---
 // Content for the "Featured Works" section
 import { allProjectsData, type ProjectDataItem } from "../../../data/projectsData";
-import FeaturedProjectCard from "../FeaturedProjectCard.astro"; // Import the new card component
+import FeaturedProjectCard from "../FeaturedProjectCard.astro";
 import Button from "../../common/Button.astro";
+import { homeContent } from "../../../data/siteContent";
+
+const { title, cta } = homeContent.featuredWorks;
 
 // Filter projects marked as featured
 const featuredProjects: ProjectDataItem[] = allProjectsData.filter((project) => project.isFeatured);
-const projectsUrl = "/projects";
 
 // Simple slugify function (consider a more robust library for complex cases)
 function slugify(text: string): string {
@@ -21,7 +23,7 @@ function slugify(text: string): string {
 }
 ---
 
-<h2 slot="title" class="about-title scroll-target-title">Featured Works</h2>
+<h2 slot="title" class="about-title scroll-target-title">{title}</h2>
 
 <div class="about-content scroll-target-content featured-works-container">
   {
@@ -40,12 +42,7 @@ function slugify(text: string): string {
   }
 
   <div class="button-group">
-    <Button
-      class="button"
-      href={projectsUrl}
-      text="Discover More Projects"
-      wrapperClass="projects-cta-button"
-    />
+    <Button class="button" href={cta.href} text={cta.text} wrapperClass="projects-cta-button" />
   </div>
 </div>
 
