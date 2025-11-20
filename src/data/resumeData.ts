@@ -10,7 +10,7 @@ export interface ResumeSection {
 
 export const resumeData = {
     download: {
-        text: "Download Résumé PDF (in Chinese)",
+        text: "PDF (Chinese)",
         href: "https://assets.zheyucao.com/resume.pdf",
         filename: "Zheyu_Cao_Resume_ZH.pdf",
     },

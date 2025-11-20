@@ -55,6 +55,11 @@ const downloadAttr = download === "" ? true : download;
     margin-bottom: 0;
   }
 
+  /* Animation support */
+  .button-wrapper.page-load-initial-state {
+    animation: pageLoadAnimate 0.8s ease-out 0s forwards;
+  }
+
   .button.button-link {
     display: inline-flex; /* Use flex to align text and icon */
     align-items: center; /* Vertically center icon and text */
