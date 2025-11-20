@@ -1,4 +1,5 @@
 ---
+import RichText from "../components/common/RichText.astro";
 import SubPageLayout from "../layouts/SubPageLayout.astro";
 import ProjectCard from "../components/projects/ProjectCard.astro";
 // Import data from the new file
@@ -44,8 +45,8 @@ function slugify(text: string): string {
             githubRepos={project.githubRepos}
             techStack={project.techStack}
           >
-            {/* Use set:html directly on a div or similar inside the slot */}
-            <div set:html={project.description} />
+            {/* Use RichText for description */}
+            <RichText content={project.description} />
           </ProjectCard>
         );
       })

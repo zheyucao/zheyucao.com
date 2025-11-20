@@ -3,6 +3,7 @@
 // Based on src/components/projects/ProjectCard.astro, adapted for homepage horizontal scroll
 
 import { Icon } from "astro-icon/components";
+import RichText from "../common/RichText.astro";
 
 interface Props {
   title: string;
@@ -28,7 +29,7 @@ const projectUrl = `/projects?scrollTo=${slug}`;
 <a href={projectUrl} class="featured-project-card">
   <div class="card-content-wrapper">
     <h4>{title}</h4>
-    <p class="summary" set:html={homepageSummary} />
+    <RichText tag="p" class="summary" inline content={homepageSummary} />
     {
       githubUrl && (
         <div class="github-icon-link-wrapper" aria-hidden="true">
@@ -98,7 +99,7 @@ const projectUrl = `/projects?scrollTo=${slug}`;
     padding-right: 2rem;
   }
 
-  .card-content-wrapper p.summary {
+  .card-content-wrapper :global(.summary) {
     font-size: 1rem; /* Increased summary size */
     color: var(--theme-text-lighter);
     margin: 0;

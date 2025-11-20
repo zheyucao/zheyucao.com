@@ -15,8 +15,8 @@ export const resumeData = {
             title: "Profile",
             type: "text",
             content: [
-                "I'm <strong>Zheyu Cao</strong>, a fourth-year undergraduate student at <strong>Northwestern Polytechnical University</strong>, majoring in <strong>Computer Science and Technology</strong>.",
-                "I'm deeply interested in <strong>frontend development</strong>, <strong>artificial intelligence</strong>, and <strong>linguistics</strong>. I love exploring and learning cool new things, especially where technology meets aesthetics.",
+                "I'm **Zheyu Cao**, a fourth-year undergraduate student at **Northwestern Polytechnical University**, majoring in **Computer Science and Technology**.",
+                "I'm deeply interested in **frontend development**, **artificial intelligence**, and **linguistics**. I love exploring and learning cool new things, especially where technology meets aesthetics.",
             ],
         },
         {
@@ -27,16 +27,16 @@ export const resumeData = {
                 {
                     title: "Northwestern Polytechnical University",
                     date: "September 2026 (Expected)",
-                    subtitle: "Master of Engineering in Intelligence Science and Technology, <br /><em>Admitted</em>",
+                    subtitle: "Master of Engineering in Intelligence Science and Technology  \n*Admitted*",
                 },
                 {
                     title: "Northwestern Polytechnical University",
                     date: "September 2022 – Present",
                     subtitle:
-                        "Bachelor of Engineering in Computer Science and Technology, <br /><em>Fourth-year Undergraduate</em>",
+                        "Bachelor of Engineering in Computer Science and Technology  \n*Fourth-year Undergraduate*",
                     details: [
-                        "GPA: <strong>3.718</strong> &emsp; Average Score: <strong>90.49</strong> &emsp; Major Rank: <strong>8</strong>/192",
-                        "College English Test - Band 4: <strong>650</strong> &emsp; College English Test - Band 6: <strong>634</strong>",
+                        "GPA: **3.718** &emsp; Average Score: **90.49** &emsp; Major Rank: **8**/192",
+                        "College English Test - Band 4: **650** &emsp; College English Test - Band 6: **634**",
                     ],
                 },
             ],
@@ -51,27 +51,27 @@ export const resumeData = {
                     date: "November 2024",
                 },
                 {
-                    title: "NPU <strong>Outstanding Student & First-Class Scholarship</strong>",
+                    title: "NPU **Outstanding Student & First-Class Scholarship**",
                     date: "November 2024",
                 },
                 {
-                    title: "NPU <strong>Outstanding Student & Second-Class Scholarship</strong>",
+                    title: "NPU **Outstanding Student & Second-Class Scholarship**",
                     date: "November 2023",
                 },
                 {
-                    title: "China Robot Contest: <strong>National First Prize</strong>",
+                    title: "China Robot Contest: **National First Prize**",
                     date: "November 2024",
                 },
                 {
-                    title: "China Robot Contest: <strong>National First Prize</strong>",
+                    title: "China Robot Contest: **National First Prize**",
                     date: "May 2024",
                 },
                 {
-                    title: "China Robot Contest: <strong>National Second Prize</strong>",
+                    title: "China Robot Contest: **National Second Prize**",
                     date: "October 2023",
                 },
                 {
-                    title: "China Robot Championship: <strong>National First Prize</strong>",
+                    title: "China Robot Championship: **National First Prize**",
                     date: "October 2024",
                 },
                 {
@@ -89,7 +89,7 @@ export const resumeData = {
                     subtitle: "Research Intern",
                     date: "July 2024 – September 2024",
                     details: [
-                        "Supervisor: <strong><a href='https://frcchang.github.io/' target='_blank'>Prof. Yue Zhang</a></strong>.",
+                        "Supervisor: **[Prof. Yue Zhang](https://frcchang.github.io/)**.",
                         "Focus: LLM Prompting, Reasoning, Chain of Thought.",
                     ],
                 },
@@ -101,7 +101,7 @@ export const resumeData = {
                         "Managed team operations, served as Technical Director and led recruitment.",
                         "Led design and implementation of 2023-2025 recruitment technical exams.",
                         "Maintained team DevOps (cloud storage, LLM chatbot, code hosting, etc.).",
-                        "Team awarded <strong>Model Team of NPU</strong> (2022).",
+                        "Team awarded **Model Team of NPU** (2022).",
                     ],
                 },
                 {
@@ -109,7 +109,7 @@ export const resumeData = {
                     subtitle: "Member",
                     date: "September 2023 – June 2024",
                     details: [
-                        "<strong>National project</strong>, completed with <strong>Good standing</strong> (2024).",
+                        "**National project**, completed with **Good standing** (2024).",
                         "Project: UAV Camouflage Object Recognition Based on Hyperspectral Image Reconstruction.",
                         "Contributed to UAV joint control development.",
                     ],
@@ -126,7 +126,7 @@ export const resumeData = {
                     date: "September 2024 – January 2025",
                     details: [
                         "Independently completed course labs, including Bootloader, Paging, Process Scheduling, Syscalls, etc.",
-                        "Implemented graphics system for uniOS (2-person team). <ul><li>Responsible for system design, hardware drivers and composition layer.</li><li>Implemented antialiasing, dirty region detection, alpha blending, etc.</li><li>Designed and implemented a simple window manager and GUI for uniOS.</li><li>GitHub Repository: <a href='https://github.com/angine04/unios' target='_blank'>https://github.com/angine04/unios</a>.</li></ul>",
+                        "Implemented graphics system for uniOS (2-person team):\n- Responsible for system design, hardware drivers and composition layer.\n- Implemented antialiasing, dirty region detection, alpha blending, etc.\n- Designed and implemented a simple window manager and GUI for uniOS.\n- GitHub Repository: [https://github.com/angine04/unios](https://github.com/angine04/unios).",
                     ],
                 },
                 {
@@ -134,8 +134,8 @@ export const resumeData = {
                     date: "April 2025",
                     details: [
                         "This website you're currently viewing.",
-                        "Designed and built by me for myself. It is built using: <ul><li>Astro (framework)</li><li>TypeScript (programming language)</li><li>Plain CSS (styling)</li><li>GSAP (animations)</li><li>Node.js & pnpm (environment & package management)</li><li>Github Pages (hosting)</li></ul>",
-                        "GitHub Repository: <a href='https://github.com/zheyucao/zheyucao.com' target='_blank'>https://github.com/zheyucao/zheyucao.com</a>.",
+                        "Designed and built by me for myself. It is built using:\n- Astro (framework)\n- TypeScript (programming language)\n- Plain CSS (styling)\n- GSAP (animations)\n- Node.js & pnpm (environment & package management)\n- Github Pages (hosting)",
+                        "GitHub Repository: [https://github.com/zheyucao/zheyucao.com](https://github.com/zheyucao/zheyucao.com).",
                     ],
                 },
             ],

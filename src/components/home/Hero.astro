@@ -1,4 +1,5 @@
 ---
+import RichText from "../common/RichText.astro";
 import { homeContent } from "../../data/siteContent";
 
 const { greeting, name, description } = homeContent.hero;
@@ -8,7 +9,9 @@ const { greeting, name, description } = homeContent.hero;
   <div class="hero-text">
     <div class="greeting">{greeting}</div>
     <div class="hero-name">{name}</div>
-    <div class="hero-description" set:html={description} />
+    <div class="hero-description">
+      <RichText content={description} />
+    </div>
   </div>
   <!-- Scroll Down Icon Removed -->
 </section>
@@ -79,7 +82,8 @@ const { greeting, name, description } = homeContent.hero;
     animation: unblurFadeIn 2s ease-out 0.8s forwards;
   }
 
-  .hero-description em {
+  .hero-description :global(em) {
     font-weight: 600;
+    font-style: normal;
   }
 </style>

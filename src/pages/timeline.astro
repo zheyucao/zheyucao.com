@@ -5,7 +5,21 @@ import { allTimelineEvents } from "../data/timelineEvents";
 import "../styles/timeline.css";
 
 // Use the imported data
-const allEvents = allTimelineEvents;
+// const allEvents = allTimelineEvents; // Replaced by mapped version below
+
+// Pre-render Markdown for client-side usage
+import MarkdownIt from "markdown-it";
+const md = new MarkdownIt({
+  html: true,
+  linkify: true,
+  typographer: true,
+  breaks: true,
+});
+
+const allEvents = allTimelineEvents.map((event) => ({
+  ...event,
+  renderedDescription: event.description ? md.render(event.description) : "",
+}));
 
 // Calculate unique categories based on actual data
 const categories = [...new Set(allEvents.map((event) => event.category).filter(Boolean))].sort();
@@ -17,10 +31,6 @@ let initialFilteredEvents = allTimelineEvents.sort((a, b) =>
     ? new Date(b.date).getTime() - new Date(a.date).getTime()
     : new Date(a.date).getTime() - new Date(b.date).getTime()
 );
-
-// Remove placeholder/unused variable definitions
-// const TimelineEvent = ... (If component not used for SSR)
-// const processedEvents = ...
 ---
 
 <SubPageLayout title="Timeline">
@@ -128,8 +138,8 @@ let initialFilteredEvents = allTimelineEvents.sort((a, b) =>
     filteredEvents.forEach((event, index) => {
       const isLast = index === filteredEvents.length - 1;
       const displayDate = event.dateRange ? event.dateRange : formatTimelineDate(event.date);
-      const descriptionHTML = event.description
-        ? `<div class="timeline-description">${event.description}</div>`
+      const descriptionHTML = event.renderedDescription
+        ? `<div class="timeline-description">${event.renderedDescription}</div>`
         : "";
 
       timelineHTML += `

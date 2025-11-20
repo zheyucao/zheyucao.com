@@ -9,6 +9,8 @@ interface Props {
   isLast?: boolean; // To prevent line extending past the last item
 }
 
+import RichText from "../common/RichText.astro";
+
 const { date, dateRange, title, description, /*category,*/ isLast = false } = Astro.props;
 ---
 
@@ -20,6 +22,12 @@ const { date, dateRange, title, description, /*category,*/ isLast = false } = As
       <h3 class="timeline-title">{title}</h3>
       <!-- {category && <span class="timeline-category">{category}</span>} -->
     </div>
-    {description && <div class="timeline-description" set:html={description} />}
+    {
+      description && (
+        <div class="timeline-description">
+          <RichText content={description} />
+        </div>
+      )
+    }
   </div>
 </li>

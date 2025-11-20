@@ -1,6 +1,7 @@
 ---
 import SubPageLayout from "../layouts/SubPageLayout.astro";
 import { Icon } from "astro-icon/components";
+import RichText from "../components/common/RichText.astro";
 import { contactData } from "../data/contactData";
 
 const { intro, sections } = contactData;
@@ -8,13 +9,19 @@ const { intro, sections } = contactData;
 
 <SubPageLayout title="Contact">
   <div class="contact-content">
-    {intro.map((text) => <p class="intro-text">{text}</p>)}
+    <div class="intro-text">
+      <RichText content={intro} />
+    </div>
 
     {
       Object.values(sections).map((section) => (
         <>
           <h3 class="contact-section-title">{section.title}</h3>
-          {section.description && <p class="section-description" set:html={section.description} />}
+          {section.description && (
+            <div class="section-description">
+              <RichText content={section.description} />
+            </div>
+          )}
           <ul class="contact-list">
             {section.items.map((item) => (
               <li>

@@ -1,6 +1,7 @@
 ---
 // Content for the "Meet me!" section
 import Button from "../../common/Button.astro";
+import RichText from "../../common/RichText.astro";
 import { homeContent } from "../../../data/siteContent";
 
 const { title, paragraphs, cta } = homeContent.meetMe;
@@ -9,7 +10,7 @@ const { title, paragraphs, cta } = homeContent.meetMe;
 <h2 slot="title" class="about-title scroll-target-title">{title}</h2>
 
 <div class="about-content scroll-target-content">
-  {paragraphs.map((paragraph) => <p set:html={paragraph} />)}
+  <RichText content={paragraphs} />
 
   <div class="button-group">
     <Button class="button" href={cta.href} text={cta.text} wrapperClass="meet-me-cta-button" />

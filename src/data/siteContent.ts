@@ -2,13 +2,13 @@ export const homeContent = {
     hero: {
         greeting: "Hello, I'm",
         name: "Zheyu Cao",
-        description: "One who <em>discovers</em>, <em>devises</em> and <em>devotes</em>.",
+        description: "One who *discovers*, *devises* and *devotes*.",
     },
     meetMe: {
         title: "About me",
         paragraphs: [
-            "I'm Zheyu Cao, a fourth-year undergraduate in <strong>Computer Science and Technology</strong> at <strong>Northwestern Polytechnical University</strong>.",
-            "I enjoy tackling challenges and creating cool projects, from websites to handcrafted OS kernels. I currently focus on <strong>Artificial Intelligence</strong>, particularly exploring the capabilities of LLMs.",
+            "I'm Zheyu Cao, a fourth-year undergraduate in **Computer Science and Technology** at **Northwestern Polytechnical University**.",
+            "I enjoy tackling challenges and creating cool projects, from websites to handcrafted OS kernels. I currently focus on **Artificial Intelligence**, particularly exploring the capabilities of LLMs.",
             "Currently, I am eager to contribute to cutting-edge Deep Learning research.",
         ],
         cta: {

@@ -1,0 +1,151 @@
+---
+/**
+ * RichText Component
+ *
+ * Renders Markdown content with proper styling.
+ * Accepts either a single string or an array of strings (paragraphs).
+ *
+ * Usage:
+ *   <RichText content="# Hello\nThis is **bold**" />
+ *   <RichText content={["First paragraph", "Second paragraph"]} />
+ *   <RichText tag="p" inline content="Inline **bold** text" />
+ */
+
+import MarkdownIt from "markdown-it";
+
+interface Props {
+  content: string | string[];
+  class?: string;
+  tag?: string;
+  inline?: boolean;
+}
+
+const { content, class: className = "", tag: Tag = "div", inline = false } = Astro.props;
+
+// Convert array to markdown string with paragraph breaks
+let markdownContent = Array.isArray(content) ? content.join("\n\n") : content;
+
+// Convert literal \n to actual newlines (for line breaks within paragraphs)
+// This handles cases like "text  \n*italic*" in the data
+markdownContent = markdownContent.replace(/\\n/g, "\n");
+
+// Initialize markdown-it with HTML enabled and breaks
+const md = new MarkdownIt({
+  html: true,
+  linkify: true,
+  typographer: true,
+  breaks: true, // Convert \n to <br>
+});
+
+const html = inline ? md.renderInline(markdownContent) : md.render(markdownContent);
+---
+
+<Tag class={`rich-text ${className}`} set:html={html} />
+
+<style>
+  .rich-text {
+    line-height: 1.7;
+  }
+
+  /* Headings */
+  .rich-text :global(h1),
+  .rich-text :global(h2),
+  .rich-text :global(h3),
+  .rich-text :global(h4),
+  .rich-text :global(h5),
+  .rich-text :global(h6) {
+    margin-top: 1.5em;
+    margin-bottom: 0.5em;
+    font-weight: 600;
+    line-height: 1.3;
+  }
+
+  .rich-text :global(h1) {
+    font-size: 2em;
+  }
+  .rich-text :global(h2) {
+    font-size: 1.5em;
+  }
+  .rich-text :global(h3) {
+    font-size: 1.25em;
+  }
+
+  /* Paragraphs */
+  .rich-text :global(p) {
+    margin-bottom: 1em;
+  }
+
+  .rich-text :global(p:last-child) {
+    margin-bottom: 0;
+  }
+
+  /* Links */
+  .rich-text :global(a) {
+    color: var(--link-color);
+    text-decoration: none;
+    transition: color 0.3s ease;
+  }
+
+  .rich-text :global(a:hover) {
+    color: var(--link-hover-color);
+    text-decoration: underline;
+  }
+
+  /* Strong and emphasis */
+  .rich-text :global(strong) {
+    font-weight: 600;
+  }
+
+  .rich-text :global(em) {
+    font-style: italic;
+  }
+
+  /* Lists */
+  .rich-text :global(ul),
+  .rich-text :global(ol) {
+    margin: 1em 0;
+    padding-left: 2em;
+  }
+
+  .rich-text :global(li) {
+    margin-bottom: 0.5em;
+  }
+
+  /* Code */
+  .rich-text :global(code) {
+    background-color: var(--code-bg, rgba(0, 0, 0, 0.05));
+    padding: 0.2em 0.4em;
+    border-radius: 3px;
+    font-family: var(--font-family-mono, monospace);
+    font-size: 0.9em;
+  }
+
+  .rich-text :global(pre) {
+    background-color: var(--code-bg, rgba(0, 0, 0, 0.05));
+    padding: 1em;
+    border-radius: 5px;
+    overflow-x: auto;
+    margin: 1em 0;
+  }
+
+  .rich-text :global(pre code) {
+    background-color: transparent;
+    padding: 0;
+  }
+
+  /* Blockquotes */
+  .rich-text :global(blockquote) {
+    border-left: 3px solid var(--text-muted);
+    padding-left: 1em;
+    margin: 1em 0;
+    font-style: italic;
+    color: var(--text-muted);
+  }
+
+  /* Horizontal rule */
+  .rich-text :global(hr) {
+    border: none;
+    border-top: 1px solid var(--text-muted);
+    margin: 2em 0;
+  }
+</style>

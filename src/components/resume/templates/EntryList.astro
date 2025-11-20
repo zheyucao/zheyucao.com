@@ -1,4 +1,6 @@
 ---
+import RichText from "../../common/RichText.astro";
+
 export interface EntryItem {
   title: string;
   subtitle?: string;
@@ -20,16 +22,20 @@ const { title, entries } = Astro.props;
     entries.map((entry) => (
       <div class="entry-item">
         <div class="header">
-          <span class="title" set:html={entry.title} />
-          {entry.subtitle && <span class="subtitle" set:html={entry.subtitle} />}
+          <span class="title">
+            <RichText content={entry.title} />
+          </span>
+          {entry.subtitle && (
+            <span class="subtitle">
+              <RichText content={entry.subtitle} />
+            </span>
+          )}
           {entry.date && <span class="date">{entry.date}</span>}
         </div>
         {entry.details && (
-          <ul class="details">
-            {entry.details.map((detail) => (
-              <li set:html={detail} />
-            ))}
-          </ul>
+          <div class="details">
+            <RichText content={entry.details} />
+          </div>
         )}
       </div>
     ))
@@ -76,14 +82,9 @@ const { title, entries } = Astro.props;
     margin-left: 1rem;
   }
   .details {
-    list-style: disc;
-    padding-left: 1.5rem;
-    margin-left: 0;
+    margin-top: 0.8rem;
     font-size: 1.1rem;
     line-height: 1.8;
-  }
-  .details li {
-    margin-bottom: 0.3rem;
   }
 
   @media (max-width: 600px) {

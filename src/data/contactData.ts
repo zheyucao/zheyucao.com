@@ -65,7 +65,7 @@ export const contactData: {
         online: {
             title: "Online Presence",
             description:
-                "I also go by <strong>Angine</strong> online. You can find me through:",
+                "I also go by **Angine** online. You can find me through:",
             items: [
                 {
                     icon: "ri:mail-line",
