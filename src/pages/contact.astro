@@ -18,60 +18,64 @@ const { intro, sections } = await getContactViewModel();
     }
 
     {
-      sections.map((section) => (
+      sections.map((section, sectionIndex) => (
         <>
           <div class="section-prose">
             <section.Content />
           </div>
           <ul class="contact-list">
-            {section.items.map((item) => (
+            {section.items.map((item, itemIndex) => (
               <li>
                 <Icon name={item.icon} class="contact-icon" />
-                {
-                  (() => {
-                    const value = item.content || item.label || item.href || "";
-                    const description = item.description;
-                    const copyValue =
-                      item.href ? undefined : item.copyOnClick === false ? undefined : value;
+                {(() => {
+                  const value = item.content || item.label || item.href || "";
+                  const description = item.description;
+                  const copyValue = item.href
+                    ? undefined
+                    : item.copyOnClick === false
+                      ? undefined
+                      : value;
+                  const triggerId = `contact-item-${sectionIndex}-${itemIndex}`;
 
-                    if (item.href) {
-                      return (
-                        <>
-                          <a href={item.href} target={item.target} rel={item.rel} set:html={value} />
-                          {description && <span class="inline-desc">&nbsp;{description}</span>}
-                        </>
-                      );
-                    }
-
-                    if (copyValue) {
-                      return (
-                        <>
-                          <Tooltip
-                            class="copy-only-tooltip"
-                            label="Copied!"
-                            position="bottom"
-                            trigger="click"
-                          >
-                            <span
-                              class:list={["copyable", { clickable: true }]}
-                              data-copy-value={copyValue}
-                              role="text"
-                              set:html={value}
-                            />
-                          </Tooltip>
-                          {description && <span class="inline-desc">&nbsp;{description}</span>}
-                        </>
-                      );
-                    }
-
+                  if (item.href) {
                     return (
                       <>
-                        <span set:html={value} />
+                        <a href={item.href} target={item.target} rel={item.rel} set:html={value} />
                         {description && <span class="inline-desc">&nbsp;{description}</span>}
                       </>
                     );
-                  })()
-                }
+                  }
+
+                  if (copyValue) {
+                    return (
+                      <>
+                        <span
+                          id={triggerId}
+                          class:list={["copyable", { clickable: true }]}
+                          data-copy-value={copyValue}
+                          role="text"
+                          set:html={value}
+                        />
+                        <Tooltip
+                          triggerId={triggerId}
+                          class="copy-only-tooltip"
+                          position="right"
+                          triggerEvent="click"
+                        >
+                          Copied!
+                        </Tooltip>
+                        {description && <span class="inline-desc">&nbsp;{description}</span>}
+                      </>
+                    );
+                  }
+
+                  return (
+                    <>
+                      <span set:html={value} />
+                      {description && <span class="inline-desc">&nbsp;{description}</span>}
+                    </>
+                  );
+                })()}
               </li>
             ))}
           </ul>
