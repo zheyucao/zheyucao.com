@@ -129,6 +129,15 @@ const ui_strings = defineCollection({
             emailLabel: z.string(),
             copyrightText: z.string(),
         }),
+        pages: z.object({
+            projects: z.object({
+                title: z.string(),
+            }),
+            timeline: z.object({
+                title: z.string(),
+                filterAll: z.string(),
+            }),
+        }),
     }),
 });
 

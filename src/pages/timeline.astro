@@ -8,13 +8,16 @@ const {
   events: allEvents,
   categories,
   initialEvents: initialFilteredEvents,
+  pageTitle,
+  filterAll,
 } = await getTimelineViewModel();
 ---
 
-<SubPageLayout title="Timeline">
+<SubPageLayout title={pageTitle}>
   <div class="timeline-controls">
     <div class="control-group category-tabs">
-      <button type="button" class="category-tab" data-category="all" aria-pressed="true">All</button
+      <button type="button" class="category-tab" data-category="all" aria-pressed="true"
+        >{filterAll}</button
       >
       {
         categories.map((cat) => (

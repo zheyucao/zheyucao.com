@@ -3,10 +3,10 @@ import SubPageLayout from "../layouts/SubPageLayout.astro";
 import ProjectCard from "../components/projects/ProjectCard.astro";
 import { getProjectsViewModel } from "../viewmodels/projectsViewModel";
 
-const { projects } = await getProjectsViewModel();
+const { projects, pageTitle } = await getProjectsViewModel();
 ---
 
-<SubPageLayout title="Projects">
+<SubPageLayout title={pageTitle}>
   <div class="projects-grid">
     {
       projects.map((project) => (

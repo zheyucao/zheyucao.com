@@ -1,4 +1,4 @@
-import { getCollection } from "astro:content";
+import { getCollection, getEntry } from "astro:content";
 
 /**
  * Projects page view model
@@ -20,7 +20,12 @@ export async function getProjectsViewModel() {
     // For now, keep original order as timeframe is optional
     // You can add custom sorting logic here if needed
 
+    // Fetch UI strings
+    const uiStrings = await getEntry("ui-strings", "en");
+    const pageTitle = uiStrings.data.pages.projects.title;
+
     return {
         projects,
+        pageTitle,
     };
 }

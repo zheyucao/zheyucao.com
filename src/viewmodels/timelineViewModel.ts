@@ -1,4 +1,4 @@
-import { getCollection } from "astro:content";
+import { getCollection, getEntry } from "astro:content";
 import MarkdownIt from "markdown-it";
 
 const md = new MarkdownIt({
@@ -31,9 +31,15 @@ export async function getTimelineViewModel() {
         new Date(b.date).getTime() - new Date(a.date).getTime()
     );
 
+    // Fetch UI strings
+    const uiStrings = await getEntry("ui-strings", "en");
+    const { title: pageTitle, filterAll } = uiStrings.data.pages.timeline;
+
     return {
         events: allEvents,
         categories,
         initialEvents: sortedEvents,
+        pageTitle,
+        filterAll,
     };
 }
