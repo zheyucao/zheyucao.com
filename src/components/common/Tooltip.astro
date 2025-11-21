@@ -203,11 +203,18 @@ const {
       // Find the scrolling container (page-wrapper or window)
       const scrollContainer = document.querySelector(".page-wrapper") || window;
 
-      // Update position on scroll/resize if active
+      // Use requestAnimationFrame for smoother position updates during scroll
+      let ticking = false;
       scrollContainer.addEventListener(
         "scroll",
         () => {
-          if (tooltip.classList.contains("active")) updatePosition();
+          if (!ticking && tooltip.classList.contains("active")) {
+            requestAnimationFrame(() => {
+              updatePosition();
+              ticking = false;
+            });
+            ticking = true;
+          }
         },
         { passive: true }
       );
