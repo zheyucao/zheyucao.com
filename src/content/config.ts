@@ -103,9 +103,8 @@ const resume = defineCollection({
 });
 
 const contact = defineCollection({
-    type: 'data',
+    type: 'content',
     schema: z.object({
-        intro: z.array(z.string()),
         sections: z.record(z.object({
             title: z.string(),
             description: z.string().optional(),

@@ -1,16 +1,16 @@
 ---
-import SubPageLayout from "../layouts/SubPageLayout.astro";
-import { Icon } from "astro-icon/components";
 import RichText from "../components/common/RichText.astro";
+import SubPageLayout from "../layouts/SubPageLayout.astro";
 import { getContactViewModel } from "../viewmodels/contactViewModel";
+import { Icon } from "astro-icon/components";
 
-const { intro, sections } = await getContactViewModel();
+const { Content, sections } = await getContactViewModel();
 ---
 
 <SubPageLayout title="Contact">
   <div class="contact-content">
     <div class="intro-text">
-      <RichText content={intro} />
+      <Content />
     </div>
 
     {
