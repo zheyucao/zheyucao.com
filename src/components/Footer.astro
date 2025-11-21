@@ -1,13 +1,34 @@
 ---
 // Component: src/components/Footer.astro
 import { siteConfig } from "../config";
-import { getEntry } from "astro:content";
+import { getCollection, getEntry } from "astro:content";
 
 const currentYear = new Date().getFullYear();
 const { metadata, navigation, social } = siteConfig;
 
 const uiStrings = await getEntry("ui-strings", "en");
 const { footer: footerStrings } = uiStrings.data;
+
+// Load contact items for footer (single source of truth)
+const contactEntries = await getCollection("contact");
+const listEntries = contactEntries.filter((entry) => entry.data.kind === "list");
+const contactFooterItems = listEntries
+  .sort((a, b) => (a.data.order ?? 0) - (b.data.order ?? 0))
+  .flatMap((entry, sectionIndex) => {
+    const baseOrder = entry.data.order ?? sectionIndex;
+    const items = (entry.data as any).items || [];
+    return items
+      .map((item: any, idx: number) => ({
+        ...item,
+        order: baseOrder * 100 + idx,
+      }))
+      .filter(
+        (item) =>
+          item.showOnContact !== false &&
+          item.href // footer only shows linkable items
+      );
+  })
+  .sort((a, b) => a.order - b.order);
 ---
 
 <footer class="site-footer">
@@ -39,16 +60,34 @@ const { footer: footerStrings } = uiStrings.data;
     <div class="footer-column footer-column-3">
       <h4>{footerStrings.connectHeading}</h4>
       <ul>
-        <li>
-          <a class="link" href={social.github} target="_blank" rel="noopener noreferrer"
-            >{footerStrings.githubLabel}</a
-          >
-        </li>
-        <li>
-          <a class="link" href={social.email} target="_blank" rel="noopener noreferrer"
-            >{footerStrings.emailLabel}</a
-          >
-        </li>
+        {
+          contactFooterItems.length > 0
+            ? contactFooterItems.map((item) => (
+                <li>
+                  <a
+                    class="link"
+                    href={item.href}
+                    target={item.target}
+                    rel={item.rel}
+                    aria-label={item.label || item.content || item.href}
+                  >
+                    {item.label || item.content || item.href}
+                  </a>
+                </li>
+              ))
+            : [
+                <li>
+                  <a class="link" href={social.github} target="_blank" rel="noopener noreferrer"
+                    >{footerStrings.githubLabel}</a
+                  >
+                </li>,
+                <li>
+                  <a class="link" href={social.email} target="_blank" rel="noopener noreferrer"
+                    >{footerStrings.emailLabel}</a
+                  >
+                </li>,
+              ]
+        }
       </ul>
     </div>
   </div>

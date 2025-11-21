@@ -28,11 +28,16 @@ const { intro, sections } = await getContactViewModel();
                 <Icon name={item.icon} class="contact-icon" />
                 {item.href ? (
                   <>
-                    <a href={item.href} target={item.target} rel={item.rel} set:html={item.label} />
+                    <a
+                      href={item.href}
+                      target={item.target}
+                      rel={item.rel}
+                      set:html={item.content || item.label}
+                    />
                     {item.description && <span>&nbsp;{item.description}</span>}
                   </>
                 ) : (
-                  <span set:html={item.label} />
+                  <span set:html={item.content || item.label} />
                 )}
               </li>
             ))}

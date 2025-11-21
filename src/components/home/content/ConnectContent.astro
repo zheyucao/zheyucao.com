@@ -1,9 +1,7 @@
 ---
 // Content for the "Keep in touch" section
 import Button from "../../common/Button.astro";
-import Tooltip from "../../common/Tooltip.astro";
-import { Icon } from "astro-icon/components";
-import type { AstroComponentFactory } from "astro/runtime/server";
+import ContactIcons from "../../contact/ContactIcons.astro";
 
 interface Props {
   data: {
@@ -12,7 +10,7 @@ interface Props {
       text: string;
       href: string;
     };
-    Content: AstroComponentFactory;
+    Content: any;
     socialItems?: {
       icon: string;
       label?: string;
@@ -36,43 +34,11 @@ const { title, cta, Content, socialItems } = data;
     <Content />
   </div>
 
-  <div class="connect-icon-links">
-    {
-      socialItems?.length
-        ? socialItems.map((item) => {
-            const label = item.label || "Link";
-            const description = item.description;
-            return (
-              <Tooltip label={label} position="bottom">
-                <div slot="bubble">
-                  <div class="tooltip-label">{label}</div>
-                  {description && <div class="tooltip-desc">{description}</div>}
-                </div>
-                {item.href ? (
-                  <a
-                    href={item.href}
-                    target={item.target}
-                    rel={item.rel}
-                    aria-label={label}
-                  >
-                    <Icon name={item.icon} size={22} aria-hidden="true" />
-                  </a>
-                ) : (
-                  <span
-                    class="icon-placeholder"
-                    role="img"
-                    aria-label={label}
-                    data-copy-value={(item.copyOnClick ?? true) ? label : undefined}
-                  >
-                    <Icon name={item.icon} size={22} aria-hidden="true" />
-                  </span>
-                )}
-              </Tooltip>
-            );
-          })
-        : null
-    }
-  </div>
+  {socialItems?.length ? (
+    <div class="connect-icon-links">
+      <ContactIcons items={socialItems} />
+    </div>
+  ) : null}
 
   {/* Button for full contact page */}
   <div class="button-group">
@@ -88,33 +54,7 @@ const { title, cta, Content, socialItems } = data;
   }
 
   .connect-icon-links {
-    display: flex;
-    align-items: center;
-    gap: 1.8rem; /* Generous spacing between icons */
-    margin-bottom: 2.5rem; /* Space below icons */
-  }
-
-  .connect-icon-links a,
-  .connect-icon-links .icon-placeholder {
-    color: var(--theme-icon-color);
-    opacity: 0.8;
-    transition:
-      opacity 0.2s ease,
-      color 0.2s ease;
-    display: inline-block;
-  }
-
-  .connect-icon-links a:hover,
-  .connect-icon-links a:focus,
-  .connect-icon-links .icon-placeholder:hover,
-  .connect-icon-links .icon-placeholder:focus {
-    opacity: 1;
-    color: var(--theme-accent);
-    outline: none;
-  }
-
-  .connect-icon-links .icon-placeholder {
-    cursor: pointer;
+    margin: 2rem 0;
   }
 
   /* Style for the button group containing the CTA button */
@@ -127,25 +67,3 @@ const { title, cta, Content, socialItems } = data;
   /* Remove styles specific to the old .cta-link if they exist */
   /* .cta-link { ... } */
 </style>
-
-<script>
-  const handleCopy = async (value) => {
-    try {
-      await navigator.clipboard.writeText(value);
-    } catch (e) {
-      console.error("Unable to copy contact value:", e);
-    }
-  };
-
-  document.addEventListener("astro:page-load", () => {
-    const copyTargets = document.querySelectorAll(".connect-icon-links [data-copy-value]");
-    copyTargets.forEach((el) => {
-      el.addEventListener("click", (event) => {
-        const value = el.getAttribute("data-copy-value");
-        if (!value) return;
-        event.preventDefault();
-        handleCopy(value);
-      });
-    });
-  });
-</script>

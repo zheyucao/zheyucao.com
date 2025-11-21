@@ -114,7 +114,8 @@ const contact = defineCollection({
             order: z.number().optional(),
             items: z.array(z.object({
                 icon: z.string(),
-                label: z.string().optional(),
+                label: z.string().optional(), // display label
+                content: z.string().optional(), // underlying value (e.g., number, handle)
                 href: z.string().optional(),
                 target: z.string().optional(),
                 rel: z.string().optional(),
