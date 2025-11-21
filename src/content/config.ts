@@ -104,10 +104,14 @@ const resume = defineCollection({
 
 const contact = defineCollection({
     type: 'content',
-    schema: z.object({
-        sections: z.record(z.object({
-            title: z.string(),
-            description: z.string().optional(),
+    schema: z.discriminatedUnion('kind', [
+        z.object({
+            kind: z.literal('text'),
+            order: z.number().optional(),
+        }),
+        z.object({
+            kind: z.literal('list'),
+            order: z.number().optional(),
             items: z.array(z.object({
                 icon: z.string(),
                 label: z.string().optional(),
@@ -116,8 +120,8 @@ const contact = defineCollection({
                 rel: z.string().optional(),
                 description: z.string().optional(),
             })),
-        })),
-    }),
+        }),
+    ]),
 });
 
 const ui_strings = defineCollection({

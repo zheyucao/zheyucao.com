@@ -1,27 +1,27 @@
 ---
-import RichText from "../components/common/RichText.astro";
 import SubPageLayout from "../layouts/SubPageLayout.astro";
 import { getContactViewModel } from "../viewmodels/contactViewModel";
 import { Icon } from "astro-icon/components";
 
-const { Content, sections } = await getContactViewModel();
+const { intro, sections } = await getContactViewModel();
 ---
 
 <SubPageLayout title="Contact">
   <div class="contact-content">
-    <div class="intro-text">
-      <Content />
-    </div>
+    {
+      intro && (
+        <div class="intro-text">
+          <intro.Content />
+        </div>
+      )
+    }
 
     {
-      Object.values(sections).map((section) => (
+      sections.map((section) => (
         <>
-          <h3 class="contact-section-title">{section.title}</h3>
-          {section.description && (
-            <div class="section-description">
-              <RichText content={section.description} />
-            </div>
-          )}
+          <div class="section-prose">
+            <section.Content />
+          </div>
           <ul class="contact-list">
             {section.items.map((item) => (
               <li>
@@ -55,19 +55,12 @@ const { Content, sections } = await getContactViewModel();
     color: var(--text-muted);
   }
 
-  .contact-section-title {
-    font-size: 1.4rem; /* Slightly smaller than page title */
-    font-weight: 600;
-    margin-top: 3rem; /* Space above section title */
-    margin-bottom: 0.5rem;
-    color: var(--text-heading-color); /* Use a heading color variable if available */
-  }
-
-  .section-description {
+  .section-prose {
     font-size: 1.2rem;
-    color: var(--text-muted);
+    line-height: 1.7;
+    color: var(--text-heading-color);
+    margin-top: 3rem;
     margin-bottom: 1.5rem;
-    line-height: 1.6;
   }
 
   .contact-list {

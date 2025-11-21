@@ -1,4 +1,4 @@
-import { getEntry } from "astro:content";
+import { getCollection, getEntry } from "astro:content";
 
 export interface ContactItem {
     icon: string;
@@ -10,16 +10,19 @@ export interface ContactItem {
 }
 
 export interface ContactSection {
-    title: string;
-    description?: string;
+    order: number;
+    Content: any;
     items: ContactItem[];
 }
 
-export type ContactSections = Record<string, ContactSection>;
+export interface ContactIntro {
+    order: number;
+    Content: any;
+}
 
 export interface ContactViewModel {
-    Content: any;
-    sections: ContactSections;
+    intro?: ContactIntro;
+    sections: ContactSection[];
 }
 
 /**
@@ -27,11 +30,40 @@ export interface ContactViewModel {
  * Fetches contact data for the contact page
  */
 export async function getContactViewModel(): Promise<ContactViewModel> {
-    const contactEntry = await getEntry("contact", "info");
-    const { Content } = await contactEntry.render();
+    const contactEntries = await getCollection("contact");
+
+    const introEntries = contactEntries.filter((entry) => entry.data.kind === "text");
+    const sectionEntries = contactEntries.filter((entry) => entry.data.kind === "list");
+
+    // Pick the first intro by order (if present)
+    let intro: ContactIntro | undefined;
+    if (introEntries.length > 0) {
+        introEntries.sort((a, b) => (a.data.order ?? Infinity) - (b.data.order ?? Infinity));
+        const introEntry = introEntries[0];
+        const { Content } = await introEntry.render();
+        intro = {
+            order: introEntry.data.order ?? Infinity,
+            Content,
+        };
+    }
+
+    // Build section view models
+    const sections = await Promise.all(
+        sectionEntries.map(async (entry) => {
+            const { Content } = await entry.render();
+            return {
+                order: entry.data.order ?? Infinity,
+                items: (entry.data as any).items,
+                Content,
+            };
+        })
+    );
+
+    // Sort sections by order
+    sections.sort((a, b) => a.order - b.order);
 
     return {
-        Content,
-        sections: contactEntry.data.sections,
+        intro,
+        sections,
     };
 }
