@@ -122,7 +122,6 @@ const contact = defineCollection({
                 description: z.string().optional(),
                 showOnHome: z.boolean().optional(),
                 showOnContact: z.boolean().optional(),
-                copyOnClick: z.boolean().optional(),
             })),
         }),
     ]),

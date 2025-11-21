@@ -18,7 +18,6 @@ interface Props {
       target?: string;
       rel?: string;
       description?: string;
-      copyOnClick?: boolean;
     }[];
   };
 }
@@ -34,11 +33,13 @@ const { title, cta, Content, socialItems } = data;
     <Content />
   </div>
 
-  {socialItems?.length ? (
-    <div class="connect-icon-links">
-      <ContactIcons items={socialItems} />
-    </div>
-  ) : null}
+  {
+    socialItems?.length ? (
+      <div class="connect-icon-links">
+        <ContactIcons items={socialItems} />
+      </div>
+    ) : null
+  }
 
   {/* Button for full contact page */}
   <div class="button-group">
