@@ -21,27 +21,31 @@ export interface FooterAnimationElements {
  */
 export function setupFooterAnimation(elements: FooterAnimationElements): () => void {
     const { footer, scroller } = elements;
-    const { GSAP } = ANIMATION_CONSTANTS;
 
     let trigger: ScrollTrigger | null = null;
 
-    // Reveal animation on scroll
-    const animation = gsap.fromTo(
-        footer,
-        { y: "100%" },
-        { y: "0%", ease: "power1.out" }
-    );
-
+    // Fade-in animation on scroll (matching original behavior)
     trigger = ScrollTrigger.create({
         trigger: footer,
         scroller: scroller,
-        start: "top bottom",
-        end: "top center",
-        animation: animation,
-        scrub: GSAP.FOOTER_SCRUB,
+        start: "top 95%",
+        end: "top 40%",
+        scrub: 1,
+        animation: gsap.fromTo(
+            footer,
+            { opacity: 0, y: 15 },
+            { opacity: 1, y: 0, ease: "power1.in" }
+        ),
     });
 
     // Return cleanup function
+    return () => {
+        if (trigger) {
+            trigger.kill();
+            trigger = null;
+        }
+    };
+
     return () => {
         if (trigger) {
             trigger.kill();
