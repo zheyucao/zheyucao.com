@@ -121,7 +121,7 @@ const contact = defineCollection({
                 rel: z.string().optional(),
                 description: z.string().optional(),
                 showOnHome: z.boolean().optional(),
-                showOnContact: z.boolean().optional(),
+                showOnFooter: z.boolean().optional(),
             })),
         }),
     ]),

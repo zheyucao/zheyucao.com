@@ -23,9 +23,7 @@ const contactFooterItems = listEntries
         order: baseOrder * 100 + idx,
       }))
       .filter(
-        (item) =>
-          item.showOnContact !== false &&
-          item.href // footer only shows linkable items
+        (item) => item.showOnFooter !== false && item.href // footer only shows linkable items
       );
   })
   .sort((a, b) => a.order - b.order);
@@ -77,14 +75,14 @@ const contactFooterItems = listEntries
               ))
             : [
                 <li>
-                  <a class="link" href={social.github} target="_blank" rel="noopener noreferrer"
-                    >{footerStrings.githubLabel}</a
-                  >
+                  <a class="link" href={social.github} target="_blank" rel="noopener noreferrer">
+                    {footerStrings.githubLabel}
+                  </a>
                 </li>,
                 <li>
-                  <a class="link" href={social.email} target="_blank" rel="noopener noreferrer"
-                    >{footerStrings.emailLabel}</a
-                  >
+                  <a class="link" href={social.email} target="_blank" rel="noopener noreferrer">
+                    {footerStrings.emailLabel}
+                  </a>
                 </li>,
               ]
         }

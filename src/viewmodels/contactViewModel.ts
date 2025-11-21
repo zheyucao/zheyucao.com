@@ -8,7 +8,7 @@ export interface ContactItem {
     rel?: string;
     description?: string;
     showOnHome?: boolean;
-    showOnContact?: boolean;
+    showOnFooter?: boolean;
 }
 
 export interface ContactSection {
@@ -56,7 +56,7 @@ export async function getContactViewModel(): Promise<ContactViewModel> {
             const items = (entry.data as any).items as ContactItem[];
             return {
                 order: entry.data.order ?? Infinity,
-                items: items.filter((item) => item.showOnContact !== false),
+                items, // Show all items on contact page
                 Content,
             };
         })
