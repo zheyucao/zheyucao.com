@@ -17,6 +17,7 @@ const projects = defineCollection({
         thumbnailSrc: z.string().optional(),
         isFeatured: z.boolean().default(false),
         homepageSummary: z.string().optional(),
+        order: z.number().optional(), // Manual ordering for projects page
     }),
 });
 
@@ -86,6 +87,7 @@ const resume = defineCollection({
             title: z.string(),
             subtitle: z.string().optional(),
             date: z.string().optional(),
+            order: z.number().optional(), // Manual ordering
             actions: z.array(z.object({
                 text: z.string(),
                 href: z.string(),

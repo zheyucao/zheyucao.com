@@ -22,10 +22,17 @@ export async function getResumeViewModel() {
                 title: entry.data.title,
                 subtitle: entry.data.subtitle,
                 date: entry.data.date,
+                order: (entry.data as any).order,
                 Content,
             };
         })
     );
+    // Sort by order field (if specified)
+    education.sort((a, b) => {
+        const orderA = a.order ?? Infinity;
+        const orderB = b.order ?? Infinity;
+        return orderA - orderB;
+    });
 
     // Filter experience entries
     const experienceEntries = allResumeContent.filter((entry) => entry.id.startsWith("experience/"));
@@ -36,10 +43,17 @@ export async function getResumeViewModel() {
                 title: entry.data.title,
                 subtitle: entry.data.subtitle,
                 date: entry.data.date,
+                order: (entry.data as any).order,
                 Content,
             };
         })
     );
+    // Sort by order field (if specified)
+    experience.sort((a, b) => {
+        const orderA = a.order ?? Infinity;
+        const orderB = b.order ?? Infinity;
+        return orderA - orderB;
+    });
 
     // Filter project entries
     const projectEntries = allResumeContent.filter((entry) => entry.id.startsWith("projects/"));
@@ -49,10 +63,17 @@ export async function getResumeViewModel() {
             return {
                 title: entry.data.title,
                 date: entry.data.date,
+                order: (entry.data as any).order,
                 Content,
             };
         })
     );
+    // Sort by order field (if specified)
+    projects.sort((a, b) => {
+        const orderA = a.order ?? Infinity;
+        const orderB = b.order ?? Infinity;
+        return orderA - orderB;
+    });
 
     // Fetch awards data
     console.log("Resume entries:", allResumeContent.map(e => ({ id: e.id, type: (e.data as any).type })));

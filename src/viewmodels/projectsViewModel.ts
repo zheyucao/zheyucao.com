@@ -16,9 +16,14 @@ export async function getProjectsViewModel() {
         })
     );
 
-    // Sort projects by date (newest first) if timeframe exists
-    // For now, keep original order as timeframe is optional
-    // You can add custom sorting logic here if needed
+    // Sort projects by order field (if specified)
+    // Projects with order come first, sorted by order value
+    // Projects without order come after, in their original order
+    projects.sort((a, b) => {
+        const orderA = a.data.order ?? Infinity;
+        const orderB = b.data.order ?? Infinity;
+        return orderA - orderB;
+    });
 
     // Fetch UI strings
     const uiStrings = await getEntry("ui-strings", "en");

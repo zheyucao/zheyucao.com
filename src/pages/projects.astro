@@ -70,11 +70,10 @@ const { projects, pageTitle } = await getProjectsViewModel();
 
 <style>
   .projects-grid {
-    column-count: 1; /* Default to 1 column on mobile */
+    column-count: 1;
     column-gap: 3rem;
   }
 
-  /* Apply multi-column layout for wider screens */
   @media (min-width: 768px) {
     .projects-grid {
       column-count: 2;
@@ -82,13 +81,11 @@ const { projects, pageTitle } = await getProjectsViewModel();
     }
   }
 
-  /* Ensure cards don't break across columns */
   .projects-grid > :global(.project-card) {
     break-inside: avoid;
     margin-bottom: 3rem;
   }
 
-  /* Remove margin from last card */
   .projects-grid > :global(.project-card:last-child) {
     margin-bottom: 0;
   }
