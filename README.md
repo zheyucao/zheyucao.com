@@ -1,59 +1,37 @@
-# zheyucao.com - My Personal Website
+# zheyucao.com - Personal Website
 
-This is the source code for the zheyucao.com personal website, built with Astro. It serves as both a personal website and a template for creating your own site.
+Source code for zheyucao.com, built with Astro. Content lives in collections (MDX/YAML frontmatter) and pages render it through layouts and components.
 
 ## Project Structure
 
-- **src/pages/**: Contains the main pages of the website.
-  - `index.astro`: Home page with hero, about, projects preview, and contact sections.
-  - `projects.astro`: Full list of projects.
-  - `timeline.astro`: Timeline of events.
-  - `resume.astro`: Resume page.
-  - `contact.astro`: Contact information.
-- **src/components/**: Reusable UI components.
-  - `Footer.astro`: Footer component.
-  - `ScrollIndicator.astro`: Scroll indicator component.
-  - `DynamicBackground.astro`: Dynamic background component.
-  - Subdirectories for page-specific components (e.g., `home/`, `projects/`, `timeline/`, `resume/`, `common/`).
-- **src/layouts/**: Page layouts.
-  - `Layout.astro`: Main layout.
-  - `SubPageLayout.astro`: Layout for sub-pages.
-- **src/data/**: Centralized data for site content.
-  - `config.ts`: Global site configuration (metadata, navigation, social links).
-  - `siteContent.ts`: Text content for the homepage and general sections.
-  - `resumeData.ts`: Structured data for the resume page (experience, education, skills, etc.).
-  - `contactData.ts`: Contact information and social links.
-  - `projectsData.ts`: Data for the projects portfolio.
-  - `timelineEvents.ts`: Data for the timeline page.
-- **src/styles/**: CSS styles.
-  - `global.css`: Global styles, variables, and animations.
-  - `timeline.css`: Specific styles for the timeline.
-- **public/**: Static assets.
-  - `images/`: Images used in the website.
-  - `favicon.png`: Favicon for the website.
-- **utils/**: Utility functions and scripts.
+- **src/pages/**: Page shells that get data from view models and render components (`index.astro`, `projects.astro`, `timeline.astro`, `resume.astro`, `contact.astro`).
+- **src/components/**: Reusable UI grouped by domain (`home/`, `projects/`, `timeline/`, `resume/`, `common/`).
+- **src/layouts/**: Base page layouts (`Layout.astro`, `SubPageLayout.astro`).
+- **src/content/**: Content collections (MDX/YAML frontmatter) for sections, projects, timeline, resume, contact, and UI strings; schemas in `src/content/config.ts`.
+- **src/viewmodels/**: Load content collections and shape props for pages.
+- **src/config.ts**: Site metadata and navigation.
+- **src/styles/**: Global and feature styles.
+- **public/**: Static assets (images, favicon).
+- **utils/**: Utility scripts.
 
 ## Features
 
-- **Home Page**: Features a hero section, about section, projects preview, and contact section.
-- **Projects Page**: Displays a full list of projects.
-- **Timeline Page**: Shows a timeline of events.
-- **Resume Page**: Fully data-driven resume with generic templates for easy customization.
-- **Contact Page**: Contact information with categorized sections.
-- **Animations**: Uses GSAP for animations, including scroll-triggered effects.
-- **Data-Driven Architecture**: All content is managed through structured data files for easy updates.
+- **Home**: Hero, about, featured projects, highlights, and contact teaser.
+- **Projects**: MDX-backed projects with ordering and featured flags.
+- **Timeline**: Events sourced from content collection with client-side filtering.
+- **Résumé**: Collection-driven resume using generic section templates.
+- **Contact**: Intro and contact lists pulled from individual MDX entries.
+- **Animations**: GSAP-driven scroll effects and intersection reveals.
 
 ## Content Management
 
-This project uses a data-driven architecture to separate content from code, making it easy to update and maintain.
+Content is managed through Astro content collections:
 
-- **Global Config**: `src/config.ts` handles site-wide settings like title, description, and navigation links.
-- **Page Content**:
-  - **Home**: Managed via `src/data/siteContent.ts`.
-  - **Resume**: Fully data-driven via `src/data/resumeData.ts`. The resume page uses a generic rendering system (`ResumeSectionRenderer`) that takes this data and renders the appropriate templates (`EntryList`, `SkillGrid`, `TextSection`, `ContactList`).
-  - **Contact**: Managed via `src/data/contactData.ts`.
-  - **Projects & Timeline**: Managed via `src/data/projectsData.ts` and `src/data/timelineEvents.ts`.
-- **Customization**: To update the site's text or data, simply modify the corresponding file in `src/data/`. No need to touch the Astro components for content updates.
+- **Global config**: `src/config.ts` for site metadata and navigation.
+- **Content collections** (`src/content/` with schemas in `src/content/config.ts`): sections, projects, timeline events, résumé entries, contact intro/lists, UI strings. MDX bodies hold prose; frontmatter holds structured fields (links, tech stacks, flags, order).
+- **View models** (`src/viewmodels/`): load and map content into the shapes pages need.
+
+To update copy or data, edit the relevant entry in `src/content/`.
 
 ## Development
 
@@ -90,7 +68,7 @@ pnpm install
 
 ## Usage Guidelines
 
-- **Replace Personal Information**: You **must** replace all personal information found in the content files (e.g., in `src/pages/`, `src/components/`, `src/data/`, etc.). This includes, but is not limited to:
+- **Replace Personal Information**: You **must** replace all personal information found in the content files (e.g., in `src/content/`, `src/config.ts`). This includes, but is not limited to:
   - Your name
   - Biography or "About Me" sections
   - Contact information (email, social media links)

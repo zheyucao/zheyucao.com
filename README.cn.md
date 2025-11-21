@@ -1,46 +1,34 @@
 # zheyucao.com - 我的个人网站
 
-这是 zheyucao.com 个人网站的源代码，使用 Astro 构建。它既是一个个人网站，也可以作为创建你自己网站的模板。
+这是 zheyucao.com 的源代码，基于 Astro 构建，内容以集合的形式存放，页面通过组件和布局渲染。
 
 ## 项目结构
 
-- **src/pages/**: 包含网站的主要页面。
-  - `index.astro`: 主页，包含英雄区、关于区、项目预览和联系区。
-  - `projects.astro`: 项目完整列表。
-  - `timeline.astro`: 时间线事件。
-  - `resume.astro`: 简历页面。
-  - `contact.astro`: 联系信息。
-- **src/components/**: 可复用的UI组件。
-  - `Footer.astro`: 页脚组件。
-  - `ScrollIndicator.astro`: 滚动指示器组件。
-  - `DynamicBackground.astro`: 动态背景组件。
-  - 页面特定组件的子目录（例如 `home/`, `projects/`, `timeline/`, `resume/`, `common/`）。
-- **src/layouts/**: 页面布局。
-  - `Layout.astro`: 主布局。
-  - `SubPageLayout.astro`: 子页面布局。
-- **src/data/**: 项目和时间线事件的结构化数据。
-  - `projectsData.ts`: 项目数据。
-  - `timelineEvents.ts`: 时间线事件数据。
-- **src/styles/**: CSS样式。
-  - `timeline.css`: 时间线页面的样式。
-- **public/**: 静态资源。
-  - `images/`: 网站使用的图片。
-  - `favicon.png`: 网站的favicon。
-- **utils/**: 工具函数和脚本。
+- **src/pages/**: 页面壳文件，依赖视图模型提供数据并调用展示组件（`index.astro`, `projects.astro`, `timeline.astro`, `resume.astro`, `contact.astro`）。
+- **src/components/**: UI 组件，按功能分组（如 `home/`, `projects/`, `timeline/`, `resume/`, `common/`）。
+- **src/layouts/**: 页面布局（`Layout.astro`, `SubPageLayout.astro`）。
+- **src/content/**: 内容集合（MDX/YAML frontmatter），对应分区、项目、时间线、简历、联系信息、UI 字符串，集合 schema 定义在 `src/content/config.ts`。
+- **src/viewmodels/**: 视图模型，从内容集合读取并整理页面需要的数据。
+- **src/config.ts**: 全站元数据与导航配置。
+- **src/styles/**: 全局与特定样式文件。
+- **public/**: 静态资源（图片、favicon）。
+- **utils/**: 工具脚本。
 
 ## 功能
 
-- **主页**: 包含英雄区、关于区、项目预览和联系区。
-- **项目页面**: 显示项目的完整列表。
-- **时间线页面**: 显示时间线事件。
-- **简历页面**: 简历专用页面。
-- **联系页面**: 联系信息。
-- **动画**: 使用GSAP进行动画，包括滚动触发效果。
+- **主页**: 英雄、关于、精选项目、动态/荣誉、联系入口。
+- **项目**: 基于 MDX 的项目条目，可排序、可设置精选。
+- **时间线**: 内容集合提供事件，前端支持分类筛选。
+- **简历**: 集合驱动的简历，使用通用区块组件渲染。
+- **联系**: 独立的联系分区文件，可控制顺序与内容。
+- **动画**: GSAP 驱动的滚动与显隐动画。
 
 ## 内容管理
 
-- 项目和时间线事件通过 `src/data/` 中的结构化数据文件进行管理。
-- 未来计划包括使用Astro内容集合进行更动态的内容管理。
+- **全局配置**: `src/config.ts` 管理站点标题、描述、导航等。
+- **内容集合**: 位于 `src/content/`（schema 定义在 `src/content/config.ts`），MDX 正文写文案，frontmatter 存放结构化字段（如链接、技术栈、排序、标记）。
+- **视图模型**: `src/viewmodels/` 负责读取集合并为页面产出所需的 props。
+- 更新文案或数据时，直接修改相应的内容文件即可，通常无需改动组件。
 
 ## 开发
 
