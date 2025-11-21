@@ -3,6 +3,7 @@ interface Props {
   triggerId: string;
   triggerEvent?: "hover" | "click";
   position?: "top" | "bottom" | "left" | "right";
+  dismissAfter?: number; // milliseconds, only applies to click-triggered tooltips
   class?: string;
 }
 
@@ -10,6 +11,7 @@ const {
   triggerId,
   triggerEvent = "hover",
   position = "bottom",
+  dismissAfter = 2000,
   class: className = "",
 } = Astro.props;
 ---
@@ -21,6 +23,7 @@ const {
   data-trigger-id={triggerId}
   data-position={position}
   data-trigger-event={triggerEvent}
+  data-dismiss-after={dismissAfter}
 >
   <slot />
 </div>
@@ -116,6 +119,7 @@ const {
 
       const position = tooltip.dataset.position || "bottom";
       const triggerEvent = tooltip.dataset.triggerEvent || "hover";
+      const dismissAfter = parseInt(tooltip.dataset.dismissAfter || "2000", 10);
 
       // Move tooltip to body to avoid stacking context issues
       document.body.appendChild(tooltip);
@@ -160,6 +164,13 @@ const {
       const show = () => {
         updatePosition();
         tooltip.classList.add("active");
+
+        // Auto-dismiss click-triggered tooltips
+        if (triggerEvent === "click") {
+          setTimeout(() => {
+            tooltip.classList.remove("active");
+          }, dismissAfter);
+        }
       };
 
       const hide = () => {
@@ -189,8 +200,11 @@ const {
         trigger.addEventListener("click", toggle);
       }
 
+      // Find the scrolling container (page-wrapper or window)
+      const scrollContainer = document.querySelector(".page-wrapper") || window;
+
       // Update position on scroll/resize if active
-      window.addEventListener(
+      scrollContainer.addEventListener(
         "scroll",
         () => {
           if (tooltip.classList.contains("active")) updatePosition();
