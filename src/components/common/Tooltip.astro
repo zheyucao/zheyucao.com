@@ -3,12 +3,18 @@ interface Props {
   label: string;
   class?: string;
   position?: "top" | "bottom";
+  trigger?: "hover" | "click";
 }
 
-const { label, class: className = "", position = "bottom" } = Astro.props;
+const {
+  label,
+  class: className = "",
+  position = "bottom",
+  trigger = "hover",
+} = Astro.props;
 ---
 
-<span class={`tooltip ${position} ${className}`}>
+<span class={`tooltip ${position} trigger-${trigger} ${className}`}>
   <slot />
   <span class="tooltip-bubble">
     <slot name="bubble">{label}</slot>
@@ -57,11 +63,31 @@ const { label, class: className = "", position = "bottom" } = Astro.props;
     transform: translate(-50%, -10px);
   }
 
-  .tooltip:hover .tooltip-bubble,
-  .tooltip:focus-within .tooltip-bubble {
+  .tooltip.trigger-hover:hover .tooltip-bubble,
+  .tooltip.trigger-hover:focus-within .tooltip-bubble {
     opacity: 1;
     visibility: visible;
     transform: translate(-50%, 2px);
+  }
+
+  /* Click-triggered tooltips stay hidden unless explicitly activated */
+  .tooltip.trigger-click .tooltip-bubble {
+    opacity: 0;
+    visibility: hidden;
+    transform: translate(-50%, 10px);
+  }
+
+  .tooltip.trigger-click.copy-active .tooltip-bubble {
+    opacity: 1;
+    visibility: visible;
+    transform: translate(-50%, 0);
+    pointer-events: auto;
+  }
+
+  .tooltip.trigger-click.copy-active .tooltip-bubble {
+    opacity: 1 !important;
+    visibility: visible !important;
+    transform: translate(-50%, 0);
   }
 
   .tooltip-bubble .tooltip-label {

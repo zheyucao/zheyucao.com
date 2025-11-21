@@ -2,6 +2,7 @@
 import SubPageLayout from "../layouts/SubPageLayout.astro";
 import { getContactViewModel } from "../viewmodels/contactViewModel";
 import { Icon } from "astro-icon/components";
+import Tooltip from "../components/common/Tooltip.astro";
 
 const { intro, sections } = await getContactViewModel();
 ---
@@ -26,19 +27,51 @@ const { intro, sections } = await getContactViewModel();
             {section.items.map((item) => (
               <li>
                 <Icon name={item.icon} class="contact-icon" />
-                {item.href ? (
-                  <>
-                    <a
-                      href={item.href}
-                      target={item.target}
-                      rel={item.rel}
-                      set:html={item.content || item.label}
-                    />
-                    {item.description && <span>&nbsp;{item.description}</span>}
-                  </>
-                ) : (
-                  <span set:html={item.content || item.label} />
-                )}
+                {
+                  (() => {
+                    const value = item.content || item.label || item.href || "";
+                    const description = item.description;
+                    const copyValue =
+                      item.href ? undefined : item.copyOnClick === false ? undefined : value;
+
+                    if (item.href) {
+                      return (
+                        <>
+                          <a href={item.href} target={item.target} rel={item.rel} set:html={value} />
+                          {description && <span class="inline-desc">&nbsp;{description}</span>}
+                        </>
+                      );
+                    }
+
+                    if (copyValue) {
+                      return (
+                        <>
+                          <Tooltip
+                            class="copy-only-tooltip"
+                            label="Copied!"
+                            position="bottom"
+                            trigger="click"
+                          >
+                            <span
+                              class:list={["copyable", { clickable: true }]}
+                              data-copy-value={copyValue}
+                              role="text"
+                              set:html={value}
+                            />
+                          </Tooltip>
+                          {description && <span class="inline-desc">&nbsp;{description}</span>}
+                        </>
+                      );
+                    }
+
+                    return (
+                      <>
+                        <span set:html={value} />
+                        {description && <span class="inline-desc">&nbsp;{description}</span>}
+                      </>
+                    );
+                  })()
+                }
               </li>
             ))}
           </ul>
@@ -105,6 +138,10 @@ const { intro, sections } = await getContactViewModel();
     text-decoration: underline;
   }
 
+  .inline-desc {
+    color: var(--text-muted);
+  }
+
   .section-divider {
     border: 0;
     height: 1px;
@@ -114,3 +151,43 @@ const { intro, sections } = await getContactViewModel();
 
   /* Remove label styles as they are no longer used */
 </style>
+
+<script>
+  const handleCopy = async (el, value) => {
+    if (!value) return;
+    const tooltip = el.closest(".tooltip");
+    const bubble = tooltip?.querySelector(".tooltip-bubble");
+    const labelEl = tooltip?.querySelector("[data-tooltip-label]");
+    const descEl = tooltip?.querySelector("[data-tooltip-desc]");
+
+    try {
+      await navigator.clipboard.writeText(value);
+      if (labelEl) {
+        const originalLabel =
+          labelEl.getAttribute("data-original-label") || labelEl.textContent || "Copied!";
+        labelEl.textContent = "Copied!";
+        if (descEl) descEl.style.display = "none";
+        if (bubble) bubble.classList.add("copy-active");
+        setTimeout(() => {
+          labelEl.textContent = originalLabel;
+          if (descEl) descEl.style.display = "";
+          if (bubble) bubble.classList.remove("copy-active");
+        }, 1200);
+      }
+    } catch (e) {
+      console.error("Unable to copy contact value:", e);
+    }
+  };
+
+  document.addEventListener("astro:page-load", () => {
+    const copyTargets = document.querySelectorAll(".contact-list [data-copy-value]");
+    copyTargets.forEach((el) => {
+      el.addEventListener("click", (event) => {
+        const value = el.getAttribute("data-copy-value");
+        if (!value) return;
+        event.preventDefault();
+        handleCopy(el, value);
+      });
+    });
+  });
+</script>

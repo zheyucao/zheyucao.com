@@ -26,7 +26,7 @@ const { items = [] } = Astro.props;
       const value = item.content || item.href || item.label || "Link";
       const displayLabel = value;
       const description = item.description;
-      const copyValue = item.copyOnClick === false ? undefined : value;
+      const copyValue = item.copyOnClick === false || item.href ? undefined : value;
       const secondary = description || undefined;
       return (
         <Tooltip label={displayLabel} position="bottom">
