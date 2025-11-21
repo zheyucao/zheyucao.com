@@ -1,5 +1,5 @@
 ---
-import { ANIMATION_CONSTANTS } from "../constants/animationConstants";
+
 ---
 
 <div id="dynamic-background-container" transition:persist={true}>
@@ -7,12 +7,12 @@ import { ANIMATION_CONSTANTS } from "../constants/animationConstants";
 </div>
 
 <script>
+  import { ANIMATION_CONSTANTS } from "../constants/animationConstants";
+
   const svgNS = "http://www.w3.org/2000/svg";
   const svgContainer = document.getElementById("dynamic-background-svg") as SVGElement | null;
 
   if (svgContainer) {
-    // console.log('[DynamicBackground] Script Execution Start'); // Removed debug log
-
     const isMobileDevice =
       ("maxTouchPoints" in navigator && navigator.maxTouchPoints > 0) || window.innerWidth < 1024; // Consider tablets/smaller laptops potentially lower-spec too
     // console.log(`Lower performance device detected: ${isMobileDevice}`); // Optional logging
