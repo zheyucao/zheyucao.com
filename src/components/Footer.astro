@@ -1,9 +1,13 @@
 ---
 // Component: src/components/Footer.astro
 import { siteConfig } from "../config";
+import { getEntry } from "astro:content";
 
 const currentYear = new Date().getFullYear();
 const { metadata, navigation, social } = siteConfig;
+
+const uiStrings = await getEntry("ui-strings", "en");
+const { footer: footerStrings } = uiStrings.data;
 ---
 
 <footer class="site-footer">
@@ -13,10 +17,13 @@ const { metadata, navigation, social } = siteConfig;
       <p class="footer-description">
         {metadata.description}
       </p>
-      <p class="copyright">&copy; {currentYear} {metadata.author}. All rights reserved.</p>
+      <p class="copyright">
+        &copy; {currentYear}
+        {metadata.author}. {footerStrings.copyrightText}.
+      </p>
     </div>
     <div class="footer-column footer-column-2">
-      <h4>Links</h4>
+      <h4>{footerStrings.linksHeading}</h4>
       <ul>
         {
           navigation.items.map((item) => (
@@ -30,13 +37,17 @@ const { metadata, navigation, social } = siteConfig;
       </ul>
     </div>
     <div class="footer-column footer-column-3">
-      <h4>Connect</h4>
+      <h4>{footerStrings.connectHeading}</h4>
       <ul>
         <li>
-          <a class="link" href={social.github} target="_blank" rel="noopener noreferrer">GitHub</a>
+          <a class="link" href={social.github} target="_blank" rel="noopener noreferrer"
+            >{footerStrings.githubLabel}</a
+          >
         </li>
         <li>
-          <a class="link" href={social.email} target="_blank" rel="noopener noreferrer">Email</a>
+          <a class="link" href={social.email} target="_blank" rel="noopener noreferrer"
+            >{footerStrings.emailLabel}</a
+          >
         </li>
       </ul>
     </div>

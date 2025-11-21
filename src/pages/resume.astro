@@ -3,24 +3,31 @@ import SubPageLayout from "../layouts/SubPageLayout.astro";
 import ResumeSectionRenderer from "../components/resume/ResumeSectionRenderer.astro";
 import Button from "../components/common/Button.astro";
 import { getResumeViewModel } from "../viewmodels/resumeViewModel";
+import { getEntry } from "astro:content";
 
-const { mainColumn, sidebar } = await getResumeViewModel();
+const { mainColumn, sidebar, metadata } = await getResumeViewModel();
+const { title, actions } = metadata;
 ---
 
-<SubPageLayout title="Résumé">
-  <Button
-    slot="actions"
-    href="https://assets.zheyucao.com/resume.pdf"
-    text="PDF (Chinese)"
-    style="primary"
-    download="Zheyu_Cao_Resume_ZH.pdf"
-    icon="↓"
-    iconPosition="left"
-    target="_blank"
-    rel="noopener noreferrer"
-    noMargin={true}
-    wrapperClass="page-load-initial-state"
-  />
+<SubPageLayout title={title}>
+  {
+    actions &&
+      actions.map((action) => (
+        <Button
+          slot="actions"
+          href={action.href}
+          text={action.text}
+          style={action.style as any}
+          download={action.download}
+          icon={action.icon}
+          iconPosition={action.iconPosition}
+          target={action.target}
+          rel={action.rel}
+          noMargin={true}
+          wrapperClass="page-load-initial-state"
+        />
+      ))
+  }
 
   <div class="resume-container">
     <div class="main-column">
@@ -65,11 +72,5 @@ const { mainColumn, sidebar } = await getResumeViewModel();
     .sidebar {
       position: static;
     }
-
-    /* But maybe we want contact info at bottom on mobile? 
-       For now, let's keep it simple. The user can reorder in data if needed. 
-       Actually, typically download is top, contact is top or bottom. 
-       With the current data structure, sidebar has both. 
-    */
   }
 </style>

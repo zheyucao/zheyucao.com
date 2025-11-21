@@ -5,12 +5,16 @@ import { getCollection, getEntry } from "astro:content";
  * Aggregates and organizes resume content into main column and sidebar
  */
 export async function getResumeViewModel() {
-    // Fetch profile
-    const profileEntry = await getEntry("resume-profile", "profile");
+    // Fetch all resume content
+    const allResumeContent = await getCollection("resume");
+
+    // Filter profile
+    const profileEntry = allResumeContent.find((entry) => entry.id.startsWith("profile/"));
+    if (!profileEntry) throw new Error("Profile entry not found");
     const { Content: ProfileContent } = await profileEntry.render();
 
-    // Fetch education entries
-    const educationEntries = await getCollection("resume-education");
+    // Filter education entries
+    const educationEntries = allResumeContent.filter((entry) => entry.id.startsWith("education/"));
     const education = await Promise.all(
         educationEntries.map(async (entry) => {
             const { Content } = await entry.render();
@@ -23,8 +27,8 @@ export async function getResumeViewModel() {
         })
     );
 
-    // Fetch experience entries
-    const experienceEntries = await getCollection("resume-experience");
+    // Filter experience entries
+    const experienceEntries = allResumeContent.filter((entry) => entry.id.startsWith("experience/"));
     const experience = await Promise.all(
         experienceEntries.map(async (entry) => {
             const { Content } = await entry.render();
@@ -37,8 +41,8 @@ export async function getResumeViewModel() {
         })
     );
 
-    // Fetch project entries
-    const projectEntries = await getCollection("resume-projects");
+    // Filter project entries
+    const projectEntries = allResumeContent.filter((entry) => entry.id.startsWith("projects/"));
     const projects = await Promise.all(
         projectEntries.map(async (entry) => {
             const { Content } = await entry.render();
@@ -51,13 +55,25 @@ export async function getResumeViewModel() {
     );
 
     // Fetch awards data
-    const awardsData = await getEntry("resume-data", "awards");
+    console.log("Resume entries:", allResumeContent.map(e => ({ id: e.id, type: (e.data as any).type })));
+
+    const awardsEntry = allResumeContent.find((entry) => entry.id === "awards.mdx");
+    if (!awardsEntry) {
+        console.error("Awards entry not found in collection");
+        throw new Error("Awards entry not found");
+    }
+    if ((awardsEntry.data as any).type !== 'awards') {
+        console.error("Awards entry has wrong type:", (awardsEntry.data as any).type);
+        throw new Error("Awards entry invalid type");
+    }
 
     // Fetch skills data
-    const skillsData = await getEntry("resume-data", "skills");
+    const skillsEntry = allResumeContent.find((entry) => entry.id === "skills.mdx");
+    if (!skillsEntry || (skillsEntry.data as any).type !== 'skills') throw new Error("Skills entry not found or invalid");
 
     // Fetch contact data
-    const contactData = await getEntry("resume-data", "contact");
+    const contactEntry = allResumeContent.find((entry) => entry.id === "contact.mdx");
+    if (!contactEntry || (contactEntry.data as any).type !== 'contact') throw new Error("Contact entry not found or invalid");
 
     // Build mainColumn and sidebar structure
     const mainColumn = [
@@ -75,9 +91,9 @@ export async function getResumeViewModel() {
         },
         {
             id: "awards",
-            title: awardsData.data.title,
+            title: awardsEntry.data.title,
             type: "entries",
-            content: awardsData.data.content,
+            content: awardsEntry.data.content,
         },
         {
             id: "experience",
@@ -96,20 +112,25 @@ export async function getResumeViewModel() {
     const sidebar = [
         {
             id: "skills",
-            title: skillsData.data.title,
+            title: skillsEntry.data.title,
             type: "skills",
-            content: skillsData.data.content,
+            content: skillsEntry.data.content,
         },
         {
             id: "contact",
-            title: contactData.data.title,
+            title: contactEntry.data.title,
             type: "contact",
-            content: contactData.data.content,
+            content: contactEntry.data.content,
         },
     ];
+
+    // Fetch metadata
+    const metadataEntry = allResumeContent.find((entry) => entry.id === "metadata.mdx");
+    if (!metadataEntry) throw new Error("Metadata entry not found");
 
     return {
         mainColumn,
         sidebar,
+        metadata: metadataEntry.data as any,
     };
 }

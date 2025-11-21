@@ -47,54 +47,21 @@ const sections = defineCollection({
     }),
 });
 
-const resume_experience = defineCollection({
+const resume = defineCollection({
     type: 'content',
-    schema: z.object({
-        title: z.string(),
-        subtitle: z.string().optional(),
-        date: z.string(),
-    }),
-});
-
-const resume_education = defineCollection({
-    type: 'content',
-    schema: z.object({
-        title: z.string(),
-        subtitle: z.string().optional(),
-        date: z.string(),
-    }),
-});
-
-const resume_projects = defineCollection({
-    type: 'content',
-    schema: z.object({
-        title: z.string(),
-        date: z.string(),
-    }),
-});
-
-const resume_profile = defineCollection({
-    type: 'content',
-    schema: z.object({
-        title: z.string(),
-    }),
-});
-
-const resume_data = defineCollection({
-    type: 'data', // YAML/JSON
     schema: z.union([
         // Skills
         z.object({
-            id: z.literal('skills'),
+            type: z.literal('skills'),
             title: z.string(),
             content: z.array(z.object({
-                name: z.string(),
+                category: z.string(),
                 items: z.array(z.string()),
             })),
         }),
         // Awards
         z.object({
-            id: z.literal('awards'),
+            type: z.literal('awards'),
             title: z.string(),
             content: z.array(z.object({
                 title: z.string(),
@@ -103,7 +70,7 @@ const resume_data = defineCollection({
         }),
         // Contact
         z.object({
-            id: z.literal('contact'),
+            type: z.literal('contact'),
             title: z.string(),
             content: z.array(z.object({
                 icon: z.string(),
@@ -111,7 +78,24 @@ const resume_data = defineCollection({
                 href: z.string().optional(),
                 target: z.string().optional(),
                 rel: z.string().optional(),
+                description: z.string().optional(),
             })),
+        }),
+        // Standard Entry (Experience, Education, Projects, Profile, Metadata)
+        z.object({
+            title: z.string(),
+            subtitle: z.string().optional(),
+            date: z.string().optional(),
+            actions: z.array(z.object({
+                text: z.string(),
+                href: z.string(),
+                style: z.string().optional(),
+                download: z.string().optional(),
+                icon: z.string().optional(),
+                iconPosition: z.enum(['left', 'right']).optional(),
+                target: z.string().optional(),
+                rel: z.string().optional(),
+            })).optional(),
         }),
     ]),
 });
@@ -135,14 +119,24 @@ const contact = defineCollection({
     }),
 });
 
+const ui_strings = defineCollection({
+    type: 'data',
+    schema: z.object({
+        footer: z.object({
+            linksHeading: z.string(),
+            connectHeading: z.string(),
+            githubLabel: z.string(),
+            emailLabel: z.string(),
+            copyrightText: z.string(),
+        }),
+    }),
+});
+
 export const collections = {
     projects,
     timeline,
     sections,
-    'resume-experience': resume_experience,
-    'resume-education': resume_education,
-    'resume-projects': resume_projects,
-    'resume-profile': resume_profile,
-    'resume-data': resume_data,
+    resume,
     contact,
+    'ui-strings': ui_strings,
 };
