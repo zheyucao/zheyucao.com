@@ -5,28 +5,16 @@ interface Props {
   position?: "top" | "bottom" | "left" | "right";
   dismissAfter?: number; // milliseconds, only applies to click-triggered tooltips
   class?: string;
+  position?: "top" | "bottom";
+  trigger?: "hover" | "click";
 }
 
-const {
-  triggerId,
-  triggerEvent = "hover",
-  position = "bottom",
-  dismissAfter = 2000,
-  class: className = "",
-} = Astro.props;
+const { label, class: className = "", position = "bottom", trigger = "hover" } = Astro.props;
 ---
 
-<div
-  id={`tooltip-${triggerId}`}
-  class={`tooltip-bubble ${position} trigger-${triggerEvent} ${className}`}
-  role="tooltip"
-  data-trigger-id={triggerId}
-  data-position={position}
-  data-trigger-event={triggerEvent}
-  data-dismiss-after={dismissAfter}
->
+<span class={`tooltip ${position} trigger-${trigger} ${className}`}>
   <slot />
-</div>
+</span>
 
 <style>
   .tooltip-bubble {
@@ -51,17 +39,48 @@ const {
     white-space: normal;
   }
 
-  /* Active state */
-  .tooltip-bubble.active {
+  .tooltip.bottom .tooltip-bubble {
+    top: 100%;
+    left: 50%;
+    transform: translate(-50%, 10px);
+  }
+
+  .tooltip.top .tooltip-bubble {
+    bottom: 100%;
+    left: 50%;
+    transform: translate(-50%, -10px);
+  }
+
+  .tooltip.trigger-hover:hover .tooltip-bubble,
+  .tooltip.trigger-hover:focus-within .tooltip-bubble {
     opacity: 1;
     visibility: visible;
   }
 
-  /* Copy active state (specific to ContactIcons usage) */
-  .tooltip-bubble.copy-active {
+  /* Click-triggered tooltips stay hidden unless explicitly activated */
+  .tooltip.trigger-click .tooltip-bubble {
+    opacity: 0;
+    visibility: hidden;
+    transform: translate(-50%, 10px);
+  }
+
+  .tooltip.trigger-click.copy-active .tooltip-bubble {
+    opacity: 1;
+    visibility: visible;
+    transform: translate(-50%, 0);
+    pointer-events: auto;
+  }
+
+  .tooltip.trigger-click.copy-active .tooltip-bubble {
     opacity: 1 !important;
     visibility: visible !important;
-    pointer-events: auto;
+    transform: translate(-50%, 0);
+  }
+
+  .tooltip-bubble .tooltip-label {
+    margin-bottom: 0.05rem;
+    font-size: 0.95rem;
+    font-weight: 600;
   }
 
   /* --- Positioning Styles --- */

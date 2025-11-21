@@ -35,7 +35,6 @@ const { intro, sections } = await getContactViewModel();
                     : item.copyOnClick === false
                       ? undefined
                       : value;
-                  const triggerId = `contact-item-${sectionIndex}-${itemIndex}`;
 
                   if (item.href) {
                     return (
@@ -49,21 +48,18 @@ const { intro, sections } = await getContactViewModel();
                   if (copyValue) {
                     return (
                       <>
-                        <span
-                          id={triggerId}
-                          class:list={["copyable", { clickable: true }]}
-                          data-copy-value={copyValue}
-                          role="text"
-                          set:html={value}
-                        />
                         <Tooltip
-                          triggerId={triggerId}
                           class="copy-only-tooltip"
-                          position="right"
-                          triggerEvent="click"
-                          dismissAfter={1000}
+                          label="Copied!"
+                          position="bottom"
+                          trigger="click"
                         >
-                          Copied!
+                          <span
+                            class:list={["copyable", { clickable: true }]}
+                            data-copy-value={copyValue}
+                            role="text"
+                            set:html={value}
+                          />
                         </Tooltip>
                         {description && <span class="inline-desc">&nbsp;{description}</span>}
                       </>
