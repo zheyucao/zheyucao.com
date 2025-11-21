@@ -207,64 +207,23 @@ const contactFooterItems = listEntries
 </style>
 
 <script>
-  // GSAP Scroll-controlled animation for the footer
-  import { gsap } from "gsap";
-  import { ScrollTrigger } from "gsap/ScrollTrigger";
+  import { setupFooterAnimation } from "../lib/animations/footerAnimation";
 
-  function setupFooterAnimation() {
-    // Ensure plugin is registered (safe to call multiple times)
-    gsap.registerPlugin(ScrollTrigger);
+  let cleanup: (() => void) | null = null;
 
-    const footerElement = document.querySelector(".site-footer");
-    const pageWrapper = document.querySelector(".page-wrapper");
+  document.addEventListener("astro:page-load", () => {
+    const footer = document.querySelector(".site-footer") as HTMLElement | null;
+    const scroller = document.querySelector(".page-wrapper") as HTMLElement | null;
 
-    // Kill previous ScrollTriggers targeting the footer FIRST
-    ScrollTrigger.getAll().forEach((trigger) => {
-      // Simplify the check: Only kill triggers directly associated with footerElement
-      if (trigger.trigger === footerElement) {
-        trigger.kill();
-      }
-    });
-
-    if (footerElement && pageWrapper) {
-      gsap.fromTo(
-        footerElement,
-        { opacity: 0, y: 15 },
-        {
-          opacity: 1,
-          y: 0,
-          ease: "power1.in",
-          scrollTrigger: {
-            trigger: footerElement,
-            scroller: pageWrapper,
-            start: "top 95%",
-            end: "top 40%",
-            scrub: 1,
-            // markers: true,
-          },
-        }
-      );
-    } else {
-      console.warn("Footer animation setup skipped: elements not found.");
+    if (footer && scroller) {
+      cleanup = setupFooterAnimation({ footer, scroller });
     }
-  }
-
-  // Function to initialize, called on page load
-  function initializeFooter() {
-    setupFooterAnimation();
-  }
-
-  // Run setup on initial load and after SPA navigations
-  document.addEventListener("astro:page-load", initializeFooter);
+  });
 
   // Cleanup on navigation
   document.addEventListener("astro:before-swap", () => {
-    const footerElement = document.querySelector(".site-footer");
-    ScrollTrigger.getAll().forEach((trigger) => {
-      if (trigger.trigger === footerElement) {
-        trigger.kill();
-      }
-    });
+    cleanup?.();
+    cleanup = null;
   });
 </script>
 
