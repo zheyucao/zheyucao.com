@@ -50,6 +50,7 @@ const { items = [] } = Astro.props;
               role="img"
               aria-label={displayLabel}
               data-copy-value={copyValue}
+              data-has-copy={copyValue ? "true" : "false"}
             >
               <Icon name={item.icon} size={22} aria-hidden="true" />
             </span>
@@ -58,7 +59,7 @@ const { items = [] } = Astro.props;
           <Tooltip
             triggerId={triggerId}
             position="bottom"
-            triggerEvent={item.href ? "hover" : "click"}
+            triggerEvent={copyValue ? "both" : "hover"}
           >
             <div class="tooltip-label" data-tooltip-label data-original-label={displayLabel}>
               {displayLabel}
@@ -118,64 +119,72 @@ const { items = [] } = Astro.props;
 </style>
 
 <script>
-  const handleCopy = async (el, value) => {
-    const triggerId = el.id;
-    const tooltip = document.querySelector(`.tooltip-bubble[data-trigger-id="${triggerId}"]`);
-
-    const labelEl = tooltip?.querySelector("[data-tooltip-label]");
-    const descEl = tooltip?.querySelector("[data-tooltip-desc]");
-
+  const handleCopy = async (
+    tooltip: any,
+    labelEl: Element,
+    descEl: Element | null,
+    value: string,
+    trigger: HTMLElement
+  ) => {
     try {
       await navigator.clipboard.writeText(value);
 
-      if (labelEl) {
-        const originalLabel =
-          labelEl.getAttribute("data-original-label") || labelEl.textContent || "Copied!";
-        labelEl.textContent = "Copied!";
+      const originalLabel =
+        labelEl.getAttribute("data-original-label") || labelEl.textContent || "Copied!";
 
-        if (descEl) {
-          (descEl as HTMLElement).style.display = "none";
-        }
-        if (tooltip) {
-          tooltip.classList.add("copy-active");
-        }
+      // Lock tooltip to prevent hover from interfering
+      tooltip.lock();
 
-        setTimeout(() => {
-          labelEl.textContent = originalLabel;
-          if (descEl) {
-            (descEl as HTMLElement).style.display = "";
-          }
-          if (tooltip) {
-            tooltip.classList.remove("copy-active");
-          }
-        }, 1200);
+      // Show "Copied!" message
+      labelEl.textContent = "Copied!";
+
+      if (descEl) {
+        (descEl as HTMLElement).style.display = "none";
       }
+
+      // Force show tooltip with copy styling
+      tooltip.classList.add("copy-active");
+      tooltip.forceShow();
+
+      // Restore original content after delay
+      setTimeout(() => {
+        labelEl.textContent = originalLabel;
+        if (descEl) {
+          (descEl as HTMLElement).style.display = "";
+        }
+        tooltip.classList.remove("copy-active");
+
+        // Unlock first so hover can work
+        tooltip.unlock();
+
+        // Check if user is still hovering - if so, keep tooltip visible with restored content
+        // Otherwise hide it
+        if (trigger.matches(":hover")) {
+          // User is still hovering, keep tooltip visible with original content
+          tooltip.forceShow();
+        } else {
+          tooltip.forceHide();
+        }
+      }, 1200);
     } catch (e) {
       console.error("Unable to copy contact value:", e);
     }
   };
 
   document.addEventListener("astro:page-load", () => {
-    const copyTargets = document.querySelectorAll(".contact-icons [data-copy-value]");
-    copyTargets.forEach((el) => {
-      el.addEventListener("click", (event) => {
-        const value = el.getAttribute("data-copy-value");
-        if (!value) return;
-        event.preventDefault();
-        handleCopy(el, value);
-      });
-    });
+    // Listen for tooltip:click events
+    document.addEventListener("tooltip:click", async (e: any) => {
+      const { trigger, tooltip } = e.detail;
+      const copyValue = trigger.getAttribute("data-copy-value");
 
-    const linkTargets = document.querySelectorAll(".contact-icons [data-link-icon]");
-    linkTargets.forEach((el) => {
-      el.addEventListener("click", () => {
-        const triggerId = el.id;
-        const tooltip = document.querySelector(`.tooltip-bubble[data-trigger-id="${triggerId}"]`);
-        if (!tooltip) return;
+      if (!copyValue) return;
 
-        // Force hide by removing active class directly
-        tooltip.classList.remove("active");
-      });
+      const labelEl = tooltip.querySelector("[data-tooltip-label]");
+      const descEl = tooltip.querySelector("[data-tooltip-desc]");
+
+      if (labelEl) {
+        await handleCopy(tooltip, labelEl, descEl, copyValue, trigger);
+      }
     });
   });
 </script>

@@ -1,7 +1,7 @@
 ---
 interface Props {
   triggerId: string;
-  triggerEvent?: "hover" | "click";
+  triggerEvent?: "hover" | "click" | "both";
   position?: "top" | "bottom" | "left" | "right";
   dismissAfter?: number; // milliseconds, only applies to click-triggered tooltips
   class?: string;
@@ -162,6 +162,9 @@ const {
       };
 
       const show = () => {
+        // Don't respond to trigger events if tooltip is locked
+        if (tooltip.dataset.locked === "true") return;
+
         updatePosition();
         tooltip.classList.add("active");
 
@@ -174,6 +177,27 @@ const {
       };
 
       const hide = () => {
+        // Don't respond to trigger events if tooltip is locked
+        if (tooltip.dataset.locked === "true") return;
+
+        tooltip.classList.remove("active");
+      };
+
+      // Expose lock/unlock API via custom methods on the tooltip element
+      (tooltip as any).lock = () => {
+        tooltip.dataset.locked = "true";
+      };
+
+      (tooltip as any).unlock = () => {
+        delete tooltip.dataset.locked;
+      };
+
+      (tooltip as any).forceShow = () => {
+        updatePosition();
+        tooltip.classList.add("active");
+      };
+
+      (tooltip as any).forceHide = () => {
         tooltip.classList.remove("active");
       };
 
@@ -198,6 +222,23 @@ const {
         trigger.addEventListener("blur", hide);
       } else if (triggerEvent === "click") {
         trigger.addEventListener("click", toggle);
+      } else if (triggerEvent === "both") {
+        // Hover shows the tooltip
+        trigger.addEventListener("mouseenter", show);
+        trigger.addEventListener("mouseleave", hide);
+        trigger.addEventListener("focus", show);
+        trigger.addEventListener("blur", hide);
+
+        // Click dispatches a custom event for external handling
+        trigger.addEventListener("click", (e) => {
+          e.stopPropagation();
+          // Dispatch custom event that consumers can listen to
+          const clickEvent = new CustomEvent("tooltip:click", {
+            detail: { triggerId, tooltip, trigger },
+            bubbles: true,
+          });
+          trigger.dispatchEvent(clickEvent);
+        });
       }
 
       // Find the scrolling container (page-wrapper or window)
