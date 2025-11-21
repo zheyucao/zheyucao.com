@@ -16,11 +16,9 @@ interface Props {
 const {
   title,
   homepageSummary = "Click to learn more...", // Default summary
-  // githubUrl,
+  githubUrl,
   slug,
 } = Astro.props;
-
-const githubUrl = undefined;
 
 // Construct URL with query parameter instead of hash
 const projectUrl = `/projects?scrollTo=${slug}`;

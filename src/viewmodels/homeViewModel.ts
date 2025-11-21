@@ -6,51 +6,87 @@ import type { ContactItem } from "./contactViewModel";
  * Aggregates and transforms content for the homepage
  */
 export async function getHomeViewModel() {
-    // Fetch hero section
-    const heroEntry = await getEntry("sections", "hero");
+    //  Parallelize independent data fetches for better build performance
+    const [
+        heroEntry,
+        meetMeEntry,
+        connectEntry,
+        featuredWorksEntry,
+        highlightsEntry,
+        allProjects,
+        allEvents,
+        contactEntries
+    ] = await Promise.all([
+        getEntry("sections", "hero"),
+        getEntry("sections", "meet-me"),
+        getEntry("sections", "connect"),
+        getEntry("sections", "featured-works"),
+        getEntry("sections", "highlights"),
+        getCollection("projects"),
+        getCollection("timeline"),
+        getCollection("contact")
+    ]);
+
     const hero = heroEntry.data;
-
-    // Fetch meet me section
-    const meetMeEntry = await getEntry("sections", "meet-me");
-    const { Content: MeetMeContent } = await meetMeEntry.render();
-    const meetMe = {
-        ...meetMeEntry.data,
-        Content: MeetMeContent,
-    };
-
-    // Fetch connect section
-    const connectEntry = await getEntry("sections", "connect");
-    const { Content: ConnectContent } = await connectEntry.render();
-    const connect = {
-        ...connectEntry.data,
-        Content: ConnectContent,
-    };
-
-    // Fetch featured works section metadata
-    const featuredWorksEntry = await getEntry("sections", "featured-works");
     const featuredWorksSection = featuredWorksEntry.data;
-
-    // Fetch and filter featured projects
-    const allProjects = await getCollection("projects");
-    const featuredProjects = allProjects.filter((p) => p.data.isFeatured);
-
-    // Fetch highlights section metadata
-    const highlightsEntry = await getEntry("sections", "highlights");
     const highlightsSection = highlightsEntry.data;
 
-    // Fetch and filter timeline highlights
-    const allEvents = await getCollection("timeline");
+    // Render markdown content in parallel
+    const [meetMeRendered, connectRendered] = await Promise.all([
+        meetMeEntry.render(),
+        connectEntry.render()
+    ]);
+
+    const meetMe = {
+        ...meetMeEntry.data,
+        Content: meetMeRendered.Content,
+    };
+
+    const connect = {
+        ...connectEntry.data,
+        Content: connectRendered.Content,
+    };
+
+    // Filter and sort featured projects by explicit order
+    const featuredProjects = allProjects
+        .filter((p) => p.data.isFeatured)
+        .sort((a, b) => (a.data.order ?? 0) - (b.data.order ?? 0));
+
+    // Filter timeline highlights
     const highlightEvents = allEvents.filter((e) => e.data.isHighlight);
 
-    // Sort highlights by date descending (latest first)
-    highlightEvents.sort((a, b) =>
-        new Date(b.data.date).getTime() - new Date(a.data.date).getTime()
-    );
+    // Sort highlights by date descending (latest first) with safe UTC parsing
+    highlightEvents.sort((a, b) => {
+        // Parse YYYY-MM safely for cross-browser compatibility (Safari/Firefox)
+        const parseDate = (dateStr: string): number => {
+            if (!dateStr) return 0;
+            const [year, month] = dateStr.split('-').map(Number);
+            if (isNaN(year) || isNaN(month)) {
+                console.warn(`[homeViewModel] Invalid date format: ${dateStr}`);
+                return 0;
+            }
+            return Date.UTC(year, month - 1);
+        };
+
+        return parseDate(b.data.date) - parseDate(a.data.date);
+    });
+
+    // Validate dates
+    const invalidDates = highlightEvents.filter(e => {
+        const [year, month] = (e.data.date || '').split('-').map(Number);
+        return isNaN(year) || isNaN(month);
+    });
+
+    if (invalidDates.length > 0) {
+        console.warn('[homeViewModel] Timeline events with invalid dates:',
+            invalidDates.map(e => ({ id: e.id, date: e.data.date }))
+        );
+    }
 
     // Take top 3 highlights
     const topHighlights = highlightEvents.slice(0, 3);
 
-    // Render content for highlights
+    // Render content for highlights in parallel
     const highlights = await Promise.all(
         topHighlights.map(async (event) => {
             const { Content } = await event.render();
@@ -58,8 +94,7 @@ export async function getHomeViewModel() {
         })
     );
 
-    // Fetch contact lists for home social links
-    const contactEntries = await getCollection("contact");
+    // Process contact lists for home social links
     const listEntries = contactEntries.filter((entry) => entry.data.kind === "list");
     const contactItemsWithOrder = listEntries
         .sort((a, b) => (a.data.order ?? Infinity) - (b.data.order ?? Infinity))

@@ -13,11 +13,6 @@ interface Props {
 }
 const { title, showIndicatorOverride } = Astro.props;
 
-// --- Add Detailed Log ---
-console.log(
-  `[Layout.astro] Rendering for path: "${Astro.url.pathname}". Received showIndicatorOverride: ${showIndicatorOverride} (Type: ${typeof showIndicatorOverride})`
-);
-
 // Set a default title if none is provided
 const pageTitle = `${title || siteConfig.metadata.title} | ${siteConfig.metadata.author}`;
 
@@ -27,10 +22,6 @@ const shouldShowBasedOnPath = currentPath === "/";
 // Use override if provided, otherwise check path
 const showScrollIndicator =
   showIndicatorOverride !== undefined ? showIndicatorOverride : shouldShowBasedOnPath;
-// --- Add Detailed Log ---
-console.log(
-  `[Layout.astro] Path check result: ${shouldShowBasedOnPath}. Final showScrollIndicator decision: ${showScrollIndicator}`
-);
 ---
 
 <!doctype html>
@@ -62,8 +53,6 @@ console.log(
       href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400..800;1,400..800&display=swap"
       rel="stylesheet"
     />
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
       href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap"
       rel="stylesheet"
@@ -81,7 +70,6 @@ console.log(
         // 2. Set up the new observer for the current page
         const pageWrapper = document.querySelector(".page-wrapper");
         if (!pageWrapper) {
-          console.error("Page wrapper element not found for IntersectionObserver.");
           return;
         }
         const observerOptions = {
@@ -92,7 +80,6 @@ console.log(
 
         const observerCallback = (entries, observer) => {
           entries.forEach((entry) => {
-            // console.log("Observing:", entry.target, "Is intersecting:", entry.isIntersecting); // Removed debug log
             if (entry.isIntersecting) {
               entry.target.classList.add("visible");
               observer.unobserve(entry.target);
@@ -180,7 +167,6 @@ console.log(
                 .to(sectionContent, { opacity: 0, y: -30, ease: "power1.inOut", duration: 2 });
             }
           });
-          console.log(`GSAP: Setup animations for ${sections.length} sections.`);
         } else {
           // Optionally kill all ScrollTriggers if no sections are found (e.g., on non-homepage?)
           // ScrollTrigger.getAll().forEach(trigger => trigger.kill());
@@ -189,6 +175,11 @@ console.log(
 
       // Run setup on initial load and after SPA navigations
       document.addEventListener("astro:page-load", setupSectionAnimations);
+
+      // Cleanup on navigation
+      document.addEventListener("astro:before-swap", () => {
+        ScrollTrigger.getAll().forEach((trigger) => trigger.kill());
+      });
     </script>
     <!-- System Theme Handling -->
     <script>
@@ -201,21 +192,10 @@ console.log(
         } else {
           document.documentElement.classList.remove("dark");
         }
-        console.log(
-          "[Theme] Applied theme based on prefers-color-scheme:",
-          mediaQuery.matches ? "dark" : "light"
-        ); // Debug log
       };
 
       // Listener for live theme changes
       mediaQuery.addEventListener("change", checkAndApplyTheme);
-
-      // Listener to re-apply theme after client-side navigation
-      document.addEventListener("astro:page-load", checkAndApplyTheme);
-
-      // Optional: Apply on initial script load for non-Astro SPA navigators?
-      // The inline script should handle the very first load.
-      // checkAndApplyTheme();
     </script>
   </head>
   <body>

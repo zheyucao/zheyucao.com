@@ -144,25 +144,48 @@ const { items = [] } = Astro.props;
     }
   };
 
+  // Track listeners for cleanup
+  const copyListeners = new Map();
+  const linkListeners = new Map();
+
   document.addEventListener("astro:page-load", () => {
     const copyTargets = document.querySelectorAll(".contact-icons [data-copy-value]");
     copyTargets.forEach((el) => {
-      el.addEventListener("click", (event) => {
+      const handler = (event) => {
         const value = el.getAttribute("data-copy-value");
         if (!value) return;
         event.preventDefault();
         handleCopy(el, value);
-      });
+      };
+      el.addEventListener("click", handler);
+      copyListeners.set(el, handler);
     });
 
     const linkTargets = document.querySelectorAll(".contact-icons [data-link-icon]");
     linkTargets.forEach((el) => {
-      el.addEventListener("click", () => {
+      const handler = () => {
         const tooltip = el.closest(".tooltip");
         if (!tooltip) return;
         tooltip.classList.add("hide-bubble");
         setTimeout(() => tooltip.classList.remove("hide-bubble"), 250);
-      });
+      };
+      el.addEventListener("click", handler);
+      linkListeners.set(el, handler);
     });
+  });
+
+  // Cleanup on navigation
+  document.addEventListener("astro:before-swap", () => {
+    // Remove all copy listeners
+    copyListeners.forEach((handler, el) => {
+      el.removeEventListener("click", handler);
+    });
+    copyListeners.clear();
+
+    // Remove all link listeners
+    linkListeners.forEach((handler, el) => {
+      el.removeEventListener("click", handler);
+    });
+    linkListeners.clear();
   });
 </script>
