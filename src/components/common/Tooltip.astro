@@ -1,24 +1,36 @@
 ---
 interface Props {
-  triggerId: string;
-  triggerEvent?: "hover" | "click" | "both";
-  position?: "top" | "bottom" | "left" | "right";
-  dismissAfter?: number; // milliseconds, only applies to click-triggered tooltips
+  label: string;
   class?: string;
   position?: "top" | "bottom";
   trigger?: "hover" | "click";
 }
 
-const { label, class: className = "", position = "bottom", trigger = "hover" } = Astro.props;
+const {
+  label,
+  class: className = "",
+  position = "bottom",
+  trigger = "hover",
+} = Astro.props;
 ---
 
 <span class={`tooltip ${position} trigger-${trigger} ${className}`}>
   <slot />
+  <span class="tooltip-bubble">
+    <slot name="bubble">{label}</slot>
+  </span>
 </span>
 
 <style>
+  .tooltip {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+
   .tooltip-bubble {
-    position: fixed; /* Fixed positioning relative to viewport */
+    position: absolute;
     padding: none;
     border-radius: 8px;
     font-size: 0.8rem;
@@ -33,7 +45,7 @@ const { label, class: className = "", position = "bottom", trigger = "hover" } =
       opacity 0.16s ease,
       transform 0.16s ease,
       visibility 0.16s ease;
-    z-index: 1000; /* High z-index to sit on top */
+    z-index: 5;
     max-width: 240px;
     text-align: center;
     white-space: normal;
@@ -55,6 +67,7 @@ const { label, class: className = "", position = "bottom", trigger = "hover" } =
   .tooltip.trigger-hover:focus-within .tooltip-bubble {
     opacity: 1;
     visibility: visible;
+    transform: translate(-50%, 2px);
   }
 
   /* Click-triggered tooltips stay hidden unless explicitly activated */
@@ -83,237 +96,10 @@ const { label, class: className = "", position = "bottom", trigger = "hover" } =
     font-weight: 600;
   }
 
-  /* --- Positioning Styles --- */
-
-  /* Top */
-  .tooltip-bubble.top {
-    transform: translate(-50%, 10px); /* Start slightly down */
-  }
-  .tooltip-bubble.top.active,
-  .tooltip-bubble.top.copy-active {
-    transform: translate(-50%, 0);
-  }
-
-  /* Bottom */
-  .tooltip-bubble.bottom {
-    transform: translate(-50%, -10px); /* Start slightly up */
-  }
-  .tooltip-bubble.bottom.active,
-  .tooltip-bubble.bottom.copy-active {
-    transform: translate(-50%, 0);
-  }
-
-  /* Left */
-  .tooltip-bubble.left {
-    transform: translate(10px, -50%); /* Start slightly right */
-  }
-  .tooltip-bubble.left.active,
-  .tooltip-bubble.left.copy-active {
-    transform: translate(0, -50%);
-  }
-
-  /* Right */
-  .tooltip-bubble.right {
-    transform: translate(-10px, -50%); /* Start slightly left */
-  }
-  .tooltip-bubble.right.active,
-  .tooltip-bubble.right.copy-active {
-    transform: translate(0, -50%);
+  .tooltip-bubble .tooltip-desc {
+    font-family: var(--font-family-sans);
+    font-size: 0.78rem;
+    color: var(--text-muted);
+    text-align: center;
   }
 </style>
-
-<script>
-  function setupTooltips() {
-    const tooltips = document.querySelectorAll<HTMLElement>(".tooltip-bubble");
-
-    tooltips.forEach((tooltip) => {
-      const triggerId = tooltip.dataset.triggerId;
-      if (!triggerId) return;
-
-      const trigger = document.getElementById(triggerId);
-      if (!trigger) {
-        console.warn(`Tooltip trigger element with ID "${triggerId}" not found.`);
-        return;
-      }
-
-      const position = tooltip.dataset.position || "bottom";
-      const triggerEvent = tooltip.dataset.triggerEvent || "hover";
-      const dismissAfter = parseInt(tooltip.dataset.dismissAfter || "2000", 10);
-
-      // Move tooltip to body to avoid stacking context issues
-      document.body.appendChild(tooltip);
-
-      const updatePosition = () => {
-        if (!trigger || !tooltip) return;
-
-        const rect = trigger.getBoundingClientRect();
-        const tooltipRect = tooltip.getBoundingClientRect();
-
-        let top = 0;
-        let left = 0;
-
-        switch (position) {
-          case "top":
-            top = rect.top - tooltipRect.height;
-            left = rect.left + rect.width / 2; // Centered horizontally
-            break;
-          case "bottom":
-            top = rect.bottom;
-            left = rect.left + rect.width / 2; // Centered horizontally
-            break;
-          case "left":
-            // Since we use transform: translateY(-50%), top should be the center point
-            top = rect.top + rect.height / 2;
-            left = rect.left - tooltipRect.width - 16;
-            break;
-          case "right":
-            top = rect.top + rect.height / 2; // Centered vertically
-            left = rect.right + 16;
-            break;
-        }
-
-        // Prevent overflow logic (simplified)
-        // For top/bottom, we might want to clamp left
-        // For left/right, we might want to clamp top
-
-        tooltip.style.left = `${left}px`;
-        tooltip.style.top = `${top}px`;
-      };
-
-      const show = () => {
-        // Don't respond to trigger events if tooltip is locked
-        if (tooltip.dataset.locked === "true") return;
-
-        updatePosition();
-        tooltip.classList.add("active");
-
-        // Auto-dismiss click-triggered tooltips
-        if (triggerEvent === "click") {
-          setTimeout(() => {
-            tooltip.classList.remove("active");
-          }, dismissAfter);
-        }
-      };
-
-      const hide = () => {
-        // Don't respond to trigger events if tooltip is locked
-        if (tooltip.dataset.locked === "true") return;
-
-        tooltip.classList.remove("active");
-      };
-
-      // Expose lock/unlock API via custom methods on the tooltip element
-      (tooltip as any).lock = () => {
-        tooltip.dataset.locked = "true";
-      };
-
-      (tooltip as any).unlock = () => {
-        delete tooltip.dataset.locked;
-      };
-
-      (tooltip as any).forceShow = () => {
-        updatePosition();
-        tooltip.classList.add("active");
-      };
-
-      (tooltip as any).forceHide = () => {
-        tooltip.classList.remove("active");
-      };
-
-      const toggle = (e: Event) => {
-        e.stopPropagation();
-        if (tooltip.classList.contains("active")) {
-          hide();
-        } else {
-          // Close others
-          document.querySelectorAll(".tooltip-bubble.trigger-click").forEach((t) => {
-            if (t !== tooltip) t.classList.remove("active");
-          });
-          show();
-        }
-      };
-
-      // Event Listeners
-      if (triggerEvent === "hover") {
-        trigger.addEventListener("mouseenter", show);
-        trigger.addEventListener("mouseleave", hide);
-        trigger.addEventListener("focus", show);
-        trigger.addEventListener("blur", hide);
-      } else if (triggerEvent === "click") {
-        trigger.addEventListener("click", toggle);
-      } else if (triggerEvent === "both") {
-        // Hover shows the tooltip
-        trigger.addEventListener("mouseenter", show);
-        trigger.addEventListener("mouseleave", hide);
-        trigger.addEventListener("focus", show);
-        trigger.addEventListener("blur", hide);
-
-        // Click dispatches a custom event for external handling
-        trigger.addEventListener("click", (e) => {
-          e.stopPropagation();
-          // Dispatch custom event that consumers can listen to
-          const clickEvent = new CustomEvent("tooltip:click", {
-            detail: { triggerId, tooltip, trigger },
-            bubbles: true,
-          });
-          trigger.dispatchEvent(clickEvent);
-        });
-      }
-
-      // Find the scrolling container (page-wrapper or window)
-      const scrollContainer = document.querySelector(".page-wrapper") || window;
-
-      // Use requestAnimationFrame for smoother position updates during scroll
-      let ticking = false;
-      scrollContainer.addEventListener(
-        "scroll",
-        () => {
-          if (!ticking && tooltip.classList.contains("active")) {
-            requestAnimationFrame(() => {
-              updatePosition();
-              ticking = false;
-            });
-            ticking = true;
-          }
-        },
-        { passive: true }
-      );
-
-      window.addEventListener(
-        "resize",
-        () => {
-          if (tooltip.classList.contains("active")) updatePosition();
-        },
-        { passive: true }
-      );
-    });
-
-    // Global click to close click-triggered tooltips
-    document.addEventListener("click", (e) => {
-      const target = e.target as HTMLElement;
-      // Don't close if clicking inside the tooltip itself (if interactive)
-      if (target.closest(".tooltip-bubble")) return;
-
-      document.querySelectorAll(".tooltip-bubble.trigger-click").forEach((t) => {
-        // Don't close if clicking the trigger (handled by toggle)
-        const id = (t as HTMLElement).dataset.triggerId;
-        if (id && target.closest(`#${id}`)) return;
-
-        t.classList.remove("active");
-      });
-    });
-
-    // Escape key
-    document.addEventListener("keydown", (e) => {
-      if (e.key === "Escape") {
-        document.querySelectorAll(".tooltip-bubble").forEach((t) => t.classList.remove("active"));
-      }
-    });
-  }
-
-  // Run on initial load
-  setupTooltips();
-
-  // Run on view transitions
-  document.addEventListener("astro:after-swap", setupTooltips);
-</script>

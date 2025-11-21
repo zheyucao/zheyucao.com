@@ -22,19 +22,26 @@ const { items = [] } = Astro.props;
 
 <div class="contact-icons">
   {
-    items.map((item, index) => {
+    items.map((item) => {
       const value = item.content || item.href || item.label || "Link";
       const displayLabel = value;
       const description = item.description;
       const copyValue = item.copyOnClick === false || item.href ? undefined : value;
       const secondary = description || undefined;
-      const triggerId = `contact-icon-${index}`;
-
       return (
-        <>
+        <Tooltip label={displayLabel} position="bottom">
+          <div slot="bubble">
+            <div class="tooltip-label" data-tooltip-label data-original-label={displayLabel}>
+              {displayLabel}
+            </div>
+            {secondary && (
+              <div class="tooltip-desc" data-tooltip-desc data-original-desc={secondary}>
+                {secondary}
+              </div>
+            )}
+          </div>
           {item.href ? (
             <a
-              id={triggerId}
               href={item.href}
               target={item.target}
               rel={item.rel}
@@ -45,32 +52,15 @@ const { items = [] } = Astro.props;
             </a>
           ) : (
             <span
-              id={triggerId}
               class="icon-placeholder"
               role="img"
               aria-label={displayLabel}
               data-copy-value={copyValue}
-              data-has-copy={copyValue ? "true" : "false"}
             >
               <Icon name={item.icon} size={22} aria-hidden="true" />
             </span>
           )}
-
-          <Tooltip
-            triggerId={triggerId}
-            position="bottom"
-            triggerEvent={copyValue ? "both" : "hover"}
-          >
-            <div class="tooltip-label" data-tooltip-label data-original-label={displayLabel}>
-              {displayLabel}
-            </div>
-            {secondary && (
-              <div class="tooltip-desc" data-tooltip-desc data-original-desc={secondary}>
-                {secondary}
-              </div>
-            )}
-          </Tooltip>
-        </>
+        </Tooltip>
       );
     })
   }
@@ -119,72 +109,61 @@ const { items = [] } = Astro.props;
 </style>
 
 <script>
-  const handleCopy = async (
-    tooltip: any,
-    labelEl: Element,
-    descEl: Element | null,
-    value: string,
-    trigger: HTMLElement
-  ) => {
+  const handleCopy = async (el, value) => {
+    const tooltip = el.closest(".tooltip");
+    const bubble = tooltip?.querySelector(".tooltip-bubble");
+    const labelEl = tooltip?.querySelector("[data-tooltip-label]");
+    const descEl = tooltip?.querySelector("[data-tooltip-desc]");
+
     try {
       await navigator.clipboard.writeText(value);
 
-      const originalLabel =
-        labelEl.getAttribute("data-original-label") || labelEl.textContent || "Copied!";
+      if (labelEl) {
+        const originalLabel =
+          labelEl.getAttribute("data-original-label") || labelEl.textContent || "Copied!";
+        labelEl.textContent = "Copied!";
 
-      // Lock tooltip to prevent hover from interfering
-      tooltip.lock();
-
-      // Show "Copied!" message
-      labelEl.textContent = "Copied!";
-
-      if (descEl) {
-        (descEl as HTMLElement).style.display = "none";
-      }
-
-      // Force show tooltip with copy styling
-      tooltip.classList.add("copy-active");
-      tooltip.forceShow();
-
-      // Restore original content after delay
-      setTimeout(() => {
-        labelEl.textContent = originalLabel;
         if (descEl) {
-          (descEl as HTMLElement).style.display = "";
+          descEl.style.display = "none";
         }
-        tooltip.classList.remove("copy-active");
-
-        // Unlock first so hover can work
-        tooltip.unlock();
-
-        // Check if user is still hovering - if so, keep tooltip visible with restored content
-        // Otherwise hide it
-        if (trigger.matches(":hover")) {
-          // User is still hovering, keep tooltip visible with original content
-          tooltip.forceShow();
-        } else {
-          tooltip.forceHide();
+        if (bubble) {
+          bubble.classList.add("copy-active");
         }
-      }, 1200);
+
+        setTimeout(() => {
+          labelEl.textContent = originalLabel;
+          if (descEl) {
+            descEl.style.display = "";
+          }
+          if (bubble) {
+            bubble.classList.remove("copy-active");
+          }
+        }, 1200);
+      }
     } catch (e) {
       console.error("Unable to copy contact value:", e);
     }
   };
 
   document.addEventListener("astro:page-load", () => {
-    // Listen for tooltip:click events
-    document.addEventListener("tooltip:click", async (e: any) => {
-      const { trigger, tooltip } = e.detail;
-      const copyValue = trigger.getAttribute("data-copy-value");
+    const copyTargets = document.querySelectorAll(".contact-icons [data-copy-value]");
+    copyTargets.forEach((el) => {
+      el.addEventListener("click", (event) => {
+        const value = el.getAttribute("data-copy-value");
+        if (!value) return;
+        event.preventDefault();
+        handleCopy(el, value);
+      });
+    });
 
-      if (!copyValue) return;
-
-      const labelEl = tooltip.querySelector("[data-tooltip-label]");
-      const descEl = tooltip.querySelector("[data-tooltip-desc]");
-
-      if (labelEl) {
-        await handleCopy(tooltip, labelEl, descEl, copyValue, trigger);
-      }
+    const linkTargets = document.querySelectorAll(".contact-icons [data-link-icon]");
+    linkTargets.forEach((el) => {
+      el.addEventListener("click", () => {
+        const tooltip = el.closest(".tooltip");
+        if (!tooltip) return;
+        tooltip.classList.add("hide-bubble");
+        setTimeout(() => tooltip.classList.remove("hide-bubble"), 250);
+      });
     });
   });
 </script>

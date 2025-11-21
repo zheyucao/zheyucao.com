@@ -18,61 +18,60 @@ const { intro, sections } = await getContactViewModel();
     }
 
     {
-      sections.map((section, sectionIndex) => (
+      sections.map((section) => (
         <>
           <div class="section-prose">
             <section.Content />
           </div>
           <ul class="contact-list">
-            {section.items.map((item, itemIndex) => (
+            {section.items.map((item) => (
               <li>
                 <Icon name={item.icon} class="contact-icon" />
-                {(() => {
-                  const value = item.content || item.label || item.href || "";
-                  const description = item.description;
-                  const copyValue = item.href
-                    ? undefined
-                    : item.copyOnClick === false
-                      ? undefined
-                      : value;
+                {
+                  (() => {
+                    const value = item.content || item.label || item.href || "";
+                    const description = item.description;
+                    const copyValue =
+                      item.href ? undefined : item.copyOnClick === false ? undefined : value;
 
-                  if (item.href) {
+                    if (item.href) {
+                      return (
+                        <>
+                          <a href={item.href} target={item.target} rel={item.rel} set:html={value} />
+                          {description && <span class="inline-desc">&nbsp;{description}</span>}
+                        </>
+                      );
+                    }
+
+                    if (copyValue) {
+                      return (
+                        <>
+                          <Tooltip
+                            class="copy-only-tooltip"
+                            label="Copied!"
+                            position="bottom"
+                            trigger="click"
+                          >
+                            <span
+                              class:list={["copyable", { clickable: true }]}
+                              data-copy-value={copyValue}
+                              role="text"
+                              set:html={value}
+                            />
+                          </Tooltip>
+                          {description && <span class="inline-desc">&nbsp;{description}</span>}
+                        </>
+                      );
+                    }
+
                     return (
                       <>
-                        <a href={item.href} target={item.target} rel={item.rel} set:html={value} />
+                        <span set:html={value} />
                         {description && <span class="inline-desc">&nbsp;{description}</span>}
                       </>
                     );
-                  }
-
-                  if (copyValue) {
-                    return (
-                      <>
-                        <Tooltip
-                          class="copy-only-tooltip"
-                          label="Copied!"
-                          position="bottom"
-                          trigger="click"
-                        >
-                          <span
-                            class:list={["copyable", { clickable: true }]}
-                            data-copy-value={copyValue}
-                            role="text"
-                            set:html={value}
-                          />
-                        </Tooltip>
-                        {description && <span class="inline-desc">&nbsp;{description}</span>}
-                      </>
-                    );
-                  }
-
-                  return (
-                    <>
-                      <span set:html={value} />
-                      {description && <span class="inline-desc">&nbsp;{description}</span>}
-                    </>
-                  );
-                })()}
+                  })()
+                }
               </li>
             ))}
           </ul>
