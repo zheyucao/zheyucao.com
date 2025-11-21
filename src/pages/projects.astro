@@ -13,11 +13,11 @@ const { projects, pageTitle } = await getProjectsViewModel();
         <ProjectCard
           id={project.slug}
           title={project.data.title}
-          timeframe={project.data.timeframe}
           imageSrc={project.data.imageSrc}
           imageAlt={project.data.imageAlt}
-          githubUrl={project.data.githubUrl}
+          timeframe={project.data.timeframe}
           projectUrl={project.data.projectUrl}
+          githubUrl={project.data.githubUrl}
           githubRepos={project.data.githubRepos}
           techStack={project.data.techStack}
         >
@@ -70,22 +70,26 @@ const { projects, pageTitle } = await getProjectsViewModel();
 
 <style>
   .projects-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(min(100%, 400px), 1fr));
+    column-count: 1; /* Default to 1 column on mobile */
     column-gap: 3rem;
-    row-gap: 5rem;
-    margin-top: 3rem;
   }
 
-  @media (max-width: 900px) {
+  /* Apply multi-column layout for wider screens */
+  @media (min-width: 768px) {
     .projects-grid {
-      grid-template-columns: 1fr;
-      row-gap: 4rem;
+      column-count: 2;
+      column-gap: 3rem;
     }
   }
 
-  /* Prevent grid blowout from long words inside project cards */
-  .projects-grid > :global(*) {
-    min-width: 0; /* Allows grid items to shrink below their content size if needed */
+  /* Ensure cards don't break across columns */
+  .projects-grid > :global(.project-card) {
+    break-inside: avoid;
+    margin-bottom: 3rem;
+  }
+
+  /* Remove margin from last card */
+  .projects-grid > :global(.project-card:last-child) {
+    margin-bottom: 0;
   }
 </style>
