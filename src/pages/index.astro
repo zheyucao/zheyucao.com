@@ -28,7 +28,7 @@ const viewModel = await getHomeViewModel();
     </SectionWrapper>
 
     <SectionWrapper>
-      <ConnectContent data={viewModel.connect} />
+      <ConnectContent data={{ ...viewModel.connect, socialItems: viewModel.connectSocialItems }} />
     </SectionWrapper>
   </main>
 </Layout>

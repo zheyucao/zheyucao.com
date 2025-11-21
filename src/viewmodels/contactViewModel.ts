@@ -7,6 +7,8 @@ export interface ContactItem {
     target?: string;
     rel?: string;
     description?: string;
+    showOnHome?: boolean;
+    showOnContact?: boolean;
 }
 
 export interface ContactSection {
@@ -51,9 +53,10 @@ export async function getContactViewModel(): Promise<ContactViewModel> {
     const sections = await Promise.all(
         sectionEntries.map(async (entry) => {
             const { Content } = await entry.render();
+            const items = (entry.data as any).items as ContactItem[];
             return {
                 order: entry.data.order ?? Infinity,
-                items: (entry.data as any).items,
+                items: items.filter((item) => item.showOnContact !== false),
                 Content,
             };
         })

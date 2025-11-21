@@ -1,4 +1,5 @@
 import { getCollection, getEntry } from "astro:content";
+import type { ContactItem } from "./contactViewModel";
 
 /**
  * Home page view model
@@ -57,6 +58,23 @@ export async function getHomeViewModel() {
         })
     );
 
+    // Fetch contact lists for home social links
+    const contactEntries = await getCollection("contact");
+    const listEntries = contactEntries.filter((entry) => entry.data.kind === "list");
+    const contactItemsWithOrder = listEntries
+        .sort((a, b) => (a.data.order ?? Infinity) - (b.data.order ?? Infinity))
+        .flatMap((entry, sectionIndex) => {
+            const items = (entry.data as any).items as ContactItem[];
+            return items
+                .map((item, itemIndex) => ({
+                    item,
+                    order: item.showOnHome === false ? Infinity : (entry.data.order ?? sectionIndex) * 100 + itemIndex,
+                }))
+                .filter(({ item }) => item.showOnHome !== false);
+        })
+        .sort((a, b) => a.order - b.order)
+        .map(({ item }) => item);
+
     return {
         hero,
         meetMe,
@@ -69,5 +87,6 @@ export async function getHomeViewModel() {
             section: highlightsSection,
             events: highlights,
         },
+        connectSocialItems: contactItemsWithOrder,
     };
 }

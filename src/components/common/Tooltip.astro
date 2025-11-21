@@ -1,0 +1,79 @@
+---
+interface Props {
+  label: string;
+  class?: string;
+  position?: "top" | "bottom";
+}
+
+const { label, class: className = "", position = "bottom" } = Astro.props;
+---
+
+<span class={`tooltip ${position} ${className}`}>
+  <slot />
+  <span class="tooltip-bubble">
+    <slot name="bubble">{label}</slot>
+  </span>
+</span>
+
+<style>
+  .tooltip {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .tooltip-bubble {
+    position: absolute;
+    padding: none;
+    border-radius: 8px;
+    font-size: 0.8rem;
+    line-height: 1.3;
+    font-family: var(--font-family-sans);
+    background: none;
+    color: rgba(var(--text-color), 0.8);
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transition:
+      opacity 0.16s ease,
+      transform 0.16s ease,
+      visibility 0.16s ease;
+    z-index: 5;
+    max-width: 240px;
+    text-align: center;
+    white-space: normal;
+  }
+
+  .tooltip.bottom .tooltip-bubble {
+    top: 100%;
+    left: 50%;
+    transform: translate(-50%, 10px);
+  }
+
+  .tooltip.top .tooltip-bubble {
+    bottom: 100%;
+    left: 50%;
+    transform: translate(-50%, -10px);
+  }
+
+  .tooltip:hover .tooltip-bubble,
+  .tooltip:focus-within .tooltip-bubble {
+    opacity: 1;
+    visibility: visible;
+    transform: translate(-50%, 2px);
+  }
+
+  .tooltip-bubble .tooltip-label {
+    margin-bottom: 0.05rem;
+    font-size: 0.95rem;
+    font-weight: 600;
+  }
+
+  .tooltip-bubble .tooltip-desc {
+    font-family: var(--font-family-sans);
+    font-size: 0.78rem;
+    color: var(--text-muted, rgba(0, 0, 0, 0.6));
+    text-align: center;
+  }
+</style>

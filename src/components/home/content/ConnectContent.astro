@@ -1,8 +1,9 @@
 ---
 // Content for the "Keep in touch" section
 import Button from "../../common/Button.astro";
+import Tooltip from "../../common/Tooltip.astro";
 import { Icon } from "astro-icon/components";
-import { siteConfig } from "../../../config";
+import type { AstroComponentFactory } from "astro/runtime/server";
 
 interface Props {
   data: {
@@ -11,13 +12,21 @@ interface Props {
       text: string;
       href: string;
     };
-    Content: any;
+    Content: AstroComponentFactory;
+    socialItems?: {
+      icon: string;
+      label?: string;
+      href?: string;
+      target?: string;
+      rel?: string;
+      description?: string;
+      copyOnClick?: boolean;
+    }[];
   };
 }
 
 const { data } = Astro.props;
-const { title, cta, Content } = data;
-const { social } = siteConfig;
+const { title, cta, Content, socialItems } = data;
 ---
 
 <h2 slot="title" class="about-title scroll-target-title">{title}</h2>
@@ -28,19 +37,41 @@ const { social } = siteConfig;
   </div>
 
   <div class="connect-icon-links">
-    <a href={social.email} title="Send me an email" aria-label="Email">
-      <Icon name="ri:mail-line" size={24} aria-hidden="true" />
-    </a>
-    <a
-      href={social.github}
-      target="_blank"
-      rel="noopener noreferrer"
-      title="View my GitHub profile"
-      aria-label="GitHub"
-    >
-      <Icon name="ri:github-line" size={22} aria-hidden="true" />
-    </a>
-    {/* Add other icons using Icon component here */}
+    {
+      socialItems?.length
+        ? socialItems.map((item) => {
+            const label = item.label || "Link";
+            const description = item.description;
+            return (
+              <Tooltip label={label} position="bottom">
+                <div slot="bubble">
+                  <div class="tooltip-label">{label}</div>
+                  {description && <div class="tooltip-desc">{description}</div>}
+                </div>
+                {item.href ? (
+                  <a
+                    href={item.href}
+                    target={item.target}
+                    rel={item.rel}
+                    aria-label={label}
+                  >
+                    <Icon name={item.icon} size={22} aria-hidden="true" />
+                  </a>
+                ) : (
+                  <span
+                    class="icon-placeholder"
+                    role="img"
+                    aria-label={label}
+                    data-copy-value={(item.copyOnClick ?? true) ? label : undefined}
+                  >
+                    <Icon name={item.icon} size={22} aria-hidden="true" />
+                  </span>
+                )}
+              </Tooltip>
+            );
+          })
+        : null
+    }
   </div>
 
   {/* Button for full contact page */}
@@ -63,20 +94,27 @@ const { social } = siteConfig;
     margin-bottom: 2.5rem; /* Space below icons */
   }
 
-  .connect-icon-links a {
-    color: var(--theme-icon-color); /* Use theme variable */
+  .connect-icon-links a,
+  .connect-icon-links .icon-placeholder {
+    color: var(--theme-icon-color);
     opacity: 0.8;
     transition:
       opacity 0.2s ease,
       color 0.2s ease;
-    display: inline-block; /* Ensure proper spacing/alignment */
+    display: inline-block;
   }
 
   .connect-icon-links a:hover,
-  .connect-icon-links a:focus {
+  .connect-icon-links a:focus,
+  .connect-icon-links .icon-placeholder:hover,
+  .connect-icon-links .icon-placeholder:focus {
     opacity: 1;
-    color: var(--theme-accent); /* Highlight with accent color */
+    color: var(--theme-accent);
     outline: none;
+  }
+
+  .connect-icon-links .icon-placeholder {
+    cursor: pointer;
   }
 
   /* Style for the button group containing the CTA button */
@@ -89,3 +127,25 @@ const { social } = siteConfig;
   /* Remove styles specific to the old .cta-link if they exist */
   /* .cta-link { ... } */
 </style>
+
+<script>
+  const handleCopy = async (value) => {
+    try {
+      await navigator.clipboard.writeText(value);
+    } catch (e) {
+      console.error("Unable to copy contact value:", e);
+    }
+  };
+
+  document.addEventListener("astro:page-load", () => {
+    const copyTargets = document.querySelectorAll(".connect-icon-links [data-copy-value]");
+    copyTargets.forEach((el) => {
+      el.addEventListener("click", (event) => {
+        const value = el.getAttribute("data-copy-value");
+        if (!value) return;
+        event.preventDefault();
+        handleCopy(value);
+      });
+    });
+  });
+</script>

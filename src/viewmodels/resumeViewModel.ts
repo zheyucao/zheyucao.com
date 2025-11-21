@@ -76,8 +76,6 @@ export async function getResumeViewModel() {
     });
 
     // Fetch awards data
-    console.log("Resume entries:", allResumeContent.map(e => ({ id: e.id, type: (e.data as any).type })));
-
     const awardsEntry = allResumeContent.find((entry) => entry.id === "awards.mdx");
     if (!awardsEntry) {
         console.error("Awards entry not found in collection");
