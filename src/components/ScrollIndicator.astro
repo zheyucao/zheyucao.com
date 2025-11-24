@@ -66,12 +66,12 @@
     setupScrollIndicatorClick,
   } from "../lib/animations/scrollIndicator";
 
-  let cleanup: (() => void) | null = null;
-  let clickCleanup: (() => void) | null = null;
+  let cleanup = null;
+  let clickCleanup = null;
 
   document.addEventListener("astro:page-load", () => {
-    const indicator = document.querySelector("#scroll-indicator") as HTMLElement | null;
-    const scroller = document.querySelector(".page-wrapper") as HTMLElement | null;
+    const indicator = document.querySelector("#scroll-indicator");
+    const scroller = document.querySelector(".page-wrapper");
 
     if (indicator && scroller) {
       // Setup animations and click handler
@@ -82,8 +82,8 @@
 
   // Cleanup on navigation
   document.addEventListener("astro:before-swap", () => {
-    cleanup?.();
-    clickCleanup?.();
+    if (cleanup) cleanup();
+    if (clickCleanup) clickCleanup();
     cleanup = null;
     clickCleanup = null;
   });

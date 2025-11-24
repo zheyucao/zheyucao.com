@@ -46,10 +46,4 @@ export function setupFooterAnimation(elements: FooterAnimationElements): () => v
         }
     };
 
-    return () => {
-        if (trigger) {
-            trigger.kill();
-            trigger = null;
-        }
-    };
 }

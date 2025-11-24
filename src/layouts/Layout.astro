@@ -36,17 +36,12 @@ const showScrollIndicator =
     <meta name="author" content={siteConfig.metadata.author} />
     <ClientRouter />
     <!-- START Insert Theme Detection Script Here -->
-    <script is:inline>
-      // Simplified: Only check system preference
-      const isDarkMode =
-        window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches;
-      if (isDarkMode) {
-        document.documentElement.classList.add("dark");
-      } else {
-        document.documentElement.classList.remove("dark");
-      }
+    <!-- Theme Handling -->
+    <script>
+      import { initTheme } from "../lib/layout/theme";
+      initTheme();
     </script>
-    <!-- END Insert Theme Detection Script Here -->
+
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -58,144 +53,28 @@ const showScrollIndicator =
       rel="stylesheet"
     />
 
+    <!-- Intersection Observer for Scroll Reveal -->
     <script>
-      let currentIntersectionObserver: IntersectionObserver | null = null; // Added type annotation
+      import { setupIntersectionObserver } from "../lib/layout/intersectionObserver";
+
+      let cleanupObserver: (() => void) | undefined;
 
       document.addEventListener("astro:page-load", () => {
-        // 1. Disconnect old observer if it exists
-        if (currentIntersectionObserver) {
-          currentIntersectionObserver.disconnect();
-        }
-
-        // 2. Set up the new observer for the current page
-        const pageWrapper = document.querySelector(".page-wrapper");
-        if (!pageWrapper) {
-          return;
-        }
-        const observerOptions = {
-          root: pageWrapper, // Observe intersections within the page-wrapper
-          rootMargin: "0px",
-          threshold: 0.2,
-        };
-
-        const observerCallback = (entries, observer) => {
-          entries.forEach((entry) => {
-            if (entry.isIntersecting) {
-              entry.target.classList.add("visible");
-              observer.unobserve(entry.target);
-            }
-          });
-        };
-
-        const newObserver = new IntersectionObserver(observerCallback, observerOptions);
-
-        // 3. Store the new observer instance
-        currentIntersectionObserver = newObserver;
-
-        // 4. Find and observe all elements with the scroll-reveal-animate class
-        const elementsToObserve = document.querySelectorAll(".scroll-reveal-animate");
-        elementsToObserve.forEach((el) => {
-          newObserver.observe(el);
-        });
+        if (cleanupObserver) cleanupObserver();
+        cleanupObserver = setupIntersectionObserver();
       });
-    </script>
 
-    {/* === GSAP Section Animation Script === */}
-    <script>
-      // Import GSAP and ScrollTrigger directly here
-      // Ensure GSAP is installed: npm install gsap
-      import { gsap } from "gsap";
-      import { ScrollTrigger } from "gsap/ScrollTrigger";
-
-      // Register GSAP plugin
-      gsap.registerPlugin(ScrollTrigger);
-
-      function setupSectionAnimations() {
-        const pageWrapper = document.querySelector(".page-wrapper");
-        if (!pageWrapper) {
-          console.warn("Section animations setup skipped: page wrapper not found.");
-          return;
-        }
-
-        // Find all section wrappers rendered on the page
-        const sections = document.querySelectorAll(".section-wrapper");
-
-        // If sections exist, proceed with setting up animations
-        if (sections.length > 0) {
-          sections.forEach((section) => {
-            const sectionTitle = section.querySelector(".scroll-target-title");
-            const sectionContent = section.querySelector(".scroll-target-content");
-
-            // Kill previous triggers associated with these specific elements
-            ScrollTrigger.getAll().forEach((trigger) => {
-              if (trigger.trigger === sectionTitle || trigger.trigger === sectionContent) {
-                trigger.kill();
-              }
-            });
-
-            // --- Section Title Animation ---
-            if (sectionTitle) {
-              gsap.set(sectionTitle, { filter: "blur(8px)", opacity: 0 });
-              gsap
-                .timeline({
-                  scrollTrigger: {
-                    trigger: sectionTitle,
-                    scroller: pageWrapper,
-                    start: "top 85%",
-                    end: "bottom top",
-                    scrub: 1,
-                  },
-                })
-                .to(sectionTitle, { filter: "blur(0px)", opacity: 1, ease: "sine", duration: 8 })
-                .to(sectionTitle, { filter: "blur(8px)", opacity: 0, ease: "sine", duration: 1 });
-            }
-
-            // --- Section Content Animation ---
-            if (sectionContent) {
-              gsap.set(sectionContent, { opacity: 0, y: 30 });
-              gsap
-                .timeline({
-                  scrollTrigger: {
-                    trigger: sectionContent,
-                    scroller: pageWrapper,
-                    start: "top 85%",
-                    end: "bottom 30%",
-                    scrub: 1,
-                  },
-                })
-                .to(sectionContent, { opacity: 1, y: 0, ease: "power1.inOut", duration: 2 })
-                .to(sectionContent, { opacity: 0, y: -30, ease: "power1.inOut", duration: 2 });
-            }
-          });
-        } else {
-          // Optionally kill all ScrollTriggers if no sections are found (e.g., on non-homepage?)
-          // ScrollTrigger.getAll().forEach(trigger => trigger.kill());
-        }
-      }
-
-      // Run setup on initial load and after SPA navigations
-      document.addEventListener("astro:page-load", setupSectionAnimations);
-
-      // Cleanup on navigation
       document.addEventListener("astro:before-swap", () => {
-        ScrollTrigger.getAll().forEach((trigger) => trigger.kill());
+        if (cleanupObserver) cleanupObserver();
       });
     </script>
-    <!-- System Theme Handling -->
+
+    <!-- GSAP Section Animations -->
     <script>
-      const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
+      import { setupSectionAnimations, cleanupScrollTriggers } from "../lib/layout/gsapAnimations";
 
-      // Function to apply the theme class based on query match
-      const checkAndApplyTheme = () => {
-        if (mediaQuery.matches) {
-          document.documentElement.classList.add("dark");
-        } else {
-          document.documentElement.classList.remove("dark");
-        }
-      };
-
-      // Listener for live theme changes
-      mediaQuery.addEventListener("change", checkAndApplyTheme);
+      document.addEventListener("astro:page-load", setupSectionAnimations);
+      document.addEventListener("astro:before-swap", cleanupScrollTriggers);
     </script>
   </head>
   <body>
