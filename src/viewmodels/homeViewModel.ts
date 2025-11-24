@@ -1,5 +1,6 @@
 import { getCollection, getEntry } from "astro:content";
 import type { ContactItem } from "./contactViewModel";
+import { parseDate } from "../lib/utils/dateUtils";
 
 /**
  * Home page view model
@@ -26,6 +27,10 @@ export async function getHomeViewModel() {
         getCollection("timeline"),
         getCollection("contact")
     ]);
+
+    if (!heroEntry || !meetMeEntry || !connectEntry || !featuredWorksEntry || !highlightsEntry) {
+        throw new Error("Required homepage sections are missing.");
+    }
 
     const hero = heroEntry.data;
     const featuredWorksSection = featuredWorksEntry.data;
@@ -57,17 +62,6 @@ export async function getHomeViewModel() {
 
     // Sort highlights by date descending (latest first) with safe UTC parsing
     highlightEvents.sort((a, b) => {
-        // Parse YYYY-MM safely for cross-browser compatibility (Safari/Firefox)
-        const parseDate = (dateStr: string): number => {
-            if (!dateStr) return 0;
-            const [year, month] = dateStr.split('-').map(Number);
-            if (isNaN(year) || isNaN(month)) {
-                console.warn(`[homeViewModel] Invalid date format: ${dateStr}`);
-                return 0;
-            }
-            return Date.UTC(year, month - 1);
-        };
-
         return parseDate(b.data.date) - parseDate(a.data.date);
     });
 

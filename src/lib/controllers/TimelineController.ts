@@ -1,6 +1,4 @@
-// import { sanitizeHtml } from "sanitize-html"; // Removed unused import
-// Actually, the data passed from server is already sanitized.
-// We just need to handle the logic.
+import { parseDate, formatTimelineDate } from "../utils/dateUtils";
 
 export interface TimelineEvent {
     date: string;
@@ -97,24 +95,10 @@ export class TimelineController {
 
     private sortEvents(events: TimelineEvent[]): TimelineEvent[] {
         return [...events].sort((a, b) => {
-            const dateA = this.parseDate(a.date);
-            const dateB = this.parseDate(b.date);
+            const dateA = parseDate(a.date);
+            const dateB = parseDate(b.date);
             return this.currentSort === "newest" ? dateB - dateA : dateA - dateB;
         });
-    }
-
-    private parseDate(dateStr: string): number {
-        // Robust parsing logic matching original script
-        if (!dateStr) return 0;
-        const date = new Date(dateStr.includes("-") ? dateStr : `${dateStr}-01-01`);
-        return isNaN(date.getTime()) ? 0 : date.getTime();
-    }
-
-    private formatTimelineDate(dateStr: string): string {
-        if (!dateStr || !dateStr.includes("-")) return dateStr;
-        const [year, month] = dateStr.split("-");
-        const dateObj = new Date(parseInt(year), parseInt(month) - 1);
-        return dateObj.toLocaleString("en-US", { month: "long", year: "numeric" });
     }
 
     public async render() {
@@ -132,7 +116,7 @@ export class TimelineController {
                 const isLast = index === sorted.length - 1;
                 const displayDate = event.dateRange
                     ? event.dateRange
-                    : this.formatTimelineDate(event.date);
+                    : formatTimelineDate(event.date);
                 const descriptionHTML = event.renderedDescription
                     ? `<div class="timeline-description">${event.renderedDescription}</div>`
                     : "";
