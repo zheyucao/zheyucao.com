@@ -1,24 +1,35 @@
 ---
 // Component: src/components/Footer.astro
 import { siteConfig } from "../config";
-import { getCollection, getEntry } from "astro:content";
+import { getCollection, getEntry, type CollectionEntry } from "astro:content";
 
 const currentYear = new Date().getFullYear();
 const { metadata, navigation, social } = siteConfig;
 
 const uiStrings = await getEntry("ui-strings", "en");
+if (!uiStrings) {
+  throw new Error("Could not find UI strings for 'en'");
+}
 const { footer: footerStrings } = uiStrings.data;
 
 // Load contact items for footer (single source of truth)
 const contactEntries = await getCollection("contact");
-const listEntries = contactEntries.filter((entry) => entry.data.kind === "list");
+
+// Type guard to narrow down to list entries
+type ContactListEntry = CollectionEntry<"contact"> & { data: { kind: "list" } };
+const isListEntry = (entry: CollectionEntry<"contact">): entry is ContactListEntry => {
+  return entry.data.kind === "list";
+};
+
+const listEntries = contactEntries.filter(isListEntry);
+
 const contactFooterItems = listEntries
   .sort((a, b) => (a.data.order ?? 0) - (b.data.order ?? 0))
   .flatMap((entry, sectionIndex) => {
     const baseOrder = entry.data.order ?? sectionIndex;
-    const items = (entry.data as any).items || [];
+    const items = entry.data.items || [];
     return items
-      .map((item: any, idx: number) => ({
+      .map((item, idx) => ({
         ...item,
         order: baseOrder * 100 + idx,
       }))

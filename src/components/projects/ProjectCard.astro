@@ -1,10 +1,12 @@
 ---
 import { Icon } from "astro-icon/components";
+import { Image } from "astro:assets";
+import type { ImageMetadata } from "astro";
 
 interface Props {
   id?: string;
   title: string;
-  imageSrc?: string;
+  imageSrc?: ImageMetadata;
   imageAlt?: string;
   timeframe?: string;
   projectUrl?: string;
@@ -30,7 +32,7 @@ const {
   {
     imageSrc && (
       <div class="project-image-wrapper">
-        <img src={imageSrc} alt={imageAlt} class="project-image" loading="lazy" />
+        <Image src={imageSrc} alt={imageAlt} class="project-image" />
       </div>
     )
   }
@@ -250,7 +252,7 @@ const {
       threshold: 0.2,
     };
 
-    const observerCallback = (entries, observer) => {
+    const observerCallback: IntersectionObserverCallback = (entries, observer) => {
       entries.forEach((entry) => {
         // console.log("Observing:", entry.target, "Is intersecting:", entry.isIntersecting); // Removed debug log
         if (entry.isIntersecting) {

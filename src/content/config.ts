@@ -2,7 +2,7 @@ import { defineCollection, z } from 'astro:content';
 
 const projects = defineCollection({
     type: 'content',
-    schema: z.object({
+    schema: ({ image }) => z.object({
         title: z.string(),
         timeframe: z.string().optional(),
         githubUrl: z.string().url().optional(),
@@ -12,9 +12,9 @@ const projects = defineCollection({
         })).optional(),
         projectUrl: z.string().url().optional(),
         techStack: z.array(z.string()).optional(),
-        imageSrc: z.string().optional(),
+        imageSrc: image().optional(),
         imageAlt: z.string().optional(),
-        thumbnailSrc: z.string().optional(),
+        thumbnailSrc: image().optional(),
         isFeatured: z.boolean().default(false),
         homepageSummary: z.string().optional(),
         order: z.number().optional(), // Manual ordering for projects page
