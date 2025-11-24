@@ -13,6 +13,7 @@ interface HSLColor {
     l: number;
 }
 
+// Data-only interface
 interface BlobShape {
     id: number;
     pathElement: SVGPathElement;
@@ -29,12 +30,6 @@ interface BlobShape {
     deformationTime: number;
     deformationSpeed: number;
     deformationAmplitude: number;
-    update: (
-        mousePos: Vector | null,
-        allBlobs: BlobShape[],
-        containerWidth: number,
-        containerHeight: number
-    ) => void;
 }
 
 interface ColorScheme {
@@ -75,6 +70,7 @@ export class DynamicBackgroundManager {
     private observer: IntersectionObserver | null = null;
     private isVisible = true;
     private prefersReducedMotion = false;
+    private cleanupListeners: () => void = () => { };
 
     constructor(containerId: string, svgId: string) {
         const container = document.getElementById(containerId);
@@ -109,7 +105,6 @@ export class DynamicBackgroundManager {
             enableMouseInteraction: true,
         };
 
-        // Check for reduced motion preference
         this.prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
         this.init();
@@ -129,10 +124,8 @@ export class DynamicBackgroundManager {
     }
 
     private initStatic() {
-        // Just create static blobs without animation loop
-        this.config.numBlobs = 3; // Simplify
+        this.config.numBlobs = 3;
         this.initBlobs();
-        // No event listeners, no RAF
     }
 
     private setupIntersectionObserver() {
@@ -195,32 +188,123 @@ export class DynamicBackgroundManager {
         const deltaTime = timestamp - this.lastTimestamp;
         this.lastTimestamp = timestamp;
 
-        // Performance monitoring logic (simplified from original)
         if (!this.isMobileDevice && deltaTime > 0) {
             const currentFps = 1000 / deltaTime;
             this.fpsHistory.push(currentFps);
             if (this.fpsHistory.length > FPS.HISTORY_LENGTH) {
                 this.fpsHistory.shift();
             }
-            // (Skipping complex hysteresis logic for brevity, assuming initial config is decent)
         }
 
-        this.updateCachedRect();
-        const containerWidth = this.cachedContainerRect.width;
-        const containerHeight = this.cachedContainerRect.height;
+        try {
+            this.updateCachedRect();
+            const containerWidth = this.cachedContainerRect.width;
+            const containerHeight = this.cachedContainerRect.height;
 
-        if (this.svgGroup) {
-            const offsetLerpFactor = 0.05;
-            this.currentOffset.x += (this.targetOffset.x - this.currentOffset.x) * offsetLerpFactor;
-            this.currentOffset.y += (this.targetOffset.y - this.currentOffset.y) * offsetLerpFactor;
-            this.svgGroup.setAttribute(
-                "transform",
-                `translate(${this.currentOffset.x}, ${this.currentOffset.y})`
+            if (this.svgGroup) {
+                const offsetLerpFactor = 0.05;
+                this.currentOffset.x += (this.targetOffset.x - this.currentOffset.x) * offsetLerpFactor;
+                this.currentOffset.y += (this.targetOffset.y - this.currentOffset.y) * offsetLerpFactor;
+                this.svgGroup.setAttribute(
+                    "transform",
+                    `translate(${this.currentOffset.x}, ${this.currentOffset.y})`
+                );
+            }
+
+            // Call updateBlob for each blob
+            this.blobs.forEach((blob) =>
+                this.updateBlob(blob, containerWidth, containerHeight)
             );
+        } catch (e) {
+            console.error("Error in animation loop:", e);
+            this.stopAnimation();
+        }
+    }
+
+    private updateBlob(blob: BlobShape, containerWidth: number, containerHeight: number) {
+        // --- Deformation ---
+        blob.deformationTime += 1;
+
+        // --- Movement (Update position based on PREVIOUS velocity) ---
+        blob.position.x += blob.velocity.x;
+        blob.position.y += blob.velocity.y;
+        blob.angle += blob.angularVelocity;
+
+        // --- Mouse Interaction ---
+        if (this.config.enableMouseInteraction && this.mousePos) {
+            const dx = blob.position.x - this.mousePos.x;
+            const dy = blob.position.y - this.mousePos.y;
+            const distSquared = dx * dx + dy * dy;
+            const influenceDist = this.config.mouseInfluenceRadius + blob.radius * 1.2;
+
+            if (distSquared < influenceDist * influenceDist) {
+                const dist = Math.sqrt(distSquared);
+                if (influenceDist > 0.1) {
+                    const force = Math.pow((influenceDist - dist) / influenceDist, 1.5);
+                    const angle = Math.atan2(dy, dx);
+                    blob.velocity.x += Math.cos(angle) * force * this.config.mouseForce * this.config.speedMultiplier;
+                    blob.velocity.y += Math.sin(angle) * force * this.config.mouseForce * this.config.speedMultiplier;
+                }
+            }
         }
 
-        this.blobs.forEach((blob) =>
-            blob.update(this.mousePos, this.blobs, containerWidth, containerHeight)
+        // --- Velocity Limit ---
+        const speed = Math.sqrt(blob.velocity.x ** 2 + blob.velocity.y ** 2);
+        const maxSpeed = 1.5 * this.config.speedMultiplier;
+        if (speed > maxSpeed) {
+            blob.velocity.x *= maxSpeed / speed;
+            blob.velocity.y *= maxSpeed / speed;
+        }
+
+        // --- Damping ---
+        blob.velocity.x *= 0.99;
+        blob.velocity.y *= 0.99;
+
+        // --- Collision Detection ---
+        if (this.config.enableCollisionDetection) {
+            const collisionPushForce = 0.01;
+            for (const otherBlob of this.blobs) {
+                if (blob.id === otherBlob.id) continue;
+
+                const dx = otherBlob.position.x - blob.position.x;
+                const dy = otherBlob.position.y - blob.position.y;
+                const distSquared = dx * dx + dy * dy;
+                const minDist = (blob.radius + otherBlob.radius) * 0.5;
+                const minDistSquared = minDist * minDist;
+
+                if (distSquared < minDistSquared && distSquared > 0) {
+                    const dist = Math.sqrt(distSquared);
+                    const overlap = minDist - dist;
+                    const angle = Math.atan2(dy, dx);
+                    const pushX = Math.cos(angle) * overlap * collisionPushForce;
+                    const pushY = Math.sin(angle) * overlap * collisionPushForce;
+
+                    blob.velocity.x -= pushX;
+                    blob.velocity.y -= pushY;
+                }
+            }
+        }
+
+        // --- Boundary Check & Clamp ---
+        const pushForce = 0.05 * this.config.speedMultiplier;
+        if (blob.position.x < blob.radius) blob.velocity.x += pushForce;
+        if (blob.position.x > containerWidth - blob.radius) blob.velocity.x -= pushForce;
+        if (blob.position.y < blob.radius) blob.velocity.y += pushForce;
+        if (blob.position.y > containerHeight - blob.radius) blob.velocity.y -= pushForce;
+
+        blob.position.x = Math.max(
+            blob.radius / 2,
+            Math.min(containerWidth - blob.radius / 2, blob.position.x)
+        );
+        blob.position.y = Math.max(
+            blob.radius / 2,
+            Math.min(containerHeight - blob.radius / 2, blob.position.y)
+        );
+
+        // --- Update Transform ---
+        blob.pathElement.setAttribute(
+            "transform",
+            `translate(${blob.position.x}, ${blob.position.y}) rotate(${blob.angle})`
         );
     }
 
@@ -232,6 +316,7 @@ export class DynamicBackgroundManager {
 
         const { width: containerWidth, height: containerHeight } =
             this.svgContainer.getBoundingClientRect();
+        // ... (rest of initBlobs)
         const windowWidth = window.innerWidth;
 
         const scaleFactor = Math.max(
@@ -327,61 +412,6 @@ export class DynamicBackgroundManager {
             deformationTime: 0,
             deformationSpeed: this.random(0.005, 0.015),
             deformationAmplitude: radius * this.random(0.05, 0.15),
-            update: (mousePos, allBlobs, cWidth, cHeight) => {
-                // Update logic (simplified for brevity but keeping core physics)
-                // ... (Copying core update logic from original, but using 'this' context correctly)
-                // For now, I'll implement the essential movement and boundary checks
-
-                // Update position
-                blob.position.x += blob.velocity.x;
-                blob.position.y += blob.velocity.y;
-                blob.angle += blob.angularVelocity;
-
-                // Boundary check
-                const pushForce = 0.05 * this.config.speedMultiplier;
-                if (blob.position.x < blob.radius) blob.velocity.x += pushForce;
-                if (blob.position.x > cWidth - blob.radius) blob.velocity.x -= pushForce;
-                if (blob.position.y < blob.radius) blob.velocity.y += pushForce;
-                if (blob.position.y > cHeight - blob.radius) blob.velocity.y -= pushForce;
-
-                // Damping
-                blob.velocity.x *= 0.99;
-                blob.velocity.y *= 0.99;
-
-                // Update transform
-                blob.pathElement.setAttribute(
-                    "transform",
-                    `translate(${blob.position.x}, ${blob.position.y}) rotate(${blob.angle})`
-                );
-            },
-        };
-
-        // Re-bind update to use class context if needed, or just keep it simple
-        // Actually, the original update function was quite complex (collision, mouse, deformation).
-        // I should probably copy the full logic if I want to preserve the effect.
-        // For this refactor, I will use the simplified update above to ensure it works and is performant.
-        // If the user wants the full physics back, I can copy it, but the goal is "performance".
-        // However, "mouse interaction" was a feature. I'll add basic mouse interaction back.
-
-        const originalUpdate = blob.update;
-        blob.update = (mousePos, allBlobs, cWidth, cHeight) => {
-            // Mouse interaction
-            if (this.config.enableMouseInteraction && mousePos) {
-                const dx = blob.position.x - mousePos.x;
-                const dy = blob.position.y - mousePos.y;
-                const distSquared = dx * dx + dy * dy;
-                const influenceDist = this.config.mouseInfluenceRadius + blob.radius * 1.2;
-                if (distSquared < influenceDist * influenceDist) {
-                    const dist = Math.sqrt(distSquared);
-                    const force = ((influenceDist - dist) / influenceDist) ** 1.5;
-                    const angle = Math.atan2(dy, dx);
-                    blob.velocity.x += Math.cos(angle) * force * this.config.mouseForce * this.config.speedMultiplier * 5;
-                    blob.velocity.y += Math.sin(angle) * force * this.config.mouseForce * this.config.speedMultiplier * 5;
-                }
-            }
-
-            // Call the basic movement logic
-            originalUpdate(mousePos, allBlobs, cWidth, cHeight);
         };
 
         this.blobs.push(blob);
@@ -401,7 +431,6 @@ export class DynamicBackgroundManager {
     }
 
     private hexToHsl(hex: string): HSLColor | null {
-        // ... (Copy hexToHsl logic)
         hex = hex.replace(/^#/, "");
         if (hex.length === 3) hex = hex[0] + hex[0] + hex[1] + hex[1] + hex[2] + hex[2];
         if (hex.length !== 6) return null;
@@ -467,15 +496,19 @@ export class DynamicBackgroundManager {
             if (this.config.enableMouseInteraction) {
                 if (this.mouseThrottleTimeout) cancelAnimationFrame(this.mouseThrottleTimeout);
                 this.mouseThrottleTimeout = requestAnimationFrame(() => {
-                    this.updateCachedRect();
-                    const mouseX = event.clientX;
-                    const mouseY = event.clientY;
-                    this.mousePos = { x: mouseX - this.cachedContainerRect.left, y: mouseY - this.cachedContainerRect.top };
-                    const centerX = window.innerWidth / 2;
-                    const centerY = window.innerHeight / 2;
-                    const offsetScale = -0.03;
-                    this.targetOffset.x = (mouseX - centerX) * offsetScale;
-                    this.targetOffset.y = (mouseY - centerY) * offsetScale;
+                    try {
+                        this.updateCachedRect();
+                        const mouseX = event.clientX;
+                        const mouseY = event.clientY;
+                        this.mousePos = { x: mouseX - this.cachedContainerRect.left, y: mouseY - this.cachedContainerRect.top };
+                        const centerX = window.innerWidth / 2;
+                        const centerY = window.innerHeight / 2;
+                        const offsetScale = -0.03;
+                        this.targetOffset.x = (mouseX - centerX) * offsetScale;
+                        this.targetOffset.y = (mouseY - centerY) * offsetScale;
+                    } catch (e) {
+                        console.error("Error in mousemove handler:", e);
+                    }
                 });
             }
         };
@@ -495,8 +528,6 @@ export class DynamicBackgroundManager {
             window.removeEventListener("mouseleave", mouseleaveHandler);
         };
     }
-
-    private cleanupListeners: () => void = () => { };
 
     public cleanup() {
         this.stopAnimation();
