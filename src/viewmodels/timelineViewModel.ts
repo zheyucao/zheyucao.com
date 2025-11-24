@@ -61,6 +61,9 @@ export async function getTimelineViewModel() {
 
     // Fetch UI strings
     const uiStrings = await getEntry("ui-strings", "en");
+    if (!uiStrings) {
+        throw new Error("Could not find UI strings for 'en'");
+    }
     const { title: pageTitle, filterAll } = uiStrings.data.pages.timeline;
 
     return {
