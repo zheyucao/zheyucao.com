@@ -6,6 +6,11 @@
 export function parseDate(dateStr: string): number {
   if (!dateStr) return 0;
 
+  // Handle "Present" case
+  if (dateStr.toLowerCase() === "present") {
+    return Date.now();
+  }
+
   const parts = dateStr.split("-");
   const year = Number(parts[0]);
   // Default to 1 (Jan) if no month part exists

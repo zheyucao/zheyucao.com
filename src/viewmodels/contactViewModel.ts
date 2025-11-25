@@ -77,3 +77,34 @@ export async function getContactViewModel(): Promise<ContactViewModel> {
     sections,
   };
 }
+
+/**
+ * Get contact items for footer display
+ * Returns empty array if contact collection doesn't exist (Astro 5.0+ behavior)
+ */
+export async function getContactFooterItems(): Promise<ContactItem[]> {
+  const contactEntries = await getCollection("contact");
+
+  type ContactListEntry = CollectionEntry<"contact"> & { data: { kind: "list" } };
+  const isListEntry = (entry: CollectionEntry<"contact">): entry is ContactListEntry => {
+    return entry.data.kind === "list";
+  };
+
+  const listEntries = contactEntries.filter(isListEntry);
+
+  return listEntries
+    .sort((a, b) => (a.data.order ?? 0) - (b.data.order ?? 0))
+    .flatMap((entry, sectionIndex) => {
+      const baseOrder = entry.data.order ?? sectionIndex;
+      const items = entry.data.items || [];
+      return items
+        .map((item, idx) => ({
+          ...item,
+          order: baseOrder * 100 + idx,
+        }))
+        .filter(
+          (item) => item.showOnFooter !== false && item.href
+        );
+    })
+    .sort((a, b) => a.order - b.order);
+}

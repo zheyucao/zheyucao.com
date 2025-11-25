@@ -2,6 +2,7 @@ import { getCollection, getEntry } from "astro:content";
 import MarkdownIt from "markdown-it";
 import sanitizeHtml from "sanitize-html";
 import { getPageMetadata } from "../lib/viewmodels/baseViewModel";
+import { parseDate } from "../lib/utils/dateUtils";
 
 const md = new MarkdownIt({
   html: true,
@@ -14,20 +15,7 @@ const md = new MarkdownIt({
  * Helper to parse dates robustly
  * Handles "Present", "YYYY-MM", "YYYY", etc.
  */
-function parseDate(dateStr: string): number {
-  if (!dateStr) return 0;
-  if (dateStr.toLowerCase() === "present") return Date.now();
-
-  // Try standard parsing first
-  const timestamp = Date.parse(dateStr);
-  if (!isNaN(timestamp)) return timestamp;
-
-  // Handle YYYY-MM format manually if needed (though Date.parse usually handles it)
-  // or other custom formats if they exist in the content.
-  // For now, let's assume standard ISO or "Month Year" formats are used.
-  // If we encounter specific issues, we can add more logic here.
-  return 0;
-}
+// Local parseDate removed in favor of shared utility from ../lib/utils/dateUtils
 
 /**
  * Timeline page view model
