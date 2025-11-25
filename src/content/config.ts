@@ -168,8 +168,6 @@ const ui_strings = defineCollection({
     footer: z.object({
       linksHeading: z.string(),
       connectHeading: z.string(),
-      githubLabel: z.string(),
-      emailLabel: z.string(),
       copyrightText: z.string(),
     }),
     pages: z.object({

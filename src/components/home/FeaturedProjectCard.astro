@@ -2,14 +2,11 @@
 // src/components/home/FeaturedProjectCard.astro
 // Based on src/components/projects/ProjectCard.astro, adapted for homepage horizontal scroll
 
-import { Icon } from "astro-icon/components";
 import RichText from "../common/RichText.astro";
 
 interface Props {
   title: string;
-  imageAlt?: string;
   homepageSummary?: string; // Use concise summary
-  githubUrl?: string;
   slug: string; // Slug for linking to the project page
   isDoubleColumn?: boolean;
 }
@@ -17,7 +14,6 @@ interface Props {
 const {
   title,
   homepageSummary = "Click to learn more...", // Default summary
-  githubUrl,
   slug,
   isDoubleColumn = false,
 } = Astro.props;
@@ -30,13 +26,6 @@ const projectUrl = `/projects?scrollTo=${encodeURIComponent(slug)}`;
   <div class="card-content-wrapper">
     <h4>{title}</h4>
     <RichText tag="p" class="summary" inline content={homepageSummary} />
-    {
-      githubUrl && (
-        <div class="github-icon-link-wrapper" aria-hidden="true">
-          <Icon name="ri:github-line" />
-        </div>
-      )
-    }
   </div>
 </a>
 
