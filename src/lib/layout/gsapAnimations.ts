@@ -4,11 +4,11 @@ import { ANIMATION_CONSTANTS } from "../../constants/animationConstants";
 
 gsap.registerPlugin(ScrollTrigger);
 
-export function setupSectionAnimations() {
-  const pageWrapper = document.querySelector(".page-wrapper");
-  if (!pageWrapper) {
-    return;
-  }
+export function setupSectionAnimations(scroller?: HTMLElement) {
+    const pageWrapper = scroller ?? document.querySelector(".page-wrapper");
+    if (!pageWrapper) {
+        return;
+    }
 
   const sections = document.querySelectorAll(".section-wrapper");
 
