@@ -2,6 +2,7 @@ import { getCollection, getEntry } from "astro:content";
 
 export interface ContactItem {
     icon: string;
+    content?: string;
     label?: string;
     href?: string;
     target?: string;
