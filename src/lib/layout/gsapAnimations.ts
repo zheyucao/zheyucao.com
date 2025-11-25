@@ -1,5 +1,6 @@
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { ANIMATION_CONSTANTS } from "../../constants/animationConstants";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -28,10 +29,15 @@ export function setupSectionAnimations() {
                             scroller: pageWrapper,
                             start: "top 85%",
                             end: "bottom top",
-                            scrub: 1,
+                            scrub: ANIMATION_CONSTANTS.GSAP.SECTION_TITLE_SCRUB,
                         },
                     })
-                    .to(sectionTitle, { filter: "blur(0px)", opacity: 1, ease: "sine", duration: 2 });
+                    .to(sectionTitle, {
+                        filter: "blur(0px)",
+                        opacity: 1,
+                        ease: "sine",
+                        duration: ANIMATION_CONSTANTS.SECTION_TITLE_DURATION,
+                    });
             }
 
             // --- Section Content Animation ---
@@ -44,10 +50,15 @@ export function setupSectionAnimations() {
                             scroller: pageWrapper,
                             start: "top 85%",
                             end: "bottom 30%",
-                        scrub: 1,
-                    },
-                })
-                    .to(sectionContent, { opacity: 1, y: 0, ease: "power1.inOut", duration: 1.2 });
+                            scrub: ANIMATION_CONSTANTS.GSAP.SECTION_CONTENT_SCRUB,
+                        },
+                    })
+                    .to(sectionContent, {
+                        opacity: 1,
+                        y: 0,
+                        ease: "power1.inOut",
+                        duration: ANIMATION_CONSTANTS.SECTION_CONTENT_DURATION,
+                    });
             }
         });
     }

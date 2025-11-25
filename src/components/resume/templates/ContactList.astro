@@ -25,9 +25,11 @@ const { title, items } = Astro.props;
         <li>
           <Icon name={item.icon} class="contact-icon" />
           {item.href ? (
-            <a href={item.href} target={item.target} rel={item.rel} set:html={item.label} />
+            <a href={item.href} target={item.target} rel={item.rel}>
+              {item.label}
+            </a>
           ) : (
-            <span set:html={item.label} />
+            <span>{item.label}</span>
           )}
         </li>
       ))

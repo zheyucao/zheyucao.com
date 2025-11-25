@@ -34,6 +34,8 @@ export const ANIMATION_CONSTANTS = {
         FOOTER_SCRUB: 1,
         INDICATOR_SCRUB: 0.5,
     },
+    SECTION_TITLE_DURATION: 2,
+    SECTION_CONTENT_DURATION: 1.2,
 
     // Performance thresholds
     PERFORMANCE: {

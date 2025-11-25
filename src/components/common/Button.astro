@@ -6,7 +6,7 @@ interface Props extends HTMLAttributes<"a"> {
   href: string;
   text: string;
   download?: string | boolean; // Optional: true or suggested filename
-  icon?: string | null; // Optional icon character or class, defaults to null
+  icon?: string | null; // Optional icon content (rendered as HTML)
   wrapperClass?: string; // Optional class for the wrapper div
   iconPosition?: "left" | "right"; // Optional icon position, defaults to left
   noMargin?: boolean; // Optional: remove bottom margin
@@ -33,13 +33,17 @@ const downloadAttr = download === "" ? true : download;
     {/* Add specific class to span based on position */}
     {
       iconPosition === "left" && icon && (
-        <span aria-hidden="true" class="button-icon icon-left" set:html={icon} />
+        <span aria-hidden="true" class="button-icon icon-left">
+          {icon}
+        </span>
       )
     }
     {text}
     {
       iconPosition === "right" && icon && (
-        <span aria-hidden="true" class="button-icon icon-right" set:html={icon} />
+        <span aria-hidden="true" class="button-icon icon-right">
+          {icon}
+        </span>
       )
     }
   </a>
