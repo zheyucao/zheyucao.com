@@ -4,11 +4,10 @@
  * Decoupled from global DOM - accepts element references as parameters
  */
 
-import { gsap } from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { ANIMATION_CONSTANTS } from "../../constants/animationConstants";
+import { gsap, ScrollTrigger, registerGsapPlugins } from "./gsapPlugins";
 
-gsap.registerPlugin(ScrollTrigger);
+registerGsapPlugins();
 
 export interface FooterAnimationElements {
   footer: HTMLElement;

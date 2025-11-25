@@ -29,10 +29,9 @@ const { projects, pageTitle } = await getProjectsViewModel();
 </SubPageLayout>
 
 <script>
-  import { gsap } from "gsap";
-  import { ScrollToPlugin } from "gsap/ScrollToPlugin";
+  import { gsap, registerGsapPlugins } from "../lib/animations/gsapPlugins";
 
-  gsap.registerPlugin(ScrollToPlugin);
+  registerGsapPlugins();
 
   function smoothScrollToTarget() {
     const params = new URLSearchParams(window.location.search);

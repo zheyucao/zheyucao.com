@@ -1,8 +1,7 @@
-import { gsap } from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { ANIMATION_CONSTANTS } from "../../constants/animationConstants";
+import { gsap, ScrollTrigger, registerGsapPlugins } from "../animations/gsapPlugins";
 
-gsap.registerPlugin(ScrollTrigger);
+registerGsapPlugins();
 
 export function setupSectionAnimations(scroller?: HTMLElement) {
     const pageWrapper = scroller ?? document.querySelector(".page-wrapper");
