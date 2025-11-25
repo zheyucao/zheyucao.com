@@ -33,8 +33,8 @@ export function setupSectionAnimations(scroller?: HTMLElement) {
               id: `${SECTION_TRIGGER_PREFIX}-title-${index}`,
               trigger: sectionTitle,
               scroller: pageWrapper,
-              start: "top 85%",
-              end: "bottom top",
+              start: "top 90%",
+              end: "top 15%",
               scrub: ANIMATION_CONSTANTS.GSAP.SECTION_TITLE_SCRUB,
             },
           })
@@ -55,15 +55,15 @@ export function setupSectionAnimations(scroller?: HTMLElement) {
               id: `${SECTION_TRIGGER_PREFIX}-content-${index}`,
               trigger: sectionContent,
               scroller: pageWrapper,
-              start: "top 85%",
-              end: "bottom 30%",
+              start: "top 80%",
+              end: "top 40%",
               scrub: ANIMATION_CONSTANTS.GSAP.SECTION_CONTENT_SCRUB,
             },
           })
           .to(sectionContent, {
             opacity: 1,
             y: 0,
-            ease: "power1.inOut",
+            ease: "none",
             duration: ANIMATION_CONSTANTS.SECTION_CONTENT_DURATION,
           });
       }
