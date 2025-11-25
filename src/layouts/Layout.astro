@@ -81,16 +81,7 @@ const showScrollIndicator =
     <script>
       import { setupSectionAnimations, cleanupScrollTriggers } from "../lib/layout/gsapAnimations";
 
-      const runSectionAnimations = () => setupSectionAnimations();
-
-      // Ensure animations run on first load even if astro:page-load already fired
-      if (document.readyState !== "loading") {
-        requestAnimationFrame(runSectionAnimations);
-      } else {
-        document.addEventListener("DOMContentLoaded", () => requestAnimationFrame(runSectionAnimations), {
-          once: true,
-        });
-      }
+      const runSectionAnimations = () => requestAnimationFrame(() => setupSectionAnimations());
 
       document.addEventListener("astro:page-load", runSectionAnimations);
       document.addEventListener("astro:before-swap", cleanupScrollTriggers);

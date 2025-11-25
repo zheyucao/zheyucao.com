@@ -3,6 +3,8 @@ import { gsap, ScrollTrigger, registerGsapPlugins } from "../animations/gsapPlug
 
 registerGsapPlugins();
 
+const SECTION_TRIGGER_PREFIX = "section-animation";
+
 export function setupSectionAnimations(scroller?: HTMLElement) {
     const pageWrapper = scroller ?? document.querySelector(".page-wrapper");
     if (!pageWrapper) {
@@ -11,10 +13,10 @@ export function setupSectionAnimations(scroller?: HTMLElement) {
 
   const sections = document.querySelectorAll(".section-wrapper");
 
-  cleanupScrollTriggers();
+  cleanupSectionAnimations();
 
   if (sections.length > 0) {
-    sections.forEach((section) => {
+    sections.forEach((section, index) => {
       const sectionTitle = section.querySelector(".scroll-target-title");
       const sectionContent = section.querySelector(".scroll-target-content");
 
@@ -24,6 +26,7 @@ export function setupSectionAnimations(scroller?: HTMLElement) {
         gsap
           .timeline({
             scrollTrigger: {
+              id: `${SECTION_TRIGGER_PREFIX}-title-${index}`,
               trigger: sectionTitle,
               scroller: pageWrapper,
               start: "top 85%",
@@ -45,6 +48,7 @@ export function setupSectionAnimations(scroller?: HTMLElement) {
         gsap
           .timeline({
             scrollTrigger: {
+              id: `${SECTION_TRIGGER_PREFIX}-content-${index}`,
               trigger: sectionContent,
               scroller: pageWrapper,
               start: "top 85%",
@@ -61,6 +65,12 @@ export function setupSectionAnimations(scroller?: HTMLElement) {
       }
     });
   }
+}
+
+export function cleanupSectionAnimations() {
+  ScrollTrigger.getAll()
+    .filter((trigger) => typeof trigger.vars.id === "string" && trigger.vars.id.startsWith(SECTION_TRIGGER_PREFIX))
+    .forEach((trigger) => trigger.kill());
 }
 
 export function cleanupScrollTriggers() {
