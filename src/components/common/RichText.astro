@@ -12,6 +12,7 @@
  */
 
 import MarkdownIt from "markdown-it";
+import { sanitizeRich } from "../../lib/utils/sanitize";
 
 interface Props {
   content: string | string[];
@@ -37,10 +38,17 @@ const md = new MarkdownIt({
   breaks: true, // Convert \n to <br>
 });
 
-const html = inline ? md.renderInline(markdownContent) : md.render(markdownContent);
+const rawHtml = inline ? md.renderInline(markdownContent) : md.render(markdownContent);
+const html = sanitizeRich(rawHtml);
+
+// Create props object for dynamic component
+const tagProps = {
+  class: `rich-text ${className}`,
+  'set:html': html
+};
 ---
 
-<Tag class={`rich-text ${className}`} set:html={html} />
+<Tag {...tagProps} />
 
 <style>
   .rich-text {
