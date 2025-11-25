@@ -108,7 +108,7 @@ const { items = [] } = Astro.props;
 </style>
 
 <script>
-  const handleCopy = async (el, value) => {
+  const handleCopy = async (el: Element, value: string) => {
     const tooltip = el.closest(".tooltip");
     const bubble = tooltip?.querySelector(".tooltip-bubble");
     const labelEl = tooltip?.querySelector("[data-tooltip-label]");
@@ -123,7 +123,7 @@ const { items = [] } = Astro.props;
         labelEl.textContent = "Copied!";
 
         if (descEl) {
-          descEl.style.display = "none";
+          (descEl as HTMLElement).style.display = "none";
         }
         if (bubble) {
           bubble.classList.add("copy-active");
@@ -132,7 +132,7 @@ const { items = [] } = Astro.props;
         setTimeout(() => {
           labelEl.textContent = originalLabel;
           if (descEl) {
-            descEl.style.display = "";
+            (descEl as HTMLElement).style.display = "";
           }
           if (bubble) {
             bubble.classList.remove("copy-active");
@@ -151,7 +151,7 @@ const { items = [] } = Astro.props;
   document.addEventListener("astro:page-load", () => {
     const copyTargets = document.querySelectorAll(".contact-icons [data-copy-value]");
     copyTargets.forEach((el) => {
-      const handler = (event) => {
+      const handler = (event: Event) => {
         const value = el.getAttribute("data-copy-value");
         if (!value) return;
         event.preventDefault();

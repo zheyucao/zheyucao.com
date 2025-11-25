@@ -82,13 +82,12 @@ export class DynamicBackgroundManager {
   private isMobileDevice: boolean;
   private config: DynamicBackgroundConfig;
   private fpsHistory: number[] = [];
-  private currentPerformanceLevel: number;
   private lastTimestamp = 0;
   private lastLogicExecutionTime = 0;
   private observer: IntersectionObserver | null = null;
   private isVisible = true;
   private prefersReducedMotion = false;
-  private cleanupListeners: () => void = () => {};
+  private cleanupListeners: () => void = () => { };
 
   constructor(containerId: string, svgId: string) {
     const container = document.getElementById(containerId);
@@ -102,8 +101,6 @@ export class DynamicBackgroundManager {
     this.svgContainer = svg;
     this.isMobileDevice =
       ("maxTouchPoints" in navigator && navigator.maxTouchPoints > 0) || window.innerWidth < 1024;
-
-    this.currentPerformanceLevel = this.isMobileDevice ? 1 : 3;
 
     this.config = {
       numBlobs: this.isMobileDevice ? 3 : 4,

@@ -65,7 +65,7 @@ const eventsJson = JSON.stringify(events);
   </ul>
 
   {/* Data serialization for client-side hydration */}
-  <script type="application/json" id="timeline-data" set:html={eventsJson} />
+  <script is:inline type="application/json" id="timeline-data" set:html={eventsJson} />
 </SubPageLayout>
 
 <script>

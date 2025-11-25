@@ -3,8 +3,42 @@ import type { AstroComponentFactory } from "astro/runtime/server/index.js";
 import type { ContactItem } from "./contactViewModel";
 import { parseDate } from "../lib/utils/dateUtils";
 
-type SectionEntryData = CollectionEntry<"sections">["data"];
-type SectionWithContent = SectionEntryData & { Content: AstroComponentFactory };
+// Hero section requires specific fields
+type HeroData = {
+  greeting: string;
+  name: string;
+  description: string;
+};
+
+// Section with content requires title and cta
+type SectionWithContent = {
+  title: string;
+  cta: {
+    text: string;
+    href: string;
+  };
+  Content: AstroComponentFactory;
+};
+
+// Section for featured works (no fallback)
+type SectionDataBasic = {
+  title: string;
+  cta: {
+    text: string;
+    href: string;
+  };
+};
+
+// Section for highlights (with required fallback)
+type SectionDataWithFallback = {
+  title: string;
+  cta: {
+    text: string;
+    href: string;
+  };
+  fallback: string;
+};
+
 type TimelineHighlight = CollectionEntry<"timeline"> & { Content: AstroComponentFactory };
 type ContactListEntry = CollectionEntry<"contact"> & {
   data: {
@@ -15,15 +49,15 @@ type ContactListEntry = CollectionEntry<"contact"> & {
 };
 
 export interface HomeViewModel {
-  hero: SectionEntryData;
+  hero: HeroData;
   meetMe: SectionWithContent;
   connect: SectionWithContent;
   featuredWorks: {
-    section: SectionEntryData;
+    section: SectionDataBasic;
     projects: CollectionEntry<"projects">[];
   };
   highlights: {
-    section: SectionEntryData;
+    section: SectionDataWithFallback;
     events: TimelineHighlight[];
   };
   connectSocialItems: ContactItem[];
@@ -59,9 +93,40 @@ export async function getHomeViewModel(): Promise<HomeViewModel> {
     throw new Error("Required homepage sections are missing.");
   }
 
-  const hero = heroEntry.data;
-  const featuredWorksSection = featuredWorksEntry.data;
-  const highlightsSection = highlightsEntry.data;
+  // Validate hero data has required fields
+  const heroData = heroEntry.data;
+  if (!heroData.greeting || !heroData.name || !heroData.description) {
+    throw new Error("Hero section is missing required fields (greeting, name, description).");
+  }
+
+  const hero: HeroData = {
+    greeting: heroData.greeting,
+    name: heroData.name,
+    description: heroData.description,
+  };
+
+  // Validate section data
+  const validateSection = (entry: CollectionEntry<"sections">, name: string) => {
+    if (!entry.data.title || !entry.data.cta) {
+      throw new Error(`${name} section is missing required fields (title, cta).`);
+    }
+  };
+
+  validateSection(meetMeEntry, "Meet Me");
+  validateSection(connectEntry, "Connect");
+  validateSection(featuredWorksEntry, "Featured Works");
+  validateSection(highlightsEntry, "Highlights");
+
+  const featuredWorksSection: SectionDataBasic = {
+    title: featuredWorksEntry.data.title!,
+    cta: featuredWorksEntry.data.cta!,
+  };
+
+  const highlightsSection: SectionDataWithFallback = {
+    title: highlightsEntry.data.title!,
+    cta: highlightsEntry.data.cta!,
+    fallback: highlightsEntry.data.fallback || "No highlights available.",
+  };
 
   // Render markdown content in parallel
   const [meetMeRendered, connectRendered] = await Promise.all([
@@ -70,12 +135,14 @@ export async function getHomeViewModel(): Promise<HomeViewModel> {
   ]);
 
   const meetMe: SectionWithContent = {
-    ...meetMeEntry.data,
+    title: meetMeEntry.data.title!,
+    cta: meetMeEntry.data.cta!,
     Content: meetMeRendered.Content,
   };
 
   const connect: SectionWithContent = {
-    ...connectEntry.data,
+    title: connectEntry.data.title!,
+    cta: connectEntry.data.cta!,
     Content: connectRendered.Content,
   };
 
@@ -97,9 +164,8 @@ export async function getHomeViewModel(): Promise<HomeViewModel> {
   // Render content for highlights in parallel
   const highlights: TimelineHighlight[] = await Promise.all(
     topHighlights.map(async ({ event }) => {
-      const rendered = event.rendered ?? (await event.render());
-      const { Content } = rendered;
-      return { ...event, Content };
+      const rendered = await event.render();
+      return { ...event, Content: rendered.Content };
     })
   );
 
