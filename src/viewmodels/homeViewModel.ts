@@ -1,13 +1,28 @@
-import { getCollection, getEntry } from "astro:content";
+import { getCollection, getEntry, type CollectionEntry } from "astro:content";
 import type { ContactItem } from "./contactViewModel";
 import { parseDate } from "../lib/utils/dateUtils";
+
+export interface HomeViewModel {
+    hero: Record<string, unknown>;
+    meetMe: { Content: any } & Record<string, unknown>;
+    connect: { Content: any } & Record<string, unknown>;
+    featuredWorks: {
+        section: Record<string, unknown>;
+        projects: CollectionEntry<"projects">[];
+    };
+    highlights: {
+        section: Record<string, unknown>;
+        events: Array<CollectionEntry<"timeline"> & { Content: any }>;
+    };
+    connectSocialItems: ContactItem[];
+}
 
 /**
  * Home page view model
  * Aggregates and transforms content for the homepage
  */
-export async function getHomeViewModel() {
-    //  Parallelize independent data fetches for better build performance
+export async function getHomeViewModel(): Promise<HomeViewModel> {
+    // Parallelize independent data fetches for better build performance
     const [
         heroEntry,
         meetMeEntry,
@@ -57,32 +72,19 @@ export async function getHomeViewModel() {
         .filter((p) => p.data.isFeatured)
         .sort((a, b) => (a.data.order ?? 0) - (b.data.order ?? 0));
 
-    // Filter timeline highlights
+    // Filter timeline highlights and drop invalid dates
     const highlightEvents = allEvents.filter((e) => e.data.isHighlight);
 
-    // Sort highlights by date descending (latest first) with safe UTC parsing
-    highlightEvents.sort((a, b) => {
-        return parseDate(b.data.date) - parseDate(a.data.date);
-    });
+    const highlightsWithDate = highlightEvents
+        .map((event) => ({ event, dateValue: parseDate(event.data.date) }))
+        .filter(({ dateValue }) => dateValue > 0)
+        .sort((a, b) => b.dateValue - a.dateValue);
 
-    // Validate dates
-    const invalidDates = highlightEvents.filter(e => {
-        const [year, month] = (e.data.date || '').split('-').map(Number);
-        return isNaN(year) || isNaN(month);
-    });
-
-    if (invalidDates.length > 0) {
-        console.warn('[homeViewModel] Timeline events with invalid dates:',
-            invalidDates.map(e => ({ id: e.id, date: e.data.date }))
-        );
-    }
-
-    // Take top 3 highlights
-    const topHighlights = highlightEvents.slice(0, 3);
+    const topHighlights = highlightsWithDate.slice(0, 3);
 
     // Render content for highlights in parallel
     const highlights = await Promise.all(
-        topHighlights.map(async (event) => {
+        topHighlights.map(async ({ event }) => {
             const { Content } = await event.render();
             return { ...event, Content };
         })

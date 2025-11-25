@@ -2,6 +2,7 @@
 // Content for the "Highlights & Updates" section
 import Button from "../../common/Button.astro";
 import RichText from "../../common/RichText.astro";
+import { formatTimelineDate } from "../../../lib/utils/dateUtils";
 
 interface Props {
   data: {
@@ -22,23 +23,6 @@ const { section, events } = data;
 const { title, cta, fallback } = section;
 const highlightsToShow = events;
 
-// Improved date formatting function (example)
-function formatEventDate(dateStr: string): string {
-  if (!dateStr) return "";
-  try {
-    // Parse YYYY-MM. Assumes UTC for consistency if timezone matters.
-    const [year, month] = dateStr.split("-").map(Number);
-    const date = new Date(Date.UTC(year, month - 1)); // Use UTC
-    return date.toLocaleDateString("en-US", {
-      year: "numeric",
-      month: "long",
-      timeZone: "UTC", // Specify timezone for consistent output
-    });
-  } catch (e) {
-    console.error(`Error parsing date string "${dateStr}":`, e);
-    return dateStr; // Fallback to original string on error
-  }
-}
 ---
 
 <h2 slot="title" class="about-title scroll-target-title">{title}</h2>
@@ -51,7 +35,7 @@ function formatEventDate(dateStr: string): string {
           <li class="highlight-item-enhanced">
             <div class="highlight-meta">
               <time datetime={event.data.date} class="highlight-date">
-                {formatEventDate(event.data.date)}
+                {formatTimelineDate(event.data.date)}
               </time>
             </div>
             <div class="highlight-body">

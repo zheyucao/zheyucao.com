@@ -21,7 +21,7 @@ const {
 } = Astro.props;
 
 // Construct URL with query parameter instead of hash
-const projectUrl = `/projects?scrollTo=${slug}`;
+const projectUrl = `/projects?scrollTo=${encodeURIComponent(slug)}`;
 ---
 
 <a href={projectUrl} class="featured-project-card">

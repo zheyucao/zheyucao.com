@@ -39,7 +39,14 @@ const showScrollIndicator =
     <!-- Theme Handling -->
     <script>
       import { initTheme } from "../lib/layout/theme";
-      initTheme();
+      let cleanupTheme: (() => void) | undefined;
+      document.addEventListener("astro:page-load", () => {
+        cleanupTheme = initTheme();
+      });
+      document.addEventListener("astro:before-swap", () => {
+        cleanupTheme?.();
+        cleanupTheme = undefined;
+      });
     </script>
 
     <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -66,6 +73,7 @@ const showScrollIndicator =
 
       document.addEventListener("astro:before-swap", () => {
         if (cleanupObserver) cleanupObserver();
+        cleanupObserver = undefined;
       });
     </script>
 
