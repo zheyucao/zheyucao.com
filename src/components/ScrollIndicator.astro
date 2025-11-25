@@ -58,6 +58,16 @@
   .scroll-indicator.visible {
     opacity: 0.6;
   }
+
+  @media (prefers-reduced-motion: reduce) {
+    .scroll-indicator {
+      transition: none;
+    }
+
+    .indicator-content {
+      animation: none;
+    }
+  }
 </style>
 
 <script>

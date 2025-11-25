@@ -137,6 +137,22 @@ body {
   }
 }
 
+@media (prefers-reduced-motion: reduce) {
+  .scroll-reveal-animate,
+  .scroll-reveal-animate.visible {
+    opacity: 1;
+    filter: none;
+    transform: none;
+    transition: none;
+  }
+
+  .page-load-initial-state {
+    opacity: 1;
+    filter: none;
+    transform: none;
+  }
+}
+
 /* Base link style */
 a {
   color: var(--text-color);

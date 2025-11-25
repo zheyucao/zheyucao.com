@@ -1,4 +1,14 @@
+import { prefersReducedMotion } from "../utils/motionPreferences";
+
 export function setupIntersectionObserver() {
+  if (prefersReducedMotion()) {
+    // Show content immediately without transitions when reduced motion is requested
+    document.querySelectorAll(".scroll-reveal-animate").forEach((el) => {
+      el.classList.add("visible");
+    });
+    return () => {};
+  }
+
   const pageWrapper = document.querySelector(".page-wrapper");
   if (!pageWrapper) {
     return () => {};
