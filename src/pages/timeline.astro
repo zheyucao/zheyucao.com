@@ -4,11 +4,10 @@ import TimelineEvent from "../components/timeline/TimelineEvent.astro";
 import { getTimelineViewModel } from "../viewmodels/timelineViewModel";
 import "../styles/timeline.css";
 
-let allEvents, categories, initialFilteredEvents, pageTitle, filterAll;
+let categories, initialFilteredEvents, pageTitle, filterAll;
 
 try {
   const viewModel = await getTimelineViewModel();
-  allEvents = viewModel.events;
   categories = viewModel.categories;
   initialFilteredEvents = viewModel.initialEvents;
   pageTitle = viewModel.pageTitle;
@@ -55,7 +54,9 @@ try {
   </ul>
 
   {/* Data serialization for client-side hydration */}
-  <script type="application/json" id="timeline-data" set:html={JSON.stringify(allEvents)} />
+  <script type="application/json" id="timeline-data">
+    {JSON.stringify(allEvents)}
+  </script>
 </SubPageLayout>
 
 <script>
