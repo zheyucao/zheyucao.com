@@ -44,11 +44,10 @@ const html = sanitizeRich(rawHtml);
 // Create props object for dynamic component
 const tagProps = {
   class: `rich-text ${className}`,
-  'set:html': html
 };
 ---
 
-<Tag {...tagProps} />
+<Tag {...tagProps} set:html={html}/>
 
 <style>
   .rich-text {
