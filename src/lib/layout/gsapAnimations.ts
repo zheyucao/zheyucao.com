@@ -1,11 +1,15 @@
 import { ANIMATION_CONSTANTS } from "../../constants/animationConstants";
 import { gsap, ScrollTrigger, registerGsapPlugins } from "../animations/gsapPlugins";
+import { prefersReducedMotion } from "../utils/motionPreferences";
 
 registerGsapPlugins();
 
 const SECTION_TRIGGER_PREFIX = "section-animation";
 
 export function setupSectionAnimations(scroller?: HTMLElement) {
+    if (prefersReducedMotion()) {
+        return;
+    }
     const pageWrapper = scroller ?? document.querySelector(".page-wrapper");
     if (!pageWrapper) {
         return;

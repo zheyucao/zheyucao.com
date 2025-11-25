@@ -6,6 +6,7 @@
 
 import { ANIMATION_CONSTANTS } from "../../constants/animationConstants";
 import { gsap, ScrollTrigger, registerGsapPlugins } from "./gsapPlugins";
+import { prefersReducedMotion } from "../utils/motionPreferences";
 
 registerGsapPlugins();
 
@@ -21,6 +22,11 @@ export interface ScrollIndicatorElements {
 export function setupScrollIndicator(elements: ScrollIndicatorElements): () => void {
   const { indicator, scroller } = elements;
   const { SCROLL_INDICATOR, GSAP } = ANIMATION_CONSTANTS;
+
+  if (prefersReducedMotion()) {
+    gsap.set(indicator, { opacity: 0.6 });
+    return () => {};
+  }
 
   let indicatorScrubTrigger: ScrollTrigger | null = null;
   let indicatorCallbackTrigger: ScrollTrigger | null = null;
@@ -109,6 +115,14 @@ export function setupScrollIndicatorClick(elements: ScrollIndicatorElements): ()
   const { SCROLL_INDICATOR } = ANIMATION_CONSTANTS;
 
   const clickHandler = () => {
+    if (prefersReducedMotion()) {
+      scroller.scrollTo({
+        top: scroller.scrollTop + scroller.clientHeight,
+        behavior: "auto",
+      });
+      return;
+    }
+
     const currentOpacity = parseFloat(window.getComputedStyle(indicator).opacity);
     if (currentOpacity > 0.1) {
       gsap.to(scroller, {

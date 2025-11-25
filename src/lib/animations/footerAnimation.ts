@@ -6,6 +6,7 @@
 
 import { ANIMATION_CONSTANTS } from "../../constants/animationConstants";
 import { gsap, ScrollTrigger, registerGsapPlugins } from "./gsapPlugins";
+import { prefersReducedMotion } from "../utils/motionPreferences";
 
 registerGsapPlugins();
 
@@ -20,6 +21,11 @@ export interface FooterAnimationElements {
  */
 export function setupFooterAnimation(elements: FooterAnimationElements): () => void {
   const { footer, scroller } = elements;
+
+  if (prefersReducedMotion()) {
+    gsap.set(footer, { opacity: 1, y: 0 });
+    return () => {};
+  }
 
   let trigger: ScrollTrigger | null = null;
 

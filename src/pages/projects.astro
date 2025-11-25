@@ -30,6 +30,7 @@ const { projects, pageTitle } = await getProjectsViewModel();
 
 <script>
   import { gsap, registerGsapPlugins } from "../lib/animations/gsapPlugins";
+  import { prefersReducedMotion } from "../lib/utils/motionPreferences";
 
   registerGsapPlugins();
 
@@ -45,6 +46,13 @@ const { projects, pageTitle } = await getProjectsViewModel();
         if (targetElement && pageWrapperElement) {
           const targetOffsetTopInWrapper = targetElement.offsetTop;
           const finalScrollPosition = targetOffsetTopInWrapper;
+
+          if (prefersReducedMotion()) {
+            pageWrapperElement.scrollTo({ top: finalScrollPosition, behavior: "auto" });
+            const newUrl = window.location.pathname;
+            window.history.replaceState({}, "", newUrl);
+            return;
+          }
 
           gsap.to(pageWrapperElement, {
             duration: 1,
