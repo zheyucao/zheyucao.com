@@ -3,7 +3,6 @@ import SubPageLayout from "../layouts/SubPageLayout.astro";
 import ResumeSectionRenderer from "../components/resume/ResumeSectionRenderer.astro";
 import Button from "../components/common/Button.astro";
 import { getResumeViewModel } from "../viewmodels/resumeViewModel";
-import { getEntry } from "astro:content";
 
 const { mainColumn, sidebar, metadata } = await getResumeViewModel();
 const { title, actions } = metadata;

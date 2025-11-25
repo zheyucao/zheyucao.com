@@ -1,11 +1,10 @@
-import { describe, it, expect, beforeEach, vi } from "vitest";
+import { describe, it, expect, beforeEach } from "vitest";
 import { TimelineController, type TimelineEvent } from "./TimelineController";
 
 describe("TimelineController", () => {
   let container: HTMLElement;
   let sortToggle: HTMLElement;
   let categoryTab1: HTMLElement;
-  let categoryTab2: HTMLElement;
 
   const mockEvents: TimelineEvent[] = [
     {
@@ -42,7 +41,6 @@ describe("TimelineController", () => {
     sortToggle = document.getElementById("sort-toggle")!;
     const tabs = document.querySelectorAll(".category-tab");
     categoryTab1 = tabs[1] as HTMLElement; // Cat1
-    categoryTab2 = tabs[2] as HTMLElement; // Cat2
   });
 
   it("should initialize and render all events by default", async () => {

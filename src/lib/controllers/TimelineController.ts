@@ -141,9 +141,4 @@ export class TimelineController {
     // Dispatch event for footer animation
     document.dispatchEvent(new CustomEvent("refresh-footer-animation"));
   }
-
-  public cleanup() {
-    // Remove listeners if needed (though usually not needed if page is swapped)
-    // But good practice
-  }
 }

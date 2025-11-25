@@ -1,4 +1,4 @@
-import { getCollection, getEntry } from "astro:content";
+import { getCollection } from "astro:content";
 
 /**
  * Resume page view model

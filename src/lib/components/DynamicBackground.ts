@@ -328,7 +328,7 @@ export class DynamicBackgroundManager {
     const currentSmallMinSize = this.config.baseSmallMinBlobSize * scaleFactor;
     const currentSmallMaxSize = this.config.baseSmallMaxBlobSize * scaleFactor;
 
-    let initialBlobColorsHex: string[] = [];
+    const initialBlobColorsHex: string[] = [];
     const schemeNames = Object.keys(colorScheme);
     const selectedSchemeName = schemeNames[Math.floor(Math.random() * schemeNames.length)];
     const availableColors = colorScheme[selectedSchemeName] || [];
