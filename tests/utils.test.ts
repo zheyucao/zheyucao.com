@@ -23,8 +23,7 @@ describe("sanitize", () => {
   });
 
   it("sanitizeRich allows links and images", () => {
-    const input =
-      '<a href="https://example.com" target="_blank">link</a><img src="x" alt="img">';
+    const input = '<a href="https://example.com" target="_blank">link</a><img src="x" alt="img">';
     const output = sanitizeRich(input);
     expect(output).toContain("<a");
     expect(output).toContain("<img");

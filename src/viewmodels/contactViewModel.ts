@@ -102,9 +102,7 @@ export async function getContactFooterItems(): Promise<ContactItem[]> {
           ...item,
           order: baseOrder * 100 + idx,
         }))
-        .filter(
-          (item) => item.showOnFooter !== false && item.href
-        );
+        .filter((item) => item.showOnFooter !== false && item.href);
     })
     .sort((a, b) => a.order - b.order);
 }

@@ -87,7 +87,7 @@ export class DynamicBackgroundManager {
   private observer: IntersectionObserver | null = null;
   private isVisible = true;
   private prefersReducedMotion = false;
-  private cleanupListeners: () => void = () => { };
+  private cleanupListeners: () => void = () => {};
 
   constructor(containerId: string, svgId: string) {
     const container = document.getElementById(containerId);

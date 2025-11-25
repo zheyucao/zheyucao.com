@@ -79,11 +79,11 @@ export async function getHomeViewModel(): Promise<HomeViewModel> {
     allEvents,
     contactEntries,
   ] = await Promise.all([
-    getEntry("sections", "hero"),
-    getEntry("sections", "meet-me"),
-    getEntry("sections", "connect"),
-    getEntry("sections", "featured-works"),
-    getEntry("sections", "highlights"),
+    getEntry("home", "hero"),
+    getEntry("home", "meet-me"),
+    getEntry("home", "connect"),
+    getEntry("home", "featured-works"),
+    getEntry("home", "highlights"),
     getCollection("projects"),
     getCollection("timeline"),
     getCollection("contact"),
@@ -106,7 +106,7 @@ export async function getHomeViewModel(): Promise<HomeViewModel> {
   };
 
   // Validate section data
-  const validateSection = (entry: CollectionEntry<"sections">, name: string) => {
+  const validateSection = (entry: CollectionEntry<"home">, name: string) => {
     if (!entry.data.title || !entry.data.cta) {
       throw new Error(`${name} section is missing required fields (title, cta).`);
     }

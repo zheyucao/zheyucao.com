@@ -61,26 +61,33 @@ export type ResumeSection =
   | SkillsResumeSection
   | ContactResumeSection;
 
-
 const sortByOrder = <T extends { order?: number }>(items: T[]) =>
   items.sort((a, b) => (a.order ?? Infinity) - (b.order ?? Infinity));
 
 const getOrder = (entry: ResumeCollectionEntry): number | undefined =>
   "order" in entry.data ? entry.data.order : undefined;
 
-const isStandardEntry = (entry: ResumeCollectionEntry): entry is ResumeCollectionEntry & {
+const isStandardEntry = (
+  entry: ResumeCollectionEntry
+): entry is ResumeCollectionEntry & {
   data: StandardEntryData;
 } => !("type" in entry.data);
 
-const isAwardsEntry = (entry: ResumeCollectionEntry): entry is ResumeCollectionEntry & {
+const isAwardsEntry = (
+  entry: ResumeCollectionEntry
+): entry is ResumeCollectionEntry & {
   data: AwardsEntryData;
 } => "type" in entry.data && entry.data.type === "awards";
 
-const isSkillsEntry = (entry: ResumeCollectionEntry): entry is ResumeCollectionEntry & {
+const isSkillsEntry = (
+  entry: ResumeCollectionEntry
+): entry is ResumeCollectionEntry & {
   data: SkillsEntryData;
 } => "type" in entry.data && entry.data.type === "skills";
 
-const isContactEntry = (entry: ResumeCollectionEntry): entry is ResumeCollectionEntry & {
+const isContactEntry = (
+  entry: ResumeCollectionEntry
+): entry is ResumeCollectionEntry & {
   data: ContactEntryData;
 } => "type" in entry.data && entry.data.type === "contact";
 
@@ -227,28 +234,31 @@ export async function getResumeViewModel(): Promise<{
       id: "skills",
       title: skillsEntry.data.title,
       type: "skills",
-      content: skillsEntry.data.content.map((category): GridSkillCategory => ({
-        name: category.category,
-        items: category.items,
-      })),
+      content: skillsEntry.data.content.map(
+        (category): GridSkillCategory => ({
+          name: category.category,
+          items: category.items,
+        })
+      ),
     },
     {
       id: "contact",
       title: contactEntry.data.title,
       type: "contact",
-      content: contactEntry.data.content.map((item): ResumeContactItem => ({
-        icon: item.icon,
-        label: item.label ?? item.description ?? item.icon,
-        href: item.href,
-        target: item.target,
-        rel: item.rel,
-      })),
+      content: contactEntry.data.content.map(
+        (item): ResumeContactItem => ({
+          icon: item.icon,
+          label: item.label ?? item.description ?? item.icon,
+          href: item.href,
+          target: item.target,
+          rel: item.rel,
+        })
+      ),
     },
   ];
 
   // Fetch metadata from centralized page-metadata collection
   const metadata = await getPageMetadata("resume");
-
 
   return {
     mainColumn,

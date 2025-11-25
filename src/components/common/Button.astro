@@ -35,17 +35,21 @@ const iconText = typeof icon === "string" && !iconName ? icon : null;
 <div class:list={["button-wrapper", wrapperClass, { "no-margin": noMargin }]}>
   <a href={href} download={downloadAttr} class:list={["button button-link", className]} {...rest}>
     {/* Add specific class to span based on position */}
-    {iconPosition === "left" && icon ? (
-      <span aria-hidden="true" class="button-icon icon-left">
-        {iconName ? <Icon name={iconName} size={16} /> : iconText}
-      </span>
-    ) : null}
+    {
+      iconPosition === "left" && icon ? (
+        <span aria-hidden="true" class="button-icon icon-left">
+          {iconName ? <Icon name={iconName} size={16} /> : iconText}
+        </span>
+      ) : null
+    }
     {text}
-    {iconPosition === "right" && icon ? (
-      <span aria-hidden="true" class="button-icon icon-right">
-        {iconName ? <Icon name={iconName} size={16} /> : iconText}
-      </span>
-    ) : null}
+    {
+      iconPosition === "right" && icon ? (
+        <span aria-hidden="true" class="button-icon icon-right">
+          {iconName ? <Icon name={iconName} size={16} /> : iconText}
+        </span>
+      ) : null
+    }
   </a>
 </div>
 

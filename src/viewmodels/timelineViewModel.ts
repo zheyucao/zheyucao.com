@@ -31,12 +31,12 @@ export async function getTimelineViewModel() {
     description: event.body, // Pass raw body as description
     renderedDescription: event.body
       ? sanitizeHtml(md.render(event.body), {
-        allowedTags: sanitizeHtml.defaults.allowedTags.concat(["img"]),
-        allowedAttributes: {
-          ...sanitizeHtml.defaults.allowedAttributes,
-          img: ["src", "alt", "width", "height"],
-        },
-      })
+          allowedTags: sanitizeHtml.defaults.allowedTags.concat(["img"]),
+          allowedAttributes: {
+            ...sanitizeHtml.defaults.allowedAttributes,
+            img: ["src", "alt", "width", "height"],
+          },
+        })
       : "",
   }));
 

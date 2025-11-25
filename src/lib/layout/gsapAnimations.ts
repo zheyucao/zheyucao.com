@@ -7,13 +7,13 @@ registerGsapPlugins();
 const SECTION_TRIGGER_PREFIX = "section-animation";
 
 export function setupSectionAnimations(scroller?: HTMLElement) {
-    if (prefersReducedMotion()) {
-        return;
-    }
-    const pageWrapper = scroller ?? document.querySelector(".page-wrapper");
-    if (!pageWrapper) {
-        return;
-    }
+  if (prefersReducedMotion()) {
+    return;
+  }
+  const pageWrapper = scroller ?? document.querySelector(".page-wrapper");
+  if (!pageWrapper) {
+    return;
+  }
 
   const sections = document.querySelectorAll(".section-wrapper");
 
@@ -73,7 +73,10 @@ export function setupSectionAnimations(scroller?: HTMLElement) {
 
 export function cleanupSectionAnimations() {
   ScrollTrigger.getAll()
-    .filter((trigger) => typeof trigger.vars.id === "string" && trigger.vars.id.startsWith(SECTION_TRIGGER_PREFIX))
+    .filter(
+      (trigger) =>
+        typeof trigger.vars.id === "string" && trigger.vars.id.startsWith(SECTION_TRIGGER_PREFIX)
+    )
     .forEach((trigger) => trigger.kill());
 }
 

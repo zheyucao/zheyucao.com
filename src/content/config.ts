@@ -38,7 +38,7 @@ const timeline = defineCollection({
   }),
 });
 
-const sections = defineCollection({
+const home = defineCollection({
   type: "content",
   schema: z.object({
     title: z.string().optional(),
@@ -66,7 +66,6 @@ const actionSchema = z.object({
   target: z.string().optional(),
   rel: z.string().optional(),
 });
-
 
 const resume = defineCollection({
   type: "content",
@@ -153,12 +152,14 @@ const page_metadata = defineCollection({
     subtitle: z.string().optional(),
     description: z.string().optional(),
     actions: z.array(actionSchema).optional(),
-    seo: z.object({
-      ogTitle: z.string().optional(),
-      ogDescription: z.string().optional(),
-      ogImage: z.string().optional(),
-      twitterCard: z.string().optional(),
-    }).optional(),
+    seo: z
+      .object({
+        ogTitle: z.string().optional(),
+        ogDescription: z.string().optional(),
+        ogImage: z.string().optional(),
+        twitterCard: z.string().optional(),
+      })
+      .optional(),
   }),
 });
 
@@ -181,7 +182,7 @@ const ui_strings = defineCollection({
 export const collections = {
   projects,
   timeline,
-  sections,
+  home,
   resume,
   contact,
   "ui-strings": ui_strings,
