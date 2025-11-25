@@ -2,6 +2,7 @@
 // Content for the "Featured Works" section
 import FeaturedProjectCard from "../FeaturedProjectCard.astro";
 import Button from "../../common/Button.astro";
+import type { CollectionEntry } from "astro:content";
 
 interface Props {
   data: {
@@ -12,7 +13,7 @@ interface Props {
         href: string;
       };
     };
-    projects: any[];
+    projects: CollectionEntry<"projects">[];
   };
 }
 

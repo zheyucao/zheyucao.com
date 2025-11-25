@@ -1,18 +1,30 @@
 import { getCollection, getEntry, type CollectionEntry } from "astro:content";
+import type { AstroComponentFactory } from "astro/runtime/server/index.js";
 import type { ContactItem } from "./contactViewModel";
 import { parseDate } from "../lib/utils/dateUtils";
 
+type SectionEntryData = CollectionEntry<"sections">["data"];
+type SectionWithContent = SectionEntryData & { Content: AstroComponentFactory };
+type TimelineHighlight = CollectionEntry<"timeline"> & { Content: AstroComponentFactory };
+type ContactListEntry = CollectionEntry<"contact"> & {
+  data: {
+    kind: "list";
+    items: ContactItem[];
+    order?: number;
+  };
+};
+
 export interface HomeViewModel {
-  hero: Record<string, unknown>;
-  meetMe: { Content: any } & Record<string, unknown>;
-  connect: { Content: any } & Record<string, unknown>;
+  hero: SectionEntryData;
+  meetMe: SectionWithContent;
+  connect: SectionWithContent;
   featuredWorks: {
-    section: Record<string, unknown>;
+    section: SectionEntryData;
     projects: CollectionEntry<"projects">[];
   };
   highlights: {
-    section: Record<string, unknown>;
-    events: Array<CollectionEntry<"timeline"> & { Content: any }>;
+    section: SectionEntryData;
+    events: TimelineHighlight[];
   };
   connectSocialItems: ContactItem[];
 }
@@ -57,12 +69,12 @@ export async function getHomeViewModel(): Promise<HomeViewModel> {
     connectEntry.render(),
   ]);
 
-  const meetMe = {
+  const meetMe: SectionWithContent = {
     ...meetMeEntry.data,
     Content: meetMeRendered.Content,
   };
 
-  const connect = {
+  const connect: SectionWithContent = {
     ...connectEntry.data,
     Content: connectRendered.Content,
   };
@@ -83,19 +95,22 @@ export async function getHomeViewModel(): Promise<HomeViewModel> {
   const topHighlights = highlightsWithDate.slice(0, 3);
 
   // Render content for highlights in parallel
-  const highlights = await Promise.all(
+  const highlights: TimelineHighlight[] = await Promise.all(
     topHighlights.map(async ({ event }) => {
-      const { Content } = await event.render();
+      const rendered = event.rendered ?? (await event.render());
+      const { Content } = rendered;
       return { ...event, Content };
     })
   );
 
   // Process contact lists for home social links
-  const listEntries = contactEntries.filter((entry) => entry.data.kind === "list");
+  const listEntries = contactEntries.filter(
+    (entry): entry is ContactListEntry => entry.data.kind === "list"
+  );
   const contactItemsWithOrder = listEntries
     .sort((a, b) => (a.data.order ?? Infinity) - (b.data.order ?? Infinity))
     .flatMap((entry, sectionIndex) => {
-      const items = (entry.data as any).items as ContactItem[];
+      const items = entry.data.items;
       return items
         .map((item, itemIndex) => ({
           item,

@@ -3,16 +3,10 @@ import EntryList from "./templates/EntryList.astro";
 import SkillGrid from "./templates/SkillGrid.astro";
 import TextSection from "./templates/TextSection.astro";
 import ContactList from "./templates/ContactList.astro";
+import type { ResumeSection } from "../../viewmodels/resumeViewModel";
 
 interface Props {
-  section: {
-    id: string;
-    title: string;
-    type: string;
-    content?: any;
-    Content?: any;
-    visible?: boolean;
-  };
+  section: ResumeSection;
 }
 
 const { section } = Astro.props;

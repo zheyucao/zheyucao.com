@@ -36,6 +36,24 @@ interface ColorScheme {
   [key: string]: string[];
 }
 
+interface DynamicBackgroundConfig {
+  numBlobs: number;
+  baseLargeMinBlobSize: number;
+  baseLargeMaxBlobSize: number;
+  baseSmallMinBlobSize: number;
+  baseSmallMaxBlobSize: number;
+  referenceWidth: number;
+  minScaleFactor: number;
+  maxScaleFactor: number;
+  speedMultiplier: number;
+  mouseInfluenceRadius: number;
+  mouseForce: number;
+  opacity: number;
+  enableShapeChanging: boolean;
+  enableCollisionDetection: boolean;
+  enableMouseInteraction: boolean;
+}
+
 const colorScheme: ColorScheme = {
   reds: ["#FF6B6B", "#FFD93D", "#F2bF47", "#F2B707", "#F28706", "#F26430"],
   oranges: ["#FFa700", "#FF9B58", "#F27149", "#F9c443", "#faD93D"],
@@ -62,7 +80,7 @@ export class DynamicBackgroundManager {
   private cachedContainerRect = { width: 0, height: 0, left: 0, top: 0 };
   private needsRectUpdate = true;
   private isMobileDevice: boolean;
-  private config: any;
+  private config: DynamicBackgroundConfig;
   private fpsHistory: number[] = [];
   private currentPerformanceLevel: number;
   private lastTimestamp = 0;
@@ -440,8 +458,8 @@ export class DynamicBackgroundManager {
     const max = Math.max(r, g, b),
       min = Math.min(r, g, b);
     let h = 0,
-      s = 0,
-      l = (max + min) / 2;
+      s = 0;
+    const l = (max + min) / 2;
     if (max !== min) {
       const d = max - min;
       s = l > 0.5 ? d / (2 - max - min) : d / (max + min);

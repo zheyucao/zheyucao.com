@@ -3,6 +3,8 @@
 import Button from "../../common/Button.astro";
 import RichText from "../../common/RichText.astro";
 import { formatTimelineDate } from "../../../lib/utils/dateUtils";
+import type { CollectionEntry } from "astro:content";
+import type { AstroComponentFactory } from "astro/runtime/server/index.js";
 
 interface Props {
   data: {
@@ -14,7 +16,7 @@ interface Props {
       };
       fallback: string;
     };
-    events: any[];
+    events: Array<CollectionEntry<"timeline"> & { Content: AstroComponentFactory }>;
   };
 }
 

@@ -1,12 +1,13 @@
 ---
 import RichText from "../../common/RichText.astro";
+import type { AstroComponentFactory } from "astro/runtime/server/index.js";
 
 export interface EntryItem {
   title: string;
   subtitle?: string;
   date?: string;
   details?: string[];
-  Content?: any;
+  Content?: AstroComponentFactory;
 }
 
 interface Props {

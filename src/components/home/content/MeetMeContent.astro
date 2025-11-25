@@ -1,6 +1,7 @@
 ---
 // Content for the "Meet me!" section
 import Button from "../../common/Button.astro";
+import type { AstroComponentFactory } from "astro/runtime/server/index.js";
 
 interface Props {
   data: {
@@ -9,7 +10,7 @@ interface Props {
       text: string;
       href: string;
     };
-    Content: any;
+    Content: AstroComponentFactory;
   };
 }
 
