@@ -3,38 +3,7 @@ import SubPageLayout from "../layouts/SubPageLayout.astro";
 import { getContactViewModel } from "../viewmodels/contactViewModel";
 import { Icon } from "astro-icon/components";
 import Tooltip from "../components/common/Tooltip.astro";
-import sanitizeHtml from "sanitize-html"; // Import sanitize-html
-
 const { intro, sections } = await getContactViewModel();
-
-// Define a sanitization function
-const sanitize = (htmlString: string) => {
-  return sanitizeHtml(htmlString, {
-    allowedTags: sanitizeHtml.defaults.allowedTags.concat([
-      "img",
-      "a",
-      "p",
-      "h1",
-      "h2",
-      "h3",
-      "h4",
-      "h5",
-      "h6",
-      "ul",
-      "ol",
-      "li",
-      "strong",
-      "em",
-      "br",
-    ]),
-    allowedAttributes: {
-      a: ["href", "name", "target"],
-      img: ["src", "alt", "width", "height"],
-      "*": ["class", "id", "style"], // Allow class, id, style on all elements for basic styling
-    },
-    // Add more options as needed for your specific use case
-  });
-};
 ---
 
 <SubPageLayout title="Contact">
@@ -58,20 +27,16 @@ const sanitize = (htmlString: string) => {
               <li>
                 <Icon name={item.icon} class="contact-icon" />
                 {(() => {
-                  const value = item.label || item.href || "";
+                  const value = item.content || "";
                   const description = item.description;
                   const copyValue = item.href ? undefined : value;
-                  const sanitizedValue = sanitize(value);
 
                   if (item.href) {
                     return (
                       <>
-                        <a
-                          href={item.href}
-                          target={item.target}
-                          rel={item.rel}
-                          set:html={sanitizedValue}
-                        />
+                        <a href={item.href} target={item.target} rel={item.rel}>
+                          {value}
+                        </a>
                         {description && <span class="inline-desc">&nbsp;{description}</span>}
                       </>
                     );
@@ -89,8 +54,9 @@ const sanitize = (htmlString: string) => {
                           <span
                             class:list={["copyable", { clickable: true }]}
                             data-copy-value={copyValue}
-                            set:html={sanitizedValue}
-                          />
+                          >
+                            {value}
+                          </span>
                         </Tooltip>
                         {description && <span class="inline-desc">&nbsp;{description}</span>}
                       </>
@@ -99,7 +65,7 @@ const sanitize = (htmlString: string) => {
 
                   return (
                     <>
-                      <span set:html={sanitizedValue} />
+                      <span>{value}</span>
                       {description && <span class="inline-desc">&nbsp;{description}</span>}
                     </>
                   );

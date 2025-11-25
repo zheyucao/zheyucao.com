@@ -1,5 +1,5 @@
 ---
-import sanitizeHtml from "sanitize-html";
+import { sanitizeStrict } from "../../lib/utils/sanitize";
 
 interface Props {
   data: {
@@ -12,17 +12,9 @@ interface Props {
 const { data } = Astro.props;
 const { greeting, name, description } = data;
 
-const sanitize = (value: string) =>
-  sanitizeHtml(value || "", {
-    allowedTags: ["em", "strong", "br", "span"],
-    allowedAttributes: {
-      span: [],
-    },
-  });
-
-const safeGreeting = sanitize(greeting);
-const safeName = sanitize(name);
-const safeDescription = sanitize(description);
+const safeGreeting = sanitizeStrict(greeting);
+const safeName = sanitizeStrict(name);
+const safeDescription = sanitizeStrict(description);
 ---
 
 <section class="hero-section">
