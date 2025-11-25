@@ -25,7 +25,12 @@ const featuredProjects = projects;
 
 <h2 slot="title" class="about-title scroll-target-title">{title}</h2>
 
-<div class="about-content scroll-target-content featured-works-container">
+<div
+  class:list={[
+    "about-content scroll-target-content featured-works-container",
+    featuredProjects.length % 2 !== 0 ? "single-column" : "double-column",
+  ]}
+>
   {
     featuredProjects.map((project) => {
       return (
@@ -35,6 +40,7 @@ const featuredProjects = projects;
           imageAlt={project.data.imageAlt}
           githubUrl={project.data.githubUrl}
           slug={project.slug}
+          isDoubleColumn={featuredProjects.length % 2 === 0}
         />
       );
     })
@@ -55,11 +61,17 @@ const featuredProjects = projects;
   /* Apply 2-column layout on wider screens */
   @media (min-width: 696px) {
     /* Adjust breakpoint as needed (e.g., 992px for larger screens) */
-    .featured-works-container {
+    .featured-works-container.double-column {
       width: 100%;
       grid-template-columns: repeat(2, 1fr);
     }
+
+    /* Force single column if odd number of items */
+    .featured-works-container.single-column {
+      grid-template-columns: 1fr;
+    }
   }
+
   .button-group {
     display: flex;
     gap: 1rem; /* Adjust spacing as needed */

@@ -11,6 +11,7 @@ interface Props {
   homepageSummary?: string; // Use concise summary
   githubUrl?: string;
   slug: string; // Slug for linking to the project page
+  isDoubleColumn?: boolean;
 }
 
 const {
@@ -18,13 +19,14 @@ const {
   homepageSummary = "Click to learn more...", // Default summary
   githubUrl,
   slug,
+  isDoubleColumn = false,
 } = Astro.props;
 
 // Construct URL with query parameter instead of hash
 const projectUrl = `/projects?scrollTo=${encodeURIComponent(slug)}`;
 ---
 
-<a href={projectUrl} class="featured-project-card">
+<a href={projectUrl} class:list={["featured-project-card", { "double-column": isDoubleColumn }]}>
   <div class="card-content-wrapper">
     <h4>{title}</h4>
     <RichText tag="p" class="summary" inline content={homepageSummary} />
@@ -63,7 +65,7 @@ const projectUrl = `/projects?scrollTo=${encodeURIComponent(slug)}`;
   }
 
   @media (min-width: 1024px) {
-    .featured-project-card {
+    .featured-project-card.double-column {
       width: clamp(20vw, 25vw, 30vw);
     }
   }
