@@ -1,12 +1,13 @@
 ---
 // src/components/common/Button.astro
 import type { HTMLAttributes } from "astro/types";
+import { Icon } from "astro-icon/components";
 
 interface Props extends HTMLAttributes<"a"> {
   href: string;
   text: string;
   download?: string | boolean; // Optional: true or suggested filename
-  icon?: string | null; // Optional icon content (rendered as HTML)
+  icon?: string | null; // Optional icon content (plain text or iconify name like "lucide:download")
   wrapperClass?: string; // Optional class for the wrapper div
   iconPosition?: "left" | "right"; // Optional icon position, defaults to left
   noMargin?: boolean; // Optional: remove bottom margin
@@ -26,26 +27,25 @@ const {
 
 // Determine the final download attribute value
 const downloadAttr = download === "" ? true : download;
+
+const iconName = typeof icon === "string" && icon.includes(":") ? icon : undefined;
+const iconText = typeof icon === "string" && !iconName ? icon : null;
 ---
 
 <div class:list={["button-wrapper", wrapperClass, { "no-margin": noMargin }]}>
   <a href={href} download={downloadAttr} class:list={["button button-link", className]} {...rest}>
     {/* Add specific class to span based on position */}
-    {
-      iconPosition === "left" && icon && (
-        <span aria-hidden="true" class="button-icon icon-left">
-          {icon}
-        </span>
-      )
-    }
+    {iconPosition === "left" && icon ? (
+      <span aria-hidden="true" class="button-icon icon-left">
+        {iconName ? <Icon name={iconName} size={16} /> : iconText}
+      </span>
+    ) : null}
     {text}
-    {
-      iconPosition === "right" && icon && (
-        <span aria-hidden="true" class="button-icon icon-right">
-          {icon}
-        </span>
-      )
-    }
+    {iconPosition === "right" && icon ? (
+      <span aria-hidden="true" class="button-icon icon-right">
+        {iconName ? <Icon name={iconName} size={16} /> : iconText}
+      </span>
+    ) : null}
   </a>
 </div>
 
@@ -89,8 +89,11 @@ const downloadAttr = download === "" ? true : download;
 
   .button-icon {
     margin: 0; /* Reset margin */
-    display: inline-block;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
     vertical-align: middle;
+    line-height: 0;
   }
 
   /* Style based on explicit class */
