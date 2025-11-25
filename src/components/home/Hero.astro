@@ -1,4 +1,6 @@
 ---
+import sanitizeHtml from "sanitize-html";
+
 interface Props {
   data: {
     greeting: string;
@@ -9,13 +11,25 @@ interface Props {
 
 const { data } = Astro.props;
 const { greeting, name, description } = data;
+
+const sanitize = (value: string) =>
+  sanitizeHtml(value || "", {
+    allowedTags: ["em", "strong", "br", "span"],
+    allowedAttributes: {
+      span: [],
+    },
+  });
+
+const safeGreeting = sanitize(greeting);
+const safeName = sanitize(name);
+const safeDescription = sanitize(description);
 ---
 
 <section class="hero-section">
   <div class="hero-content">
-    <div class="hero-greeting">{greeting}</div>
-    <div class="hero-name">{name}</div>
-    <div class="hero-description">{description}</div>
+    <div class="hero-greeting" set:html={safeGreeting} />
+    <div class="hero-name" set:html={safeName} />
+    <div class="hero-description" set:html={safeDescription} />
   </div>
   <!-- Scroll Down Icon Removed -->
 </section>
