@@ -1,18 +1,17 @@
 import { getCollection, type CollectionEntry } from "astro:content";
 import type { AstroComponentFactory } from "astro/runtime/server/index.js";
+import type { SkillCategory as GridSkillCategory } from "../components/resume/templates/SkillGrid.astro";
+import type { ContactItem as ResumeContactItem } from "../components/resume/templates/ContactList.astro";
+import { getPageMetadata, type PageMetadata } from "../lib/viewmodels/baseViewModel";
 
 type ResumeCollectionEntry = CollectionEntry<"resume">;
+type ResumeCollectionData = ResumeCollectionEntry["data"];
 
-export type ResumeAction = {
-  text: string;
-  href: string;
-  style?: string;
-  download?: string;
-  icon?: string;
-  iconPosition?: "left" | "right";
-  target?: string;
-  rel?: string;
-};
+type TypedResumeData = Extract<ResumeCollectionData, { type: string }>;
+type StandardEntryData = Exclude<ResumeCollectionData, TypedResumeData>;
+type AwardsEntryData = Extract<ResumeCollectionData, { type: "awards" }>;
+type SkillsEntryData = Extract<ResumeCollectionData, { type: "skills" }>;
+type ContactEntryData = Extract<ResumeCollectionData, { type: "contact" }>;
 
 export type ResumeEntryItem = {
   title: string;
@@ -21,20 +20,6 @@ export type ResumeEntryItem = {
   details?: string[];
   order?: number;
   Content?: AstroComponentFactory;
-};
-
-type SkillCategory = {
-  category: string;
-  items: string[];
-};
-
-type ContactContentItem = {
-  icon: string;
-  label?: string;
-  href?: string;
-  target?: string;
-  rel?: string;
-  description?: string;
 };
 
 type TextResumeSection = {
@@ -58,7 +43,7 @@ type SkillsResumeSection = {
   id: string;
   title: string;
   type: "skills";
-  content: SkillCategory[];
+  content: GridSkillCategory[];
   visible?: boolean;
 };
 
@@ -66,7 +51,7 @@ type ContactResumeSection = {
   id: string;
   title: string;
   type: "contact";
-  content: ContactContentItem[];
+  content: ResumeContactItem[];
   visible?: boolean;
 };
 
@@ -76,19 +61,28 @@ export type ResumeSection =
   | SkillsResumeSection
   | ContactResumeSection;
 
-export type ResumeMetadata = {
-  title: string;
-  subtitle?: string;
-  date?: string;
-  order?: number;
-  actions?: ResumeAction[];
-};
 
 const sortByOrder = <T extends { order?: number }>(items: T[]) =>
   items.sort((a, b) => (a.order ?? Infinity) - (b.order ?? Infinity));
 
 const getOrder = (entry: ResumeCollectionEntry): number | undefined =>
   "order" in entry.data ? entry.data.order : undefined;
+
+const isStandardEntry = (entry: ResumeCollectionEntry): entry is ResumeCollectionEntry & {
+  data: StandardEntryData;
+} => !("type" in entry.data);
+
+const isAwardsEntry = (entry: ResumeCollectionEntry): entry is ResumeCollectionEntry & {
+  data: AwardsEntryData;
+} => "type" in entry.data && entry.data.type === "awards";
+
+const isSkillsEntry = (entry: ResumeCollectionEntry): entry is ResumeCollectionEntry & {
+  data: SkillsEntryData;
+} => "type" in entry.data && entry.data.type === "skills";
+
+const isContactEntry = (entry: ResumeCollectionEntry): entry is ResumeCollectionEntry & {
+  data: ContactEntryData;
+} => "type" in entry.data && entry.data.type === "contact";
 
 /**
  * Resume page view model
@@ -97,18 +91,24 @@ const getOrder = (entry: ResumeCollectionEntry): number | undefined =>
 export async function getResumeViewModel(): Promise<{
   mainColumn: ResumeSection[];
   sidebar: ResumeSection[];
-  metadata: ResumeMetadata;
+  metadata: PageMetadata;
 }> {
   // Fetch all resume content
   const allResumeContent = await getCollection("resume");
 
   // Filter profile
-  const profileEntry = allResumeContent.find((entry) => entry.id.startsWith("profile/"));
+  const profileEntry = allResumeContent.find(
+    (entry): entry is ResumeCollectionEntry & { data: StandardEntryData } =>
+      entry.id.startsWith("profile/") && isStandardEntry(entry)
+  );
   if (!profileEntry) throw new Error("Profile entry not found");
   const { Content: ProfileContent } = await profileEntry.render();
 
   // Filter education entries
-  const educationEntries = allResumeContent.filter((entry) => entry.id.startsWith("education/"));
+  const educationEntries = allResumeContent.filter(
+    (entry): entry is ResumeCollectionEntry & { data: StandardEntryData } =>
+      entry.id.startsWith("education/") && isStandardEntry(entry)
+  );
   const education: ResumeEntryItem[] = await Promise.all(
     educationEntries.map(async (entry) => {
       const { Content } = await entry.render();
@@ -124,7 +124,10 @@ export async function getResumeViewModel(): Promise<{
   sortByOrder(education);
 
   // Filter experience entries
-  const experienceEntries = allResumeContent.filter((entry) => entry.id.startsWith("experience/"));
+  const experienceEntries = allResumeContent.filter(
+    (entry): entry is ResumeCollectionEntry & { data: StandardEntryData } =>
+      entry.id.startsWith("experience/") && isStandardEntry(entry)
+  );
   const experience: ResumeEntryItem[] = await Promise.all(
     experienceEntries.map(async (entry) => {
       const { Content } = await entry.render();
@@ -140,7 +143,10 @@ export async function getResumeViewModel(): Promise<{
   sortByOrder(experience);
 
   // Filter project entries
-  const projectEntries = allResumeContent.filter((entry) => entry.id.startsWith("projects/"));
+  const projectEntries = allResumeContent.filter(
+    (entry): entry is ResumeCollectionEntry & { data: StandardEntryData } =>
+      entry.id.startsWith("projects/") && isStandardEntry(entry)
+  );
   const projects: ResumeEntryItem[] = await Promise.all(
     projectEntries.map(async (entry) => {
       const { Content } = await entry.render();
@@ -155,21 +161,30 @@ export async function getResumeViewModel(): Promise<{
   sortByOrder(projects);
 
   // Fetch awards data
-  const awardsEntry = allResumeContent.find((entry) => entry.id === "awards.mdx");
-  if (!awardsEntry || awardsEntry.data.type !== "awards") {
-    console.error("Awards entry has wrong type:", awardsEntry?.data.type);
+  const awardsEntry = allResumeContent.find(
+    (entry): entry is ResumeCollectionEntry & { data: AwardsEntryData } =>
+      entry.id === "awards.mdx" && isAwardsEntry(entry)
+  );
+  if (!awardsEntry) {
+    console.error("Awards entry has wrong type or missing");
     throw new Error("Awards entry invalid type");
   }
 
   // Fetch skills data
-  const skillsEntry = allResumeContent.find((entry) => entry.id === "skills.mdx");
-  if (!skillsEntry || skillsEntry.data.type !== "skills") {
+  const skillsEntry = allResumeContent.find(
+    (entry): entry is ResumeCollectionEntry & { data: SkillsEntryData } =>
+      entry.id === "skills.mdx" && isSkillsEntry(entry)
+  );
+  if (!skillsEntry) {
     throw new Error("Skills entry not found or invalid");
   }
 
   // Fetch contact data
-  const contactEntry = allResumeContent.find((entry) => entry.id === "contact.mdx");
-  if (!contactEntry || contactEntry.data.type !== "contact") {
+  const contactEntry = allResumeContent.find(
+    (entry): entry is ResumeCollectionEntry & { data: ContactEntryData } =>
+      entry.id === "contact.mdx" && isContactEntry(entry)
+  );
+  if (!contactEntry) {
     throw new Error("Contact entry not found or invalid");
   }
 
@@ -212,26 +227,28 @@ export async function getResumeViewModel(): Promise<{
       id: "skills",
       title: skillsEntry.data.title,
       type: "skills",
-      content: skillsEntry.data.content,
+      content: skillsEntry.data.content.map((category): GridSkillCategory => ({
+        name: category.category,
+        items: category.items,
+      })),
     },
     {
       id: "contact",
       title: contactEntry.data.title,
       type: "contact",
-      content: contactEntry.data.content,
+      content: contactEntry.data.content.map((item): ResumeContactItem => ({
+        icon: item.icon,
+        label: item.label ?? item.description ?? item.icon,
+        href: item.href,
+        target: item.target,
+        rel: item.rel,
+      })),
     },
   ];
 
-  // Fetch metadata
-  const metadataEntry = allResumeContent.find((entry) => entry.id === "metadata.mdx");
-  if (!metadataEntry) throw new Error("Metadata entry not found");
-  const metadata: ResumeMetadata = {
-    title: metadataEntry.data.title,
-    subtitle: metadataEntry.data.subtitle,
-    date: metadataEntry.data.date,
-    order: getOrder(metadataEntry),
-    actions: "actions" in metadataEntry.data ? metadataEntry.data.actions : undefined,
-  };
+  // Fetch metadata from centralized page-metadata collection
+  const metadata = await getPageMetadata("resume");
+
 
   return {
     mainColumn,

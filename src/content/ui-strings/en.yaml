@@ -6,8 +6,6 @@ footer:
   copyrightText: "All rights reserved"
 
 pages:
-  projects:
-    title: "Projects"
   timeline:
-    title: "Timeline"
     filterAll: "All"
+

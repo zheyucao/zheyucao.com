@@ -1,12 +1,16 @@
-import { getCollection, getEntry } from "astro:content";
+import { getCollection } from "astro:content";
+import { getPageMetadata } from "../lib/viewmodels/baseViewModel";
 
 /**
  * Projects page view model
  * Fetches and prepares project data for the projects page
  */
 export async function getProjectsViewModel() {
-  // Fetch all projects
-  const allProjects = await getCollection("projects");
+  // Fetch metadata and projects in parallel
+  const [metadata, allProjects] = await Promise.all([
+    getPageMetadata("projects"),
+    getCollection("projects"),
+  ]);
 
   // Render MDX content for each project
   const projects = await Promise.all(
@@ -25,12 +29,8 @@ export async function getProjectsViewModel() {
     return orderA - orderB;
   });
 
-  // Fetch UI strings
-  const uiStrings = await getEntry("ui-strings", "en");
-  const pageTitle = uiStrings.data.pages.projects.title;
-
   return {
+    metadata,
     projects,
-    pageTitle,
   };
 }

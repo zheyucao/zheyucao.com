@@ -55,6 +55,19 @@ const sections = defineCollection({
   }),
 });
 
+// Shared action schema for reuse across collections
+const actionSchema = z.object({
+  text: z.string(),
+  href: z.string(),
+  style: z.string().optional(),
+  download: z.string().optional(),
+  icon: z.string().optional(),
+  iconPosition: z.enum(["left", "right"]).optional(),
+  target: z.string().optional(),
+  rel: z.string().optional(),
+});
+
+
 const resume = defineCollection({
   type: "content",
   schema: z.union([
@@ -101,20 +114,7 @@ const resume = defineCollection({
       subtitle: z.string().optional(),
       date: z.string().optional(),
       order: z.number().optional(), // Manual ordering
-      actions: z
-        .array(
-          z.object({
-            text: z.string(),
-            href: z.string(),
-            style: z.string().optional(),
-            download: z.string().optional(),
-            icon: z.string().optional(),
-            iconPosition: z.enum(["left", "right"]).optional(),
-            target: z.string().optional(),
-            rel: z.string().optional(),
-          })
-        )
-        .optional(),
+      actions: z.array(actionSchema).optional(),
     }),
   ]),
 });
@@ -146,6 +146,22 @@ const contact = defineCollection({
   ]),
 });
 
+const page_metadata = defineCollection({
+  type: "content",
+  schema: z.object({
+    title: z.string(),
+    subtitle: z.string().optional(),
+    description: z.string().optional(),
+    actions: z.array(actionSchema).optional(),
+    seo: z.object({
+      ogTitle: z.string().optional(),
+      ogDescription: z.string().optional(),
+      ogImage: z.string().optional(),
+      twitterCard: z.string().optional(),
+    }).optional(),
+  }),
+});
+
 const ui_strings = defineCollection({
   type: "data",
   schema: z.object({
@@ -157,11 +173,7 @@ const ui_strings = defineCollection({
       copyrightText: z.string(),
     }),
     pages: z.object({
-      projects: z.object({
-        title: z.string(),
-      }),
       timeline: z.object({
-        title: z.string(),
         filterAll: z.string(),
       }),
     }),
@@ -175,4 +187,5 @@ export const collections = {
   resume,
   contact,
   "ui-strings": ui_strings,
+  "page-metadata": page_metadata,
 };

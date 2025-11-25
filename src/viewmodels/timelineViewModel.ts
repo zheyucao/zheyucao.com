@@ -1,6 +1,7 @@
 import { getCollection, getEntry } from "astro:content";
 import MarkdownIt from "markdown-it";
 import sanitizeHtml from "sanitize-html";
+import { getPageMetadata } from "../lib/viewmodels/baseViewModel";
 
 const md = new MarkdownIt({
   html: true,
@@ -42,12 +43,12 @@ export async function getTimelineViewModel() {
     description: event.body, // Pass raw body as description
     renderedDescription: event.body
       ? sanitizeHtml(md.render(event.body), {
-          allowedTags: sanitizeHtml.defaults.allowedTags.concat(["img"]),
-          allowedAttributes: {
-            ...sanitizeHtml.defaults.allowedAttributes,
-            img: ["src", "alt", "width", "height"],
-          },
-        })
+        allowedTags: sanitizeHtml.defaults.allowedTags.concat(["img"]),
+        allowedAttributes: {
+          ...sanitizeHtml.defaults.allowedAttributes,
+          img: ["src", "alt", "width", "height"],
+        },
+      })
       : "",
   }));
 
@@ -57,18 +58,22 @@ export async function getTimelineViewModel() {
   // Initial sort (newest first)
   const sortedEvents = [...allEvents].sort((a, b) => parseDate(b.date) - parseDate(a.date));
 
-  // Fetch UI strings
-  const uiStrings = await getEntry("ui-strings", "en");
+  // Fetch metadata and UI strings in parallel
+  const [metadata, uiStrings] = await Promise.all([
+    getPageMetadata("timeline"),
+    getEntry("ui-strings", "en"),
+  ]);
+
   if (!uiStrings) {
     throw new Error("Could not find UI strings for 'en'");
   }
-  const { title: pageTitle, filterAll } = uiStrings.data.pages.timeline;
+  const { filterAll } = uiStrings.data.pages.timeline;
 
   return {
     events: allEvents,
     categories,
     initialEvents: sortedEvents,
-    pageTitle,
+    metadata,
     filterAll,
   };
 }

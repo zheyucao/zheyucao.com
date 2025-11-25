@@ -3,10 +3,30 @@ import SubPageLayout from "../layouts/SubPageLayout.astro";
 import { getContactViewModel } from "../viewmodels/contactViewModel";
 import { Icon } from "astro-icon/components";
 import Tooltip from "../components/common/Tooltip.astro";
-const { intro, sections } = await getContactViewModel();
+import Button from "../components/common/Button.astro";
+
+const { intro, sections, metadata } = await getContactViewModel();
 ---
 
-<SubPageLayout title="Contact">
+<SubPageLayout title={metadata.title}>
+  {
+    metadata.actions &&
+      metadata.actions.map((action) => (
+        <Button
+          slot="actions"
+          href={action.href}
+          text={action.text}
+          style={action.style}
+          download={action.download}
+          icon={action.icon}
+          iconPosition={action.iconPosition}
+          target={action.target}
+          rel={action.rel}
+          noMargin={true}
+          wrapperClass="page-load-initial-state"
+        />
+      ))
+  }
   <div class="contact-content">
     {
       intro && (

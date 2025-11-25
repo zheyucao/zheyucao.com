@@ -1,4 +1,5 @@
 import { getCollection, type CollectionEntry } from "astro:content";
+import { getPageMetadata, type PageMetadata } from "../lib/viewmodels/baseViewModel";
 
 export interface ContactItem {
   icon: string;
@@ -24,6 +25,7 @@ export interface ContactIntro {
 }
 
 export interface ContactViewModel {
+  metadata: PageMetadata;
   intro?: ContactIntro;
   sections: ContactSection[];
 }
@@ -33,7 +35,10 @@ export interface ContactViewModel {
  * Fetches contact data for the contact page
  */
 export async function getContactViewModel(): Promise<ContactViewModel> {
-  const contactEntries = await getCollection("contact");
+  const [metadata, contactEntries] = await Promise.all([
+    getPageMetadata("contact"),
+    getCollection("contact"),
+  ]);
 
   const introEntries = contactEntries.filter((entry) => entry.data.kind === "text");
   const sectionEntries = contactEntries.filter((entry) => entry.data.kind === "list");
@@ -43,8 +48,7 @@ export async function getContactViewModel(): Promise<ContactViewModel> {
   if (introEntries.length > 0) {
     introEntries.sort((a, b) => (a.data.order ?? Infinity) - (b.data.order ?? Infinity));
     const introEntry = introEntries[0] as CollectionEntry<"contact">;
-    const rendered = introEntry.rendered ?? (await introEntry.render());
-    const Content = rendered.Content;
+    const { Content } = await introEntry.render();
     intro = {
       order: introEntry.data.order ?? Infinity,
       Content,
@@ -54,8 +58,7 @@ export async function getContactViewModel(): Promise<ContactViewModel> {
   // Build section view models
   const sections = await Promise.all(
     sectionEntries.map(async (entry) => {
-      const rendered = entry.rendered ?? (await entry.render());
-      const { Content } = rendered;
+      const { Content } = await entry.render();
       const items = (entry.data as { items: ContactItem[] }).items;
       return {
         order: entry.data.order ?? Infinity,
@@ -69,6 +72,7 @@ export async function getContactViewModel(): Promise<ContactViewModel> {
   sections.sort((a, b) => a.order - b.order);
 
   return {
+    metadata,
     intro,
     sections,
   };
