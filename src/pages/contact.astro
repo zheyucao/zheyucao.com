@@ -151,12 +151,12 @@ const { intro, sections } = await getContactViewModel();
 </style>
 
 <script>
-  const handleCopy = async (el, value) => {
+  const handleCopy = async (el: HTMLElement, value: string) => {
     if (!value) return;
     const tooltip = el.closest(".tooltip");
     const bubble = tooltip?.querySelector(".tooltip-bubble");
     const labelEl = tooltip?.querySelector("[data-tooltip-label]");
-    const descEl = tooltip?.querySelector("[data-tooltip-desc]");
+    const descEl = tooltip?.querySelector("[data-tooltip-desc]") as HTMLElement | null;
 
     try {
       await navigator.clipboard.writeText(value);
@@ -178,7 +178,7 @@ const { intro, sections } = await getContactViewModel();
   };
 
   document.addEventListener("astro:page-load", () => {
-    const copyTargets = document.querySelectorAll(".contact-list [data-copy-value]");
+    const copyTargets = document.querySelectorAll<HTMLElement>(".contact-list [data-copy-value]");
     copyTargets.forEach((el) => {
       el.addEventListener("click", (event) => {
         const value = el.getAttribute("data-copy-value");
