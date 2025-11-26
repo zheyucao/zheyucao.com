@@ -24,17 +24,17 @@ const { title, entries, variant = "default" } = Astro.props;
   {
     entries.map((entry) => (
       <div class={`entry-item ${variant}-entry`}>
-        <div class="header">
+        <div class="title-row">
           <span class="title">
             <RichText content={entry.title} />
           </span>
-          {entry.subtitle && (
-            <span class="subtitle">
-              <RichText content={entry.subtitle} />
-            </span>
-          )}
           {entry.date && <span class="date">{entry.date}</span>}
         </div>
+        {entry.subtitle && (
+          <div class="subtitle">
+            <RichText content={entry.subtitle} />
+          </div>
+        )}
         {entry.Content ? (
           <div class="details">
             <entry.Content />
@@ -66,27 +66,27 @@ const { title, entries, variant = "default" } = Astro.props;
   .entry-item:last-child {
     margin-bottom: 0;
   }
-  .header {
+  .title-row {
     display: flex;
     justify-content: space-between;
     flex-wrap: wrap;
-    margin-bottom: 0.8rem;
     font-size: 1.2rem;
     align-items: baseline;
+    margin-bottom: 0.8rem;
   }
   .title {
     font-weight: bold;
     margin-right: 0.5rem;
   }
   .subtitle {
-    margin-right: auto; /* Push date to the right */
+    font-size: 1.1rem;
+    margin-bottom: 0.8rem;
   }
   .date {
     font-family: var(--font-family-sans);
     color: var(--text-muted);
     font-size: 1rem;
     white-space: nowrap;
-    margin-left: 1rem;
   }
   .details {
     margin-top: 0.8rem;
@@ -103,9 +103,9 @@ const { title, entries, variant = "default" } = Astro.props;
     margin-bottom: 0;
   }
 
-  .awards-entry .header {
+  .awards-entry .title-row {
     font-size: 1.1rem;
-    line-height: 1.5;
+    line-height: 1;
     margin-bottom: 0;
   }
 
@@ -113,24 +113,13 @@ const { title, entries, variant = "default" } = Astro.props;
     font-weight: normal;
   }
 
-  .awards-entry .date {
-    padding-left: 1rem;
-  }
-
   @media (max-width: 600px) {
-    .header {
+    .title-row {
       flex-direction: column;
       align-items: flex-start;
     }
     .date {
-      margin-left: 0;
       margin-top: 0.3rem;
-    }
-    .subtitle {
-      margin-right: 0;
-    }
-    .awards-entry .date {
-      padding-left: 0;
     }
   }
 </style>
