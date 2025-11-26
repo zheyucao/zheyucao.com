@@ -3,10 +3,7 @@ export class TimelineController {
   private currentFilter: string = "all";
   private categoryTabs: NodeListOf<HTMLElement>;
 
-  constructor(
-    containerId: string,
-    categoryTabsSelector: string
-  ) {
+  constructor(containerId: string, categoryTabsSelector: string) {
     const container = document.querySelector(containerId);
     if (!container) throw new Error(`Timeline container not found: ${containerId}`);
     this.container = container as HTMLElement;
