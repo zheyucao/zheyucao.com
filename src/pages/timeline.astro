@@ -48,23 +48,21 @@ const {
       }
     </div>
   </div>
+  <ul class="timeline-container mt-8" id="timeline-container">
+    {
+      initialFilteredEvents.map((event, index) => (
+        <TimelineEvent
+          date={event.date}
+          dateRange={event.dateRange}
+          title={event.title}
+          description={event.description}
+          category={event.category}
+          isLast={index === initialFilteredEvents.length - 1}
+        />
+      ))
+    }
+  </ul>
 </SubPageLayout>
-
-<ul class="timeline-container mt-8" id="timeline-container">
-  {/* Initial server-side render */}
-  {
-    initialFilteredEvents.map((event, index) => (
-      <TimelineEvent
-        date={event.date}
-        dateRange={event.dateRange}
-        title={event.title}
-        description={event.description}
-        category={event.category}
-        isLast={index === initialFilteredEvents.length - 1}
-      />
-    ))
-  }
-</ul>
 
 <script>
   import { TimelineController } from "../lib/controllers/TimelineController";

@@ -18,6 +18,7 @@ export class TimelineController {
   private init() {
     this.setupEventListeners();
     this.updateUI();
+    this.applyFilter();
   }
 
   private setupEventListeners() {
