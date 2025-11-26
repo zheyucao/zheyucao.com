@@ -30,7 +30,7 @@ export const siteConfig: SiteConfig = {
       { name: "Home", href: "/" },
       { name: "Timeline", href: "/timeline" },
       { name: "Projects", href: "/projects" },
-      { name: "Resume", href: "/resume" },
+      { name: "Résumé", href: "/resume" },
       { name: "Contact", href: "/contact" },
     ],
   },

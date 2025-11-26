@@ -92,7 +92,7 @@ const isContactEntry = (
 } => "type" in entry.data && entry.data.type === "contact";
 
 /**
- * Resume page view model
+ * Résumé page view model
  * Aggregates and organizes resume content into main column and sidebar
  */
 export async function getResumeViewModel(): Promise<{
