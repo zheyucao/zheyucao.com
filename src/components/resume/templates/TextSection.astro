@@ -1,0 +1,38 @@
+---
+import RichText from "../../common/RichText.astro";
+import type { AstroComponentFactory } from "astro/runtime/server/index.js";
+
+interface Props {
+  title: string;
+  content?: string[]; // Array of paragraphs (Markdown supported)
+  Content?: AstroComponentFactory; // MDX Content component
+}
+
+const { title, content, Content } = Astro.props;
+---
+
+<section class="resume-section scroll-reveal-animate">
+  <h2>{title}</h2>
+  {Content ? <Content /> : content ? <RichText content={content} /> : null}
+</section>
+
+<style>
+  .resume-section {
+    margin-bottom: 4rem;
+  }
+  h2 {
+    font-size: clamp(1.8rem, 1.5rem + 1.5vw, 2.8rem);
+    margin-bottom: 2rem;
+    font-weight: 600;
+    border-bottom: 1px solid var(--text-muted);
+    padding-bottom: 0.5rem;
+  }
+  p {
+    line-height: 1.6;
+    font-size: 1.1rem;
+    margin-bottom: 1rem;
+  }
+  p:last-child {
+    margin-bottom: 0;
+  }
+</style>

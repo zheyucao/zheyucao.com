@@ -1,65 +1,77 @@
 ---
 import SubPageLayout from "../layouts/SubPageLayout.astro";
-import Education from "../components/resume/Education.astro";
-import Experience from "../components/resume/Experience.astro";
-import Skills from "../components/resume/Skills.astro";
-import Awards from "../components/resume/Awards.astro";
-import ContactInfo from "../components/resume/ContactInfo.astro";
-import Profile from "../components/resume/Profile.astro";
-import Projects from "../components/resume/Projects.astro";
+import ResumeSectionRenderer from "../components/resume/ResumeSectionRenderer.astro";
 import Button from "../components/common/Button.astro";
+import { getResumeViewModel } from "../viewmodels/resumeViewModel";
+
+const { mainColumn, sidebar, metadata } = await getResumeViewModel();
+const { title, actions } = metadata;
 ---
 
-<SubPageLayout title="Résumé">
-  <Button
-    href="https://assets.zheyucao.com/resume.pdf"
-    text="Download Résumé PDF (in Chinese)"
-    download="Zheyu_Cao_Resume_ZH.pdf"
-    icon="↓"
-    iconPosition="left"
-    target="_blank"
-    rel="noopener noreferrer"
-    wrapperClass="resume-page-download"
-  />
-  <div class="resume-columns-wrapper">
-    <div class="resume-main-column">
-      <Profile />
-      <Education />
-      <Awards />
-      <Experience />
-      <Projects />
+<SubPageLayout title={title}>
+  {
+    actions &&
+      actions.map((action) => (
+        <Button
+          slot="actions"
+          href={action.href}
+          text={action.text}
+          style={action.style}
+          download={action.download}
+          icon={action.icon}
+          iconPosition={action.iconPosition}
+          target={action.target}
+          rel={action.rel}
+          noMargin={true}
+          wrapperClass="page-load-initial-state"
+        />
+      ))
+  }
+
+  <div class="resume-container">
+    <div class="main-column">
+      {mainColumn.map((section) => <ResumeSectionRenderer section={section} />)}
     </div>
-    <div class="resume-sidebar">
-      <Skills />
-      <ContactInfo />
-    </div>
+
+    <aside class="sidebar">
+      {sidebar.map((section) => <ResumeSectionRenderer section={section} />)}
+    </aside>
   </div>
 </SubPageLayout>
 
 <style>
-  /* --- Column Layout Styles --- */
-  .resume-columns-wrapper {
-    display: flex;
-    flex-direction: row;
-    gap: 5vw;
+  .resume-container {
+    display: grid;
+    grid-template-columns: 1fr 240px;
+    gap: 4rem;
+    max-width: 1200px;
+    margin: 0 auto;
   }
-  .resume-main-column {
-    flex: 5;
-    min-width: 0;
-    font-size: 1.1rem; /* Keep increased font size */
+
+  .main-column {
+    min-width: 0; /* Prevent overflow in grid items */
+    font-size: 1.1rem;
   }
-  .resume-sidebar {
-    flex: 2;
-    min-width: 0;
-    font-size: 1.1rem; /* Keep increased font size */
+
+  .sidebar {
+    position: sticky;
+    top: 2rem;
+    height: fit-content;
+    font-size: 1.1rem;
   }
-  @media (max-width: 900px) {
-    .resume-columns-wrapper {
-      flex-direction: column;
-      gap: 0;
+
+  .download-section {
+    margin-bottom: 3rem;
+  }
+
+  @media (max-width: 1200px) {
+    .resume-container {
+      grid-template-columns: 1fr;
+      gap: 3rem;
     }
-    .resume-sidebar {
-      margin-top: 0;
+
+    .sidebar {
+      position: static;
     }
   }
 </style>

@@ -1,10 +1,12 @@
 ---
 import { Icon } from "astro-icon/components";
+import { Image } from "astro:assets";
+import type { ImageMetadata } from "astro";
 
 interface Props {
   id?: string;
   title: string;
-  imageSrc?: string;
+  imageSrc?: ImageMetadata;
   imageAlt?: string;
   timeframe?: string;
   projectUrl?: string;
@@ -30,7 +32,7 @@ const {
   {
     imageSrc && (
       <div class="project-image-wrapper">
-        <img src={imageSrc} alt={imageAlt} class="project-image" loading="lazy" />
+        <Image src={imageSrc} alt={imageAlt} class="project-image" />
       </div>
     )
   }
@@ -143,7 +145,7 @@ const {
     padding: 2rem; /* Increased padding inside card */
     display: flex;
     flex-direction: column;
-    flex-grow: 1; /* Allow content to fill remaining space */
+    /* flex-grow: 1; Removed to prevent stretching */
   }
 
   .project-header {
@@ -217,7 +219,7 @@ const {
   .project-body {
     font-size: 1.1rem;
     line-height: 1.8;
-    flex-grow: 1;
+    /* flex-grow: 1; Removed */
   }
   .project-body :global(p) {
     margin-bottom: 1em;
@@ -250,7 +252,7 @@ const {
       threshold: 0.2,
     };
 
-    const observerCallback = (entries, observer) => {
+    const observerCallback: IntersectionObserverCallback = (entries, observer) => {
       entries.forEach((entry) => {
         // console.log("Observing:", entry.target, "Is intersecting:", entry.isIntersecting); // Removed debug log
         if (entry.isIntersecting) {

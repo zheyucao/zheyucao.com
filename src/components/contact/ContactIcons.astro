@@ -1,0 +1,191 @@
+---
+import Tooltip from "../common/Tooltip.astro";
+import { Icon } from "astro-icon/components";
+
+interface ContactIconItem {
+  icon: string;
+  label?: string; // display label
+  content?: string; // underlying value (e.g., number/handle) for copy/display
+  href?: string;
+  target?: string;
+  rel?: string;
+  description?: string;
+}
+
+interface Props {
+  items?: ContactIconItem[];
+}
+
+const { items = [] } = Astro.props;
+---
+
+<div class="contact-icons">
+  {
+    items.map((item) => {
+      const value = item.content || item.href || item.label || "Link";
+      const displayLabel = value;
+      const description = item.description;
+      const copyValue = item.href ? undefined : value;
+      const secondary = description || undefined;
+      return (
+        <Tooltip label={displayLabel} position="bottom">
+          <div slot="bubble">
+            <div class="tooltip-label" data-tooltip-label data-original-label={displayLabel}>
+              {displayLabel}
+            </div>
+            {secondary && (
+              <div class="tooltip-desc" data-tooltip-desc data-original-desc={secondary}>
+                {secondary}
+              </div>
+            )}
+          </div>
+          {item.href ? (
+            <a
+              href={item.href}
+              target={item.target}
+              rel={item.rel}
+              aria-label={displayLabel}
+              data-link-icon
+            >
+              <Icon name={item.icon} size={22} aria-hidden="true" />
+            </a>
+          ) : (
+            <span
+              class="icon-placeholder"
+              role="img"
+              aria-label={displayLabel}
+              data-copy-value={copyValue}
+            >
+              <Icon name={item.icon} size={22} aria-hidden="true" />
+            </span>
+          )}
+        </Tooltip>
+      );
+    })
+  }
+</div>
+
+<style>
+  .contact-icons {
+    display: flex;
+    align-items: center;
+    gap: 1.8rem;
+  }
+
+  .contact-icons a,
+  .contact-icons .icon-placeholder {
+    color: var(--theme-icon-color);
+    opacity: 0.8;
+    transition:
+      opacity 0.2s ease,
+      color 0.2s ease;
+    display: inline-block;
+  }
+
+  .contact-icons a:hover,
+  .contact-icons a:focus,
+  .contact-icons .icon-placeholder:hover,
+  .contact-icons .icon-placeholder:focus {
+    opacity: 1;
+    color: var(--theme-accent);
+    outline: none;
+  }
+
+  .contact-icons .icon-placeholder {
+    cursor: pointer;
+  }
+
+  .tooltip-bubble.copy-active {
+    background: var(--button-hover-bg, rgba(0, 0, 0, 0.06));
+    color: var(--theme-text, #111);
+  }
+
+  .tooltip.hide-bubble .tooltip-bubble {
+    opacity: 0;
+    visibility: hidden;
+    transform: translate(-50%, 0);
+  }
+</style>
+
+<script>
+  const handleCopy = async (el: Element, value: string) => {
+    const tooltip = el.closest(".tooltip");
+    const bubble = tooltip?.querySelector(".tooltip-bubble");
+    const labelEl = tooltip?.querySelector("[data-tooltip-label]");
+    const descEl = tooltip?.querySelector("[data-tooltip-desc]");
+
+    try {
+      await navigator.clipboard.writeText(value);
+
+      if (labelEl) {
+        const originalLabel =
+          labelEl.getAttribute("data-original-label") || labelEl.textContent || "Copied!";
+        labelEl.textContent = "Copied!";
+
+        if (descEl) {
+          (descEl as HTMLElement).style.display = "none";
+        }
+        if (bubble) {
+          bubble.classList.add("copy-active");
+        }
+
+        setTimeout(() => {
+          labelEl.textContent = originalLabel;
+          if (descEl) {
+            (descEl as HTMLElement).style.display = "";
+          }
+          if (bubble) {
+            bubble.classList.remove("copy-active");
+          }
+        }, 1200);
+      }
+    } catch (e) {
+      console.error("Unable to copy contact value:", e);
+    }
+  };
+
+  // Track listeners for cleanup
+  const copyListeners = new Map();
+  const linkListeners = new Map();
+
+  document.addEventListener("astro:page-load", () => {
+    const copyTargets = document.querySelectorAll(".contact-icons [data-copy-value]");
+    copyTargets.forEach((el) => {
+      const handler = (event: Event) => {
+        const value = el.getAttribute("data-copy-value");
+        if (!value) return;
+        event.preventDefault();
+        handleCopy(el, value);
+      };
+      el.addEventListener("click", handler);
+      copyListeners.set(el, handler);
+    });
+
+    const linkTargets = document.querySelectorAll(".contact-icons [data-link-icon]");
+    linkTargets.forEach((el) => {
+      const handler = () => {
+        const tooltip = el.closest(".tooltip");
+        if (!tooltip) return;
+        tooltip.classList.add("hide-bubble");
+        setTimeout(() => tooltip.classList.remove("hide-bubble"), 250);
+      };
+      el.addEventListener("click", handler);
+      linkListeners.set(el, handler);
+    });
+  });
+
+  // Cleanup on navigation
+  document.addEventListener("astro:before-swap", () => {
+    // Remove all copy listeners
+    copyListeners.forEach((handler, el) => {
+      el.removeEventListener("click", handler);
+    });
+    copyListeners.clear();
+
+    // Remove all link listeners
+    linkListeners.forEach((handler, el) => {
+      el.removeEventListener("click", handler);
+    });
+    linkListeners.clear();
+  });
+</script>

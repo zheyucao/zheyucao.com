@@ -1,0 +1,125 @@
+---
+import RichText from "../../common/RichText.astro";
+import type { AstroComponentFactory } from "astro/runtime/server/index.js";
+
+export interface EntryItem {
+  title: string;
+  subtitle?: string;
+  date?: string;
+  details?: string[];
+  Content?: AstroComponentFactory;
+}
+
+interface Props {
+  title: string;
+  entries: EntryItem[];
+  variant?: "default" | "education" | "experience" | "awards" | "projects";
+}
+
+const { title, entries, variant = "default" } = Astro.props;
+---
+
+<section class="resume-section scroll-reveal-animate">
+  <h2>{title}</h2>
+  {
+    entries.map((entry) => (
+      <div class={`entry-item ${variant}-entry`}>
+        <div class="title-row">
+          <span class="title">
+            <RichText content={entry.title} />
+          </span>
+          {entry.date && <span class="date">{entry.date}</span>}
+        </div>
+        {entry.subtitle && (
+          <div class="subtitle">
+            <RichText content={entry.subtitle} />
+          </div>
+        )}
+        {entry.Content ? (
+          <div class="details">
+            <entry.Content />
+          </div>
+        ) : entry.details ? (
+          <div class="details">
+            <RichText content={entry.details} />
+          </div>
+        ) : null}
+      </div>
+    ))
+  }
+</section>
+
+<style>
+  .resume-section {
+    margin-bottom: 4rem;
+  }
+  h2 {
+    font-size: clamp(1.8rem, 1.5rem + 1.5vw, 2.8rem);
+    margin-bottom: 2rem;
+    font-weight: 600;
+    border-bottom: 1px solid var(--text-muted);
+    padding-bottom: 0.5rem;
+  }
+  .entry-item {
+    margin-bottom: 2.5rem;
+  }
+  .entry-item:last-child {
+    margin-bottom: 0;
+  }
+  .title-row {
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    font-size: 1.2rem;
+    align-items: baseline;
+    margin-bottom: 0.8rem;
+  }
+  .title {
+    font-weight: bold;
+    margin-right: 0.5rem;
+  }
+  .subtitle {
+    font-size: 1.1rem;
+    margin-bottom: 0.8rem;
+  }
+  .date {
+    font-family: var(--font-family-sans);
+    color: var(--text-muted);
+    font-size: 1rem;
+    white-space: nowrap;
+  }
+  .details {
+    margin-top: 0.8rem;
+    font-size: 1.1rem;
+    line-height: 1.8;
+  }
+
+  /* Awards variant - simpler layout */
+  .awards-entry {
+    margin-bottom: 1.5rem;
+  }
+
+  .awards-entry:last-child {
+    margin-bottom: 0;
+  }
+
+  .awards-entry .title-row {
+    font-size: 1.1rem;
+    line-height: 1;
+    margin-bottom: 0;
+  }
+
+  .awards-entry .title {
+    font-weight: normal;
+  }
+
+  @media (max-width: 600px) {
+    .title-row {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+    .date {
+      margin-top: 0.3rem;
+    }
+  }
+</style>

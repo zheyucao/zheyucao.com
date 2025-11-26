@@ -1,49 +1,71 @@
 ---
 // Component: src/components/Footer.astro
+import { siteConfig } from "../config";
+import { getEntry } from "astro:content";
+
 const currentYear = new Date().getFullYear();
+const { metadata, navigation } = siteConfig;
+
+const uiStrings = await getEntry("ui-strings", "en");
+if (!uiStrings) {
+  throw new Error("Could not find UI strings for 'en'");
+}
+const { footer: footerStrings } = uiStrings.data;
+
+// Load contact items for footer (single source of truth)
+import { getContactFooterItems } from "../viewmodels/contactViewModel";
+
+const contactFooterItems = await getContactFooterItems();
 ---
 
 <footer class="site-footer">
   <div class="footer-content">
     <div class="footer-column footer-column-1">
-      <h4>Zheyu Cao</h4>
+      <h4>{metadata.author}</h4>
       <p class="footer-description">
-        Currently a fourth-year student at Northwestern Polytechnical University, pursuing a
-        Bachelor's degree in Computer Science and Technology.
+        {metadata.description}
       </p>
-      <p class="copyright">&copy; {currentYear} Zheyu Cao. All rights reserved.</p>
+      <p class="copyright">
+        &copy; {currentYear}
+        {metadata.author}. {footerStrings.copyrightText}.
+      </p>
     </div>
     <div class="footer-column footer-column-2">
-      <h4>Links</h4>
+      <h4>{footerStrings.linksHeading}</h4>
       <ul>
-        <li><a href="/" data-astro-prefetch>Home</a></li>
-        <li><a href="/timeline" data-astro-prefetch>Timeline</a></li>
-        <li><a href="/projects" data-astro-prefetch>Projects</a></li>
-        <li><a href="/resume" data-astro-prefetch>Résumé</a></li>
-        <li><a href="/contact" data-astro-prefetch>Contact</a></li>
+        {
+          navigation.items.map((item) => (
+            <li>
+              <a href={item.href} data-astro-prefetch>
+                {item.name}
+              </a>
+            </li>
+          ))
+        }
       </ul>
     </div>
-    <div class="footer-column footer-column-3">
-      <h4>Connect</h4>
-      <ul>
-        <li>
-          <a
-            class="link"
-            href="https://github.com/zheyucao"
-            target="_blank"
-            rel="noopener noreferrer">GitHub</a
-          >
-        </li>
-        <li>
-          <a
-            class="link"
-            href="mailto:zheyucao2004@gmail.com"
-            target="_blank"
-            rel="noopener noreferrer">Email</a
-          >
-        </li>
-      </ul>
-    </div>
+    {
+      contactFooterItems.length > 0 && (
+        <div class="footer-column footer-column-3">
+          <h4>{footerStrings.connectHeading}</h4>
+          <ul>
+            {contactFooterItems.map((item) => (
+              <li>
+                <a
+                  class="link"
+                  href={item.href}
+                  target={item.target}
+                  rel={item.rel}
+                  aria-label={item.label || item.content || item.href}
+                >
+                  {item.label || item.content || item.href}
+                </a>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )
+    }
   </div>
 </footer>
 
@@ -163,66 +185,24 @@ const currentYear = new Date().getFullYear();
 </style>
 
 <script>
-  // GSAP Scroll-controlled animation for the footer
-  import { gsap } from "gsap";
-  import { ScrollTrigger } from "gsap/ScrollTrigger";
+  import { setupFooterAnimation } from "../lib/animations/footerAnimation";
 
-  function setupFooterAnimation() {
-    // Ensure plugin is registered (safe to call multiple times)
-    gsap.registerPlugin(ScrollTrigger);
+  let cleanup: (() => void) | null = null;
 
-    const footerElement = document.querySelector(".site-footer");
-    const pageWrapper = document.querySelector(".page-wrapper");
+  document.addEventListener("astro:page-load", () => {
+    const footer = document.querySelector(".site-footer") as HTMLElement | null;
+    const scroller = document.querySelector(".page-wrapper") as HTMLElement | null;
 
-    // Kill previous ScrollTriggers targeting the footer FIRST
-    ScrollTrigger.getAll().forEach((trigger) => {
-      // Simplify the check: Only kill triggers directly associated with footerElement
-      if (trigger.trigger === footerElement) {
-        trigger.kill();
-        console.log("Killed previous footer ScrollTrigger before setup (trigger match)"); // Debug log
-      }
-    });
-
-    if (footerElement && pageWrapper) {
-      gsap.fromTo(
-        footerElement,
-        { opacity: 0, y: 15 },
-        {
-          opacity: 1,
-          y: 0,
-          ease: "power1.in",
-          scrollTrigger: {
-            trigger: footerElement,
-            scroller: pageWrapper,
-            start: "top 95%",
-            end: "top 40%",
-            scrub: 1,
-            // markers: true,
-          },
-        }
-      );
-      console.log("Setup new footer ScrollTrigger (using pageWrapper scroller)");
-    } else {
-      console.warn("Footer animation setup skipped: elements not found.");
+    if (footer && scroller) {
+      cleanup = setupFooterAnimation({ footer, scroller });
     }
-  }
-
-  // Function to initialize, called on page load
-  function initializeFooter() {
-    setupFooterAnimation();
-  }
-
-  // Listen for a custom event to re-run the setup
-  document.addEventListener("refresh-footer-animation", () => {
-    console.log("Received refresh-footer-animation event, re-running setup...");
-    // Debounce or add checks if necessary, but directly calling setup is okay for now
-    setupFooterAnimation();
   });
 
-  // Run setup on initial load and after SPA navigations
-  // Ensure this listener doesn't add multiple 'refresh-footer-animation' listeners on navigations
-  // Using astro:page-load should be fine as the script re-runs
-  document.addEventListener("astro:page-load", initializeFooter);
+  // Cleanup on navigation
+  document.addEventListener("astro:before-swap", () => {
+    cleanup?.();
+    cleanup = null;
+  });
 </script>
 
 <script>

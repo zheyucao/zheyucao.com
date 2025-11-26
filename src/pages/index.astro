@@ -6,26 +6,29 @@ import MeetMeContent from "../components/home/content/MeetMeContent.astro";
 import FeaturedWorksContent from "../components/home/content/FeaturedWorksContent.astro";
 import HighlightsUpdatesContent from "../components/home/content/HighlightsUpdatesContent.astro";
 import ConnectContent from "../components/home/content/ConnectContent.astro";
+import { getHomeViewModel } from "../viewmodels/homeViewModel";
+
+const viewModel = await getHomeViewModel();
 ---
 
 <Layout title="Homepage">
   <main class="homepage-content">
-    <Hero />
+    <Hero data={viewModel.hero} />
 
     <SectionWrapper>
-      <MeetMeContent />
+      <MeetMeContent data={viewModel.meetMe} />
     </SectionWrapper>
 
     <SectionWrapper>
-      <FeaturedWorksContent />
+      <FeaturedWorksContent data={viewModel.featuredWorks} />
     </SectionWrapper>
 
     <SectionWrapper>
-      <HighlightsUpdatesContent />
+      <HighlightsUpdatesContent data={viewModel.highlights} />
     </SectionWrapper>
 
     <SectionWrapper>
-      <ConnectContent />
+      <ConnectContent data={{ ...viewModel.connect, socialItems: viewModel.connectSocialItems }} />
     </SectionWrapper>
   </main>
 </Layout>

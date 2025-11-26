@@ -1,64 +1,101 @@
 ---
 import SubPageLayout from "../layouts/SubPageLayout.astro";
-import { Icon } from "astro-icon/components"; // Import Icon component
+import { getContactViewModel } from "../viewmodels/contactViewModel";
+import { Icon } from "astro-icon/components";
+import Tooltip from "../components/common/Tooltip.astro";
+import Button from "../components/common/Button.astro";
+
+const { intro, sections, metadata } = await getContactViewModel();
 ---
 
-<SubPageLayout title="Contact">
+<SubPageLayout title={metadata.title}>
+  {
+    metadata.actions &&
+      metadata.actions.map((action) => (
+        <Button
+          slot="actions"
+          href={action.href}
+          text={action.text}
+          style={action.style}
+          download={action.download}
+          icon={action.icon}
+          iconPosition={action.iconPosition}
+          target={action.target}
+          rel={action.rel}
+          noMargin={true}
+          wrapperClass="page-load-initial-state"
+        />
+      ))
+  }
   <div class="contact-content">
-    <p class="intro-text">Feel free to reach out!</p>
-    <p class="intro-text">Emails are preferred and will be responded to within one working day.</p>
+    {
+      intro && (
+        <div class="intro-text">
+          <intro.Content />
+        </div>
+      )
+    }
 
-    {/* Section 1: Primary Contact */}
-    <h3 class="contact-section-title">Primary Contact</h3>
-    <p class="section-description">For academic or direct inquiries:</p>
-    <ul class="contact-list">
-      <li>
-        <Icon name="ri:mail-line" class="contact-icon" />
-        <a href="mailto:zheyucao2004@gmail.com">zheyucao2004@gmail.com</a> &nbsp;(Academic)
-      </li>
-      <li>
-        <Icon name="ri:mail-line" class="contact-icon" />
-        <a href="mailto:hi@zheyucao.com">hi@zheyucao.com</a> &nbsp;(Personal)
-      </li>
-      <li>
-        <Icon name="ri:github-line" class="contact-icon" />
-        <a href="https://github.com/zheyucao" target="_blank" rel="noopener noreferrer"
-          >github.com/zheyucao</a
-        >
-      </li>
-      <li>
-        <Icon name="ri:wechat-line" class="contact-icon" />
-        <span>aktsnnm</span>
-      </li>
-      <li>
-        <Icon name="ri:qq-line" class="contact-icon" />
-        <span>1060864974</span>
-      </li>
-      <li>
-        <Icon name="ri:planet-line" class="contact-icon" />
-        <a href="https://zheyucao.com" target="_blank" rel="noopener noreferrer"
-          >https://zheyucao.com</a
-        >
-      </li>
-    </ul>
+    {
+      sections.map((section) => (
+        <>
+          <div class="section-prose">
+            <section.Content />
+          </div>
+          <ul class="contact-list">
+            {section.items.map((item) => (
+              <li>
+                <Icon name={item.icon} class="contact-icon" />
+                {(() => {
+                  const value = item.content || "";
+                  const description = item.description;
+                  const copyValue = item.href ? undefined : value;
 
-    {/* Section 2: Online Alias / Personal */}
-    <h3 class="contact-section-title">Online Presence</h3>
-    <p class="section-description">
-      I also go by <strong>Angine</strong> online. You can find me through:
-    </p>
-    <ul class="contact-list">
-      <li>
-        <Icon name="ri:mail-line" class="contact-icon" />
-        <a href="mailto:me@angine.tech">me@angine.tech</a>
-      </li>
-      <li>
-        <Icon name="ri:github-line" class="contact-icon" />
-        <a href="https://github.com/angine04" target="_blank" rel="noopener noreferrer"
-          >github.com/angine04</a
-        >
-      </li>
-    </ul>
+                  if (item.href) {
+                    return (
+                      <>
+                        <a href={item.href} target={item.target} rel={item.rel}>
+                          {value}
+                        </a>
+                        {description && <span class="inline-desc">&nbsp;{description}</span>}
+                      </>
+                    );
+                  }
+
+                  if (copyValue) {
+                    return (
+                      <>
+                        <Tooltip
+                          class="copy-only-tooltip"
+                          label="Copied!"
+                          position="bottom"
+                          trigger="click"
+                        >
+                          <span
+                            class:list={["copyable", { clickable: true }]}
+                            data-copy-value={copyValue}
+                          >
+                            {value}
+                          </span>
+                        </Tooltip>
+                        {description && <span class="inline-desc">&nbsp;{description}</span>}
+                      </>
+                    );
+                  }
+
+                  return (
+                    <>
+                      <span>{value}</span>
+                      {description && <span class="inline-desc">&nbsp;{description}</span>}
+                    </>
+                  );
+                })()}
+              </li>
+            ))}
+          </ul>
+        </>
+      ))
+    }
   </div>
 </SubPageLayout>
 
@@ -74,19 +111,12 @@ import { Icon } from "astro-icon/components"; // Import Icon component
     color: var(--text-muted);
   }
 
-  .contact-section-title {
-    font-size: 1.4rem; /* Slightly smaller than page title */
-    font-weight: 600;
-    margin-top: 3rem; /* Space above section title */
-    margin-bottom: 0.5rem;
-    color: var(--text-heading-color); /* Use a heading color variable if available */
-  }
-
-  .section-description {
+  .section-prose {
     font-size: 1.2rem;
-    color: var(--text-muted);
+    line-height: 1.7;
+    color: var(--text-heading-color);
+    margin-top: 3rem;
     margin-bottom: 1.5rem;
-    line-height: 1.6;
   }
 
   .contact-list {
@@ -126,6 +156,10 @@ import { Icon } from "astro-icon/components"; // Import Icon component
     text-decoration: underline;
   }
 
+  .inline-desc {
+    color: var(--text-muted);
+  }
+
   .section-divider {
     border: 0;
     height: 1px;
@@ -135,3 +169,43 @@ import { Icon } from "astro-icon/components"; // Import Icon component
 
   /* Remove label styles as they are no longer used */
 </style>
+
+<script>
+  const handleCopy = async (el: HTMLElement, value: string) => {
+    if (!value) return;
+    const tooltip = el.closest(".tooltip");
+    const bubble = tooltip?.querySelector(".tooltip-bubble");
+    const labelEl = tooltip?.querySelector("[data-tooltip-label]");
+    const descEl = tooltip?.querySelector("[data-tooltip-desc]") as HTMLElement | null;
+
+    try {
+      await navigator.clipboard.writeText(value);
+      if (labelEl) {
+        const originalLabel =
+          labelEl.getAttribute("data-original-label") || labelEl.textContent || "Copied!";
+        labelEl.textContent = "Copied!";
+        if (descEl) descEl.style.display = "none";
+        if (bubble) bubble.classList.add("copy-active");
+        setTimeout(() => {
+          labelEl.textContent = originalLabel;
+          if (descEl) descEl.style.display = "";
+          if (bubble) bubble.classList.remove("copy-active");
+        }, 1200);
+      }
+    } catch (e) {
+      console.error("Unable to copy contact value:", e);
+    }
+  };
+
+  document.addEventListener("astro:page-load", () => {
+    const copyTargets = document.querySelectorAll<HTMLElement>(".contact-list [data-copy-value]");
+    copyTargets.forEach((el) => {
+      el.addEventListener("click", (event) => {
+        const value = el.getAttribute("data-copy-value");
+        if (!value) return;
+        event.preventDefault();
+        handleCopy(el, value);
+      });
+    });
+  });
+</script>

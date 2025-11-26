@@ -1,170 +1,118 @@
 ---
 import SubPageLayout from "../layouts/SubPageLayout.astro";
 import ProjectCard from "../components/projects/ProjectCard.astro";
-// Import data from the new file
-import { allProjectsData } from "../data/projectsData";
+import { getProjectsViewModel } from "../viewmodels/projectsViewModel";
+import Button from "../components/common/Button.astro";
 
-// Use imported data
-const projects = allProjectsData;
-
-// Remove inline data definition
-// const projects = [ ... ];
-
-// Copied slugify function from FeaturedWorksContent.astro
-function slugify(text: string): string {
-  return text
-    .toString()
-    .toLowerCase()
-    .replace(/\s+/g, "-")
-    .replace(/[^\w-]+/g, "")
-    .replace(/--+/g, "-")
-    .replace(/^-+/, "")
-    .replace(/-+$/, "");
-}
+const { projects, metadata } = await getProjectsViewModel();
 ---
 
-<SubPageLayout title="Projects">
-  <p class="page-intro">
-    Here are some of the projects I've worked on. You can find more details and other experiments on
-    my GitHub profiles.
-  </p>
+<SubPageLayout title={metadata.title}>
+  {
+    metadata.actions &&
+      metadata.actions.map((action) => (
+        <Button
+          slot="actions"
+          href={action.href}
+          text={action.text}
+          style={action.style}
+          download={action.download}
+          icon={action.icon}
+          iconPosition={action.iconPosition}
+          target={action.target}
+          rel={action.rel}
+          noMargin={true}
+          wrapperClass="page-load-initial-state"
+        />
+      ))
+  }
   <div class="projects-grid">
     {
-      projects.map((project) => {
-        const slug = slugify(project.title); // Generate slug
-        return (
-          <ProjectCard
-            id={slug}
-            title={project.title}
-            timeframe={project.timeframe}
-            imageSrc={project.imageSrc}
-            imageAlt={project.imageAlt}
-            githubUrl={project.githubUrl}
-            projectUrl={project.projectUrl}
-            githubRepos={project.githubRepos}
-            techStack={project.techStack}
-          >
-            {/* Use set:html directly on a div or similar inside the slot */}
-            <div set:html={project.description} />
-          </ProjectCard>
-        );
-      })
+      projects.map((project) => (
+        <ProjectCard
+          id={project.slug}
+          title={project.data.title}
+          imageSrc={project.data.imageSrc}
+          imageAlt={project.data.imageAlt}
+          timeframe={project.data.timeframe}
+          projectUrl={project.data.projectUrl}
+          githubUrl={project.data.githubUrl}
+          githubRepos={project.data.githubRepos}
+          techStack={project.data.techStack}
+        >
+          <project.Content />
+        </ProjectCard>
+      ))
     }
   </div>
 </SubPageLayout>
 
 <script>
-  import { gsap } from "gsap";
-  import { ScrollToPlugin } from "gsap/ScrollToPlugin";
+  import { gsap, registerGsapPlugins } from "../lib/animations/gsapPlugins";
+  import { prefersReducedMotion } from "../lib/utils/motionPreferences";
 
-  gsap.registerPlugin(ScrollToPlugin);
+  registerGsapPlugins();
 
   function smoothScrollToTarget() {
-    console.log("[projects.astro] smoothScrollToTarget triggered.");
     const params = new URLSearchParams(window.location.search);
     const targetId = params.get("scrollTo");
-    console.log("[projects.astro] Target ID from URL:", targetId);
 
     if (targetId) {
       setTimeout(() => {
-        console.log("[projects.astro] Inside setTimeout. Attempting to find elements...");
         const targetElement = document.getElementById(targetId);
         const pageWrapperElement = document.querySelector(".page-wrapper") as HTMLElement | null;
-        console.log("[projects.astro] Found target element:", targetElement);
-        console.log("[projects.astro] Found page wrapper:", pageWrapperElement);
 
         if (targetElement && pageWrapperElement) {
-          // Ensure both elements exist
-          console.log("[projects.astro] Both elements found. Calculating position...");
-          // Calculate the target scroll position *within* the pageWrapper
           const targetOffsetTopInWrapper = targetElement.offsetTop;
-          const finalScrollPosition = targetOffsetTopInWrapper; // Offset relative to wrapper top
+          const finalScrollPosition = targetOffsetTopInWrapper;
 
-          console.log(
-            `[projects.astro] Target offsetTop: ${targetOffsetTopInWrapper}, Final scroll position: ${finalScrollPosition}`
-          );
+          if (prefersReducedMotion()) {
+            pageWrapperElement.scrollTo({ top: finalScrollPosition, behavior: "auto" });
+            const newUrl = window.location.pathname;
+            window.history.replaceState({}, "", newUrl);
+            return;
+          }
 
-          console.log("[projects.astro] Initiating GSAP scroll on .page-wrapper...");
           gsap.to(pageWrapperElement, {
-            // Target the page wrapper
             duration: 1,
             scrollTo: {
-              y: finalScrollPosition, // Scroll the wrapper to this position
-              // autoKill: false // Might sometimes help if other triggers interfere, but let's omit for now
+              y: finalScrollPosition,
             },
             ease: "power4.out",
             onComplete: () => {
-              console.log("[projects.astro] GSAP scroll completed.");
-            }, // Log completion
-            onStart: () => {
-              console.log("[projects.astro] GSAP scroll started.");
-            }, // Log start
-            onInterrupt: () => {
-              console.log("[projects.astro] GSAP scroll interrupted!");
-            }, // Log interruption
+              const newUrl = window.location.pathname;
+              window.history.replaceState({}, "", newUrl);
+            },
           });
-
-          // Clean URL immediately
-          try {
-            history.replaceState(null, "", window.location.pathname);
-          } catch (e) {
-            console.error("Could not clean URL state:", e);
-          }
-        } else {
-          if (!targetElement)
-            console.warn(`[projects.astro] Element with id "${targetId}" not found.`);
-          if (!pageWrapperElement)
-            console.warn(`[projects.astro] .page-wrapper element not found.`);
-          // Clean URL even if target not found
-          try {
-            history.replaceState(null, "", window.location.pathname);
-          } catch {
-            // Intentionally ignore errors during this specific cleanup attempt
-          }
         }
-      }, 100); // Keep a small delay (adjust if necessary)
-    } else {
-      console.log("[projects.astro] No 'scrollTo' parameter found.");
+      }, 100);
     }
   }
 
-  document.addEventListener("astro:page-load", smoothScrollToTarget);
-
-  // Optional: Run on initial load if needed, test if astro:page-load is sufficient
-  // smoothScrollToTarget();
+  document.addEventListener("astro:page-load", () => {
+    smoothScrollToTarget();
+  });
 </script>
 
 <style>
-  .page-intro {
-    font-size: 1.2rem;
-    color: var(--text-muted);
-    margin-bottom: 3rem;
-    max-width: 70ch;
-  }
   .projects-grid {
-    /* display: grid; */ /* Remove grid display */
-    /* grid-template-columns: repeat(auto-fit, minmax(380px, 1fr)); */
-    /* align-items: start; */
-
-    /* Use CSS Columns */
-    column-count: 1; /* Default to 1 column on mobile */
-    column-gap: 3rem; /* Adjust gap */
-    gap: 3rem; /* Keep vertical gap between items in the same column */
+    column-count: 1;
+    column-gap: 3rem;
   }
 
-  /* Apply multi-column layout for wider screens */
-  @media (min-width: 1024px) {
+  @media (min-width: 768px) {
     .projects-grid {
       column-count: 2;
-      column-gap: 3rem; /* Use the larger gap for desktop */
-      gap: 3rem;
+      column-gap: 3rem;
     }
   }
 
-  /* Ensure cards don't break across columns */
   .projects-grid > :global(.project-card) {
     break-inside: avoid;
-    /* margin-bottom is handled by the grid gap, but ensure it exists */
-    /* margin-bottom: 3rem; */
+    margin-bottom: 3rem;
+  }
+
+  .projects-grid > :global(.project-card:last-child) {
+    margin-bottom: 0;
   }
 </style>

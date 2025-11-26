@@ -1,41 +1,32 @@
 ---
 // Content for the "Highlights & Updates" section
-import { allTimelineEvents, type TimelineEventItem } from "../../../data/timelineEvents";
 import Button from "../../common/Button.astro";
-const numberOfHighlightsToShow = 3; // Max number of highlights to show
+import RichText from "../../common/RichText.astro";
+import { formatTimelineDate } from "../../../lib/utils/dateUtils";
+import type { CollectionEntry } from "astro:content";
+import type { AstroComponentFactory } from "astro/runtime/server/index.js";
 
-// 1. Filter events marked as highlights
-const allHighlights: TimelineEventItem[] = allTimelineEvents.filter((event) => event.isHighlight);
-
-// 2. Sort highlights by date descending (latest first)
-//    Using getTime() for robust comparison
-allHighlights.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
-
-// 3. Slice to get the latest N highlights
-const highlightsToShow: TimelineEventItem[] = allHighlights.slice(0, numberOfHighlightsToShow);
-
-const timelineUrl = "/timeline";
-
-// Improved date formatting function (example)
-function formatEventDate(dateStr: string): string {
-  if (!dateStr) return "";
-  try {
-    // Parse YYYY-MM. Assumes UTC for consistency if timezone matters.
-    const [year, month] = dateStr.split("-").map(Number);
-    const date = new Date(Date.UTC(year, month - 1)); // Use UTC
-    return date.toLocaleDateString("en-US", {
-      year: "numeric",
-      month: "long",
-      timeZone: "UTC", // Specify timezone for consistent output
-    });
-  } catch (e) {
-    console.error(`Error parsing date string "${dateStr}":`, e);
-    return dateStr; // Fallback to original string on error
-  }
+interface Props {
+  data: {
+    section: {
+      title: string;
+      cta: {
+        text: string;
+        href: string;
+      };
+      fallback: string;
+    };
+    events: Array<CollectionEntry<"timeline"> & { Content: AstroComponentFactory }>;
+  };
 }
+
+const { data } = Astro.props;
+const { section, events } = data;
+const { title, cta, fallback } = section;
+const highlightsToShow = events;
 ---
 
-<h2 slot="title" class="about-title scroll-target-title">Highlights & Updates</h2>
+<h2 slot="title" class="about-title scroll-target-title">{title}</h2>
 
 <div class="about-content scroll-target-content">
   {
@@ -44,29 +35,33 @@ function formatEventDate(dateStr: string): string {
         {highlightsToShow.map((event) => (
           <li class="highlight-item-enhanced">
             <div class="highlight-meta">
-              <time datetime={event.date} class="highlight-date">
-                {formatEventDate(event.date)}
+              <time datetime={event.data.date} class="highlight-date">
+                {formatTimelineDate(event.data.date)}
               </time>
             </div>
             <div class="highlight-body">
-              <h4 class="highlight-title">{event.title}</h4>
-              {/* Use highlightSummary if available, fallback to description */}
-              {event.highlightSummary ? (
-                <p class="highlight-summary" set:html={event.highlightSummary} />
-              ) : event.description ? (
-                <div class="highlight-description" set:html={event.description} />
-              ) : null}
+              <h4 class="highlight-title">{event.data.title}</h4>
+              {/* Use highlightSummary if available, fallback to description (Content) */}
+              {event.data.highlightSummary ? (
+                <div class="highlight-summary">
+                  <RichText content={event.data.highlightSummary} />
+                </div>
+              ) : (
+                <div class="highlight-description">
+                  <event.Content />
+                </div>
+              )}
             </div>
           </li>
         ))}
       </ul>
     ) : (
-      <p>No recent highlights available. Check back soon!</p> // Fallback message
+      <p>{fallback}</p>
     )
   }
 
   <div class="button-group">
-    <Button class="button" href={timelineUrl} text="Explore My Journey" wrapperClass="cta-link" />
+    <Button class="button" href={cta.href} text={cta.text} wrapperClass="cta-link" />
   </div>
 </div>
 
@@ -111,8 +106,8 @@ function formatEventDate(dateStr: string): string {
     line-height: 1.5;
   }
 
-  .highlight-summary,
-  .highlight-description p {
+  .highlight-summary :global(p),
+  .highlight-description :global(p) {
     font-size: 1rem;
     color: var(--theme-text);
     margin: 0;

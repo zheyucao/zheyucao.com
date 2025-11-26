@@ -1,0 +1,8 @@
+footer:
+  linksHeading: "Links"
+  connectHeading: "Connect"
+  copyrightText: "All rights reserved"
+
+pages:
+  timeline:
+    filterAll: "All"

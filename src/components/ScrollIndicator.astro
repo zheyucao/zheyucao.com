@@ -1,5 +1,5 @@
 ---
-// Component: src/components/ScrollIndicator.astro
+
 ---
 
 <div id="scroll-indicator" class="scroll-indicator">
@@ -58,150 +58,49 @@
   .scroll-indicator.visible {
     opacity: 0.6;
   }
+
+  @media (prefers-reduced-motion: reduce) {
+    .scroll-indicator {
+      transition: none;
+    }
+
+    .indicator-content {
+      animation: none;
+    }
+  }
 </style>
 
 <script>
-  import { gsap } from "gsap";
-  import { ScrollTrigger } from "gsap/ScrollTrigger";
-  import { ScrollToPlugin } from "gsap/ScrollToPlugin";
+  import {
+    setupScrollIndicator,
+    setupScrollIndicatorClick,
+  } from "../lib/animations/scrollIndicator";
 
-  gsap.registerPlugin(ScrollTrigger, ScrollToPlugin);
+  let cleanup: (() => void) | null = null;
+  let clickCleanup: (() => void) | null = null;
 
-  let indicatorScrubTrigger: ScrollTrigger | null = null;
-  let indicatorCallbackTrigger: ScrollTrigger | null = null;
-  let fadeInTimeout: ReturnType<typeof setTimeout> | null = null;
-  // Keep track if click listener was added to prevent duplicates
-  let clickListenerAttached = false;
+  document.addEventListener("astro:page-load", () => {
+    const indicator = document.querySelector("#scroll-indicator");
+    const scroller = document.querySelector(".page-wrapper");
 
-  function cleanupTriggers() {
-    console.log("[ScrollIndicator] cleanupTriggers CALLED.");
-    if (indicatorScrubTrigger) {
-      console.log("[ScrollIndicator] Killing Scrub Trigger...");
-      indicatorScrubTrigger.kill();
-      indicatorScrubTrigger = null;
+    if (indicator && scroller) {
+      // Setup animations and click handler
+      cleanup = setupScrollIndicator({
+        indicator: indicator as HTMLElement,
+        scroller: scroller as HTMLElement,
+      });
+      clickCleanup = setupScrollIndicatorClick({
+        indicator: indicator as HTMLElement,
+        scroller: scroller as HTMLElement,
+      });
     }
-    if (indicatorCallbackTrigger) {
-      console.log("[ScrollIndicator] Killing Callback Trigger...");
-      indicatorCallbackTrigger.kill();
-      indicatorCallbackTrigger = null;
-    }
-    // Also clear any pending fade-in timeout
-    if (fadeInTimeout !== null) {
-      clearTimeout(fadeInTimeout);
-      fadeInTimeout = null;
-      console.log("[ScrollIndicator] Cleared pending fade-in timeout during cleanup.");
-    }
-    // Note: We are not removing the click listener here, assuming the element might persist briefly.
-    // If issues remain, we might need to track and remove it too.
-  }
+  });
 
-  function setupIndicatorAnimation(indicator: HTMLElement, pageWrapper: HTMLElement) {
-    console.log("[ScrollIndicator] setupIndicatorAnimation CALLED.");
-    // Cleanup is now done *before* calling this
-
-    console.log("[ScrollIndicator] Setting up new triggers...");
-
-    // Scroll-based fade-out using ScrollTrigger (Scrub)
-    const animation = gsap.fromTo(
-      indicator,
-      { opacity: 0.6 },
-      { opacity: 0, immediateRender: false }
-    );
-    indicatorScrubTrigger = ScrollTrigger.create({
-      trigger: pageWrapper,
-      scroller: pageWrapper,
-      start: "10px top",
-      end: "+=150",
-      animation: animation,
-      scrub: 0.5,
-    });
-    console.log("[ScrollIndicator] Setup new indicator Scrub Trigger");
-
-    // Show/hide callbacks trigger setup
-    const showIndicator = (delay = 0) => {
-      if (indicatorScrubTrigger?.isActive) return;
-      if (fadeInTimeout !== null) clearTimeout(fadeInTimeout);
-      fadeInTimeout = setTimeout(() => {
-        if (pageWrapper.scrollTop < 10) {
-          gsap.to(indicator, { opacity: 0.6, duration: 0.5, overwrite: true });
-        }
-      }, delay);
-    };
-    const hideIndicator = () => {
-      if (fadeInTimeout !== null) clearTimeout(fadeInTimeout);
-      if (!indicatorScrubTrigger?.isActive) {
-        gsap.to(indicator, { opacity: 0, duration: 0.3, overwrite: true });
-      }
-    };
-
-    gsap.set(indicator, { opacity: 0 });
-    if (pageWrapper.scrollTop < 10) showIndicator(3000);
-
-    indicatorCallbackTrigger = ScrollTrigger.create({
-      trigger: pageWrapper,
-      scroller: pageWrapper,
-      start: "10px top",
-      onEnter: hideIndicator,
-      onLeaveBack: () => {
-        if (pageWrapper.scrollTop < 5) {
-          // console.log("ScrollIndicator: At very top onLeaveBack, forcing hide."); // Keep logs minimal now
-          hideIndicator();
-        } else {
-          // console.log("ScrollIndicator: Near top onLeaveBack, scheduling show.");
-          showIndicator(3000);
-        }
-      },
-    });
-    console.log("[ScrollIndicator] Setup new indicator Callback Trigger");
-  }
-
-  function setupClickListener(indicator: HTMLElement, pageWrapper: HTMLElement) {
-    if (clickListenerAttached) {
-      console.log("[ScrollIndicator] Click listener already attached. Skipping.");
-      return;
-    }
-    console.log("[ScrollIndicator] Attaching click listener.");
-    indicator.addEventListener("click", () => {
-      const currentOpacity = parseFloat(window.getComputedStyle(indicator).opacity);
-      if (currentOpacity > 0.1) {
-        gsap.to(pageWrapper, {
-          duration: 1.6, // Adjusted duration slightly
-          scrollTo: pageWrapper.scrollTop + pageWrapper.clientHeight,
-          ease: "power2.out", // Adjusted ease slightly
-        });
-      }
-    });
-    clickListenerAttached = true; // Mark as attached
-  }
-
-  // Main event listener
-  document.addEventListener(
-    "astro:page-load",
-    () => {
-      console.log(
-        `[ScrollIndicator] astro:page-load DETECTED on path: "${window.location.pathname}".`
-      );
-
-      // --- STEP 1: ALWAYS CLEAN UP ---
-      cleanupTriggers();
-
-      // --- STEP 2: CHECK IF INDICATOR EXISTS ON *THIS* PAGE ---
-      const indicatorElement = document.querySelector("#scroll-indicator") as HTMLElement | null;
-      const pageWrapperElement = document.querySelector(".page-wrapper") as HTMLElement | null;
-
-      // --- STEP 3: CONDITIONAL SETUP ---
-      if (indicatorElement && pageWrapperElement) {
-        console.log("[ScrollIndicator] Indicator element FOUND. Proceeding with setup.");
-        setupIndicatorAnimation(indicatorElement, pageWrapperElement);
-        setupClickListener(indicatorElement, pageWrapperElement); // Setup click listener only if indicator exists
-      } else {
-        console.log("[ScrollIndicator] Indicator element NOT FOUND. Skipping setup.");
-        // Ensure flag is reset if element disappears
-        clickListenerAttached = false;
-      }
-    },
-    { once: false }
-  );
-
-  // Remove the astro:before-swap listener
+  // Cleanup on navigation
+  document.addEventListener("astro:before-swap", () => {
+    if (cleanup) cleanup();
+    if (clickCleanup) clickCleanup();
+    cleanup = null;
+    clickCleanup = null;
+  });
 </script>
