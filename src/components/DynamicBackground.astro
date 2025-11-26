@@ -12,7 +12,16 @@
   let backgroundManager: DynamicBackgroundManager | null = null;
 
   function initBackground() {
-    if (backgroundManager) return; // Prevent double init
+    const container = document.getElementById("dynamic-background-container");
+
+    if (!container) {
+      // Container is gone (navigated to a page without background), cleanup
+      cleanupBackground();
+      return;
+    }
+
+    if (backgroundManager) return; // Prevent double init if already running
+
     try {
       backgroundManager = new DynamicBackgroundManager(
         "dynamic-background-container",
@@ -30,11 +39,11 @@
     }
   }
 
-  // Initialize on page load
+  // Initialize (or check persistence) on page load
   document.addEventListener("astro:page-load", initBackground);
 
-  // Cleanup before navigation
-  document.addEventListener("astro:before-swap", cleanupBackground);
+  // Remove before-swap cleanup to allow persistence
+  // document.addEventListener("astro:before-swap", cleanupBackground);
 </script>
 
 <style>

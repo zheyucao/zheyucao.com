@@ -36,6 +36,12 @@ const showScrollIndicator =
     <meta name="author" content={siteConfig.metadata.author} />
     <ClientRouter />
     <!-- START Insert Theme Detection Script Here -->
+    <script is:inline>
+      // Immediate theme application to prevent flash
+      if (window.matchMedia("(prefers-color-scheme: dark)").matches) {
+        document.documentElement.classList.add("dark");
+      }
+    </script>
     <!-- Theme Handling -->
     <script>
       import { initTheme } from "../lib/layout/theme";
