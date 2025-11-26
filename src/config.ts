@@ -8,11 +8,6 @@ export interface SiteConfig {
   navigation: {
     items: { name: string; href: string }[];
   };
-  social: {
-    linkedin: string;
-    github: string;
-    email: string;
-  };
   theme: {
     defaultTheme: "light" | "dark" | "system";
   };
@@ -33,11 +28,6 @@ export const siteConfig: SiteConfig = {
       { name: "Résumé", href: "/resume" },
       { name: "Contact", href: "/contact" },
     ],
-  },
-  social: {
-    linkedin: "https://www.linkedin.com/in/zheyu-cao", // Placeholder, update if known or leave for user
-    github: "https://github.com/zheyu-cao", // Placeholder
-    email: "mailto:contact@zheyucao.com", // Placeholder
   },
   theme: {
     defaultTheme: "system",
