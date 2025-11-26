@@ -19,6 +19,7 @@ export async function getTimelineViewModel() {
   // Process events for client-side rendering
   const allEvents = rawEvents.map((event) => ({
     ...event.data,
+    description: event.body,
   }));
 
   // Calculate unique categories
