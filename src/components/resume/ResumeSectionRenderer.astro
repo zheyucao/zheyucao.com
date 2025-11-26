@@ -15,7 +15,9 @@ const { section } = Astro.props;
 {
   section.visible !== false && (
     <>
-      {section.type === "entries" && <EntryList title={section.title} entries={section.content} />}
+      {section.type === "entries" && (
+        <EntryList title={section.title} entries={section.content} variant={section.variant} />
+      )}
       {section.type === "skills" && (
         <SkillGrid title={section.title} categories={section.content} />
       )}

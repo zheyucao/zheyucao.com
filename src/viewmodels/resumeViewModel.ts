@@ -35,6 +35,7 @@ type EntryResumeSection = {
   id: string;
   title: string;
   type: "entries";
+  variant?: "default" | "education" | "experience" | "awards" | "projects";
   content: ResumeEntryItem[];
   visible?: boolean;
 };
@@ -207,24 +208,28 @@ export async function getResumeViewModel(): Promise<{
       id: "education",
       title: "Education",
       type: "entries",
+      variant: "education",
       content: education,
     },
     {
       id: "awards",
       title: awardsEntry.data.title,
       type: "entries",
+      variant: "awards",
       content: awardsEntry.data.content,
     },
     {
       id: "experience",
       title: "Experience",
       type: "entries",
+      variant: "experience",
       content: experience,
     },
     {
       id: "projects",
       title: "Projects",
       type: "entries",
+      variant: "projects",
       content: projects,
     },
   ];

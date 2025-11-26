@@ -13,16 +13,17 @@ export interface EntryItem {
 interface Props {
   title: string;
   entries: EntryItem[];
+  variant?: "default" | "education" | "experience" | "awards" | "projects";
 }
 
-const { title, entries } = Astro.props;
+const { title, entries, variant = "default" } = Astro.props;
 ---
 
 <section class="resume-section scroll-reveal-animate">
   <h2>{title}</h2>
   {
     entries.map((entry) => (
-      <div class="entry-item">
+      <div class={`entry-item ${variant}-entry`}>
         <div class="header">
           <span class="title">
             <RichText content={entry.title} />
@@ -93,6 +94,29 @@ const { title, entries } = Astro.props;
     line-height: 1.8;
   }
 
+  /* Awards variant - simpler layout */
+  .awards-entry {
+    margin-bottom: 1.5rem;
+  }
+
+  .awards-entry:last-child {
+    margin-bottom: 0;
+  }
+
+  .awards-entry .header {
+    font-size: 1.1rem;
+    line-height: 1.5;
+    margin-bottom: 0;
+  }
+
+  .awards-entry .title {
+    font-weight: normal;
+  }
+
+  .awards-entry .date {
+    padding-left: 1rem;
+  }
+
   @media (max-width: 600px) {
     .header {
       flex-direction: column;
@@ -104,6 +128,9 @@ const { title, entries } = Astro.props;
     }
     .subtitle {
       margin-right: 0;
+    }
+    .awards-entry .date {
+      padding-left: 0;
     }
   }
 </style>
