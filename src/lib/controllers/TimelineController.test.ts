@@ -1,93 +1,81 @@
 import { describe, it, expect, beforeEach } from "vitest";
-import { TimelineController, type TimelineEvent } from "./TimelineController";
+import { TimelineController } from "./TimelineController";
 
 describe("TimelineController", () => {
   let container: HTMLElement;
-  let sortToggle: HTMLElement;
   let categoryTab1: HTMLElement;
-
-  const mockEvents: TimelineEvent[] = [
-    {
-      date: "2024-01",
-      title: "Event 1",
-      category: "Cat1",
-      description: "Desc 1",
-    },
-    {
-      date: "2023-01",
-      title: "Event 2",
-      category: "Cat2",
-      description: "Desc 2",
-    },
-    {
-      date: "2024-06",
-      title: "Event 3",
-      category: "Cat1",
-      description: "Desc 3",
-    },
-  ];
+  let categoryTabAll: HTMLElement;
 
   beforeEach(() => {
-    // Setup DOM
+    // Setup DOM with events already rendered (server-side simulation)
     document.body.innerHTML = `
-      <div id="timeline-container"></div>
+      <div id="timeline-container">
+        <div class="timeline-event" data-category="Cat1" id="event1">
+          <div class="timeline-title">Event 1</div>
+        </div>
+        <div class="timeline-event" data-category="Cat2" id="event2">
+          <div class="timeline-title">Event 2</div>
+        </div>
+        <div class="timeline-event" data-category="Cat1" id="event3">
+          <div class="timeline-title">Event 3</div>
+        </div>
+      </div>
       <button class="category-tab" data-category="all">All</button>
       <button class="category-tab" data-category="Cat1">Cat1</button>
       <button class="category-tab" data-category="Cat2">Cat2</button>
-      <button id="sort-toggle">Sort</button>
     `;
 
     container = document.getElementById("timeline-container")!;
-    sortToggle = document.getElementById("sort-toggle")!;
     const tabs = document.querySelectorAll(".category-tab");
+    categoryTabAll = tabs[0] as HTMLElement;
     categoryTab1 = tabs[1] as HTMLElement; // Cat1
   });
 
-  it("should initialize and render all events by default", async () => {
-    new TimelineController("#timeline-container", mockEvents, ".category-tab", "sort-toggle");
+  it("should initialize and show all events by default", () => {
+    new TimelineController("#timeline-container", ".category-tab");
 
-    // Wait for initial render (which has a small delay/transition)
-    await new Promise((resolve) => setTimeout(resolve, 350));
+    const event1 = document.getElementById("event1")!;
+    const event2 = document.getElementById("event2")!;
+    const event3 = document.getElementById("event3")!;
 
-    const items = container.querySelectorAll(".timeline-event");
-    expect(items.length).toBe(3);
-    // Default sort is newest first: Event 3 (2024-06), Event 1 (2024-01), Event 2 (2023-01)
-    expect(items[0].querySelector(".timeline-title")?.textContent).toBe("Event 3");
-    expect(items[1].querySelector(".timeline-title")?.textContent).toBe("Event 1");
-    expect(items[2].querySelector(".timeline-title")?.textContent).toBe("Event 2");
+    expect(event1.style.display).toBe("");
+    expect(event2.style.display).toBe("");
+    expect(event3.style.display).toBe("");
   });
 
-  it("should filter events when category tab is clicked", async () => {
-    new TimelineController("#timeline-container", mockEvents, ".category-tab", "sort-toggle");
-    await new Promise((resolve) => setTimeout(resolve, 350));
+  it("should filter events when category tab is clicked", () => {
+    new TimelineController("#timeline-container", ".category-tab");
 
     // Click Cat1
     categoryTab1.click();
-    await new Promise((resolve) => setTimeout(resolve, 350));
 
-    const items = container.querySelectorAll(".timeline-event");
-    expect(items.length).toBe(2); // Event 1 and Event 3
-    expect(items[0].querySelector(".timeline-title")?.textContent).toBe("Event 3");
-    expect(items[1].querySelector(".timeline-title")?.textContent).toBe("Event 1");
+    const event1 = document.getElementById("event1")!;
+    const event2 = document.getElementById("event2")!;
+    const event3 = document.getElementById("event3")!;
+
+    // Cat1 events should be visible
+    expect(event1.style.display).toBe("");
+    expect(event3.style.display).toBe("");
+
+    // Cat2 event should be hidden
+    expect(event2.style.display).toBe("none");
   });
 
-  it("should toggle sort order when sort button is clicked", async () => {
-    new TimelineController("#timeline-container", mockEvents, ".category-tab", "sort-toggle");
-    await new Promise((resolve) => setTimeout(resolve, 350));
+  it("should show all events when 'All' tab is clicked after filtering", () => {
+    new TimelineController("#timeline-container", ".category-tab");
 
-    // Default: Newest first (Event 3, Event 1, Event 2)
-    let items = container.querySelectorAll(".timeline-event");
-    expect(items[0].querySelector(".timeline-title")?.textContent).toBe("Event 3");
+    // Click Cat1 first
+    categoryTab1.click();
 
-    // Click sort (switch to Oldest first)
-    sortToggle.click();
-    await new Promise((resolve) => setTimeout(resolve, 350));
+    // Then click All
+    categoryTabAll.click();
 
-    items = container.querySelectorAll(".timeline-event");
-    expect(items.length).toBe(3);
-    // Oldest first: Event 2 (2023-01), Event 1 (2024-01), Event 3 (2024-06)
-    expect(items[0].querySelector(".timeline-title")?.textContent).toBe("Event 2");
-    expect(items[1].querySelector(".timeline-title")?.textContent).toBe("Event 1");
-    expect(items[2].querySelector(".timeline-title")?.textContent).toBe("Event 3");
+    const event1 = document.getElementById("event1")!;
+    const event2 = document.getElementById("event2")!;
+    const event3 = document.getElementById("event3")!;
+
+    expect(event1.style.display).toBe("");
+    expect(event2.style.display).toBe("");
+    expect(event3.style.display).toBe("");
   });
 });

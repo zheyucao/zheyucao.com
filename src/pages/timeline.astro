@@ -13,8 +13,6 @@ const {
   filterAll,
   events: allEvents,
 } = viewModel;
-
-const eventsJson = JSON.stringify(allEvents);
 ---
 
 <SubPageLayout title={metadata.title}>
@@ -49,41 +47,31 @@ const eventsJson = JSON.stringify(allEvents);
         ))
       }
     </div>
-    <!-- <div class="control-group">
-      <button type="button" id="sort-toggle" data-sort-current="newest">Newest First</button>
-    </div> -->
   </div>
-
-  <ul class="timeline-container mt-8" id="timeline-container">
-    {/* Initial server-side render */}
-    {
-      initialFilteredEvents.map((event, index) => (
-        <TimelineEvent
-          date={event.date}
-          dateRange={event.dateRange}
-          title={event.title}
-          description={event.description}
-          category={event.category}
-          isLast={index === initialFilteredEvents.length - 1}
-        />
-      ))
-    }
-  </ul>
-
-  {/* Data serialization for client-side hydration */}
-  <script is:inline type="application/json" id="timeline-data" set:html={eventsJson} />
 </SubPageLayout>
 
+<ul class="timeline-container mt-8" id="timeline-container">
+  {/* Initial server-side render */}
+  {
+    initialFilteredEvents.map((event, index) => (
+      <TimelineEvent
+        date={event.date}
+        dateRange={event.dateRange}
+        title={event.title}
+        description={event.description}
+        category={event.category}
+        isLast={index === initialFilteredEvents.length - 1}
+      />
+    ))
+  }
+</ul>
+
 <script>
-  import { TimelineController, type TimelineEvent } from "../lib/controllers/TimelineController";
+  import { TimelineController } from "../lib/controllers/TimelineController";
 
   document.addEventListener("astro:page-load", () => {
-    const dataEl = document.getElementById("timeline-data");
-    if (!dataEl) return;
-
     try {
-      const events = JSON.parse(dataEl.textContent || "[]") as TimelineEvent[];
-      new TimelineController("#timeline-container", events, ".category-tab", "sort-toggle");
+      new TimelineController("#timeline-container", ".category-tab");
     } catch (e) {
       console.error("Failed to initialize TimelineController", e);
     }

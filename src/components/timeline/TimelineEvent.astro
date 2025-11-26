@@ -11,10 +11,10 @@ interface Props {
 
 import RichText from "../common/RichText.astro";
 
-const { date, dateRange, title, description, /*category,*/ isLast = false } = Astro.props;
+const { date, dateRange, title, description, category, isLast = false } = Astro.props;
 ---
 
-<li class:list={["timeline-event", { "is-last": isLast }]}>
+<li class:list={["timeline-event", { "is-last": isLast }]} data-category={category}>
   <div class="timeline-marker"></div>
   <div class="timeline-content">
     <div class="timeline-header">

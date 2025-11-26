@@ -1,15 +1,6 @@
 import { getCollection, getEntry } from "astro:content";
-import MarkdownIt from "markdown-it";
-import sanitizeHtml from "sanitize-html";
 import { getPageMetadata } from "../lib/viewmodels/baseViewModel";
 import { parseDate } from "../lib/utils/dateUtils";
-
-const md = new MarkdownIt({
-  html: true,
-  linkify: true,
-  typographer: true,
-  breaks: true,
-});
 
 /**
  * Helper to parse dates robustly
@@ -28,16 +19,6 @@ export async function getTimelineViewModel() {
   // Process events for client-side rendering
   const allEvents = rawEvents.map((event) => ({
     ...event.data,
-    description: event.body, // Pass raw body as description
-    renderedDescription: event.body
-      ? sanitizeHtml(md.render(event.body), {
-          allowedTags: sanitizeHtml.defaults.allowedTags.concat(["img"]),
-          allowedAttributes: {
-            ...sanitizeHtml.defaults.allowedAttributes,
-            img: ["src", "alt", "width", "height"],
-          },
-        })
-      : "",
   }));
 
   // Calculate unique categories
