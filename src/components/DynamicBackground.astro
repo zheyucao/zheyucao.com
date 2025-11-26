@@ -46,8 +46,14 @@
     height: 100%;
     z-index: -1;
     filter: blur(30px);
+    opacity: 0;
+    transition:
+      filter 0.3s ease,
+      opacity 1.5s ease-in-out;
+  }
+
+  #dynamic-background-container.is-ready {
     opacity: var(--dynamic-bg-opacity);
-    transition: filter 0.3s ease;
   }
 
   /* Medium screens (e.g., tablets) */

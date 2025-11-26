@@ -87,7 +87,7 @@ export class DynamicBackgroundManager {
   private observer: IntersectionObserver | null = null;
   private isVisible = true;
   private prefersReducedMotion = false;
-  private cleanupListeners: () => void = () => {};
+  private cleanupListeners: () => void = () => { };
 
   constructor(containerId: string, svgId: string) {
     const container = document.getElementById(containerId);
@@ -128,19 +128,33 @@ export class DynamicBackgroundManager {
   private init() {
     if (this.prefersReducedMotion) {
       this.initStatic();
-      return;
+    } else {
+      this.svgContainer.classList.add("css-hue-shift-active");
+      this.initBlobs();
+      this.setupEventListeners();
+      this.setupIntersectionObserver();
+      this.startAnimation();
     }
 
-    this.svgContainer.classList.add("css-hue-shift-active");
-    this.initBlobs();
-    this.setupEventListeners();
-    this.setupIntersectionObserver();
-    this.startAnimation();
+    // Trigger fade-in
+    requestAnimationFrame(() => {
+      this.container.classList.add("is-ready");
+    });
   }
 
   private initStatic() {
     this.config.numBlobs = 3;
     this.initBlobs();
+  }
+
+  public cleanup() {
+    this.container.classList.remove("is-ready");
+    this.svgContainer.classList.remove("css-hue-shift-active");
+    this.stopAnimation();
+    if (this.mouseThrottleTimeout) cancelAnimationFrame(this.mouseThrottleTimeout);
+    this.cleanupListeners();
+    if (this.observer) this.observer.disconnect();
+    this.blobs = [];
   }
 
   private setupIntersectionObserver() {
@@ -565,11 +579,5 @@ export class DynamicBackgroundManager {
     };
   }
 
-  public cleanup() {
-    this.stopAnimation();
-    if (this.mouseThrottleTimeout) cancelAnimationFrame(this.mouseThrottleTimeout);
-    this.cleanupListeners();
-    if (this.observer) this.observer.disconnect();
-    this.blobs = [];
-  }
+
 }
