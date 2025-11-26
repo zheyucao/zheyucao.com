@@ -55,7 +55,7 @@ export function setupSectionAnimations(scroller?: HTMLElement) {
               id: `${SECTION_TRIGGER_PREFIX}-content-${index}`,
               trigger: sectionContent,
               scroller: pageWrapper,
-              start: "top 80%",
+              start: "top 70%",
               end: "top 40%",
               scrub: ANIMATION_CONSTANTS.GSAP.SECTION_CONTENT_SCRUB,
             },
