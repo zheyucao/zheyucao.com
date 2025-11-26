@@ -262,6 +262,355 @@ export async function getHomeViewModel(): Promise<HomeViewModel> {
 
 ---
 
+### 6.1 动画性能深度分析 (Animation Performance Deep Analysis)
+
+#### 6.1.1 内存管理 ⭐⭐⭐⭐⭐ (5/5)
+
+**内存泄漏防护措施：**
+
+1. **GSAP ScrollTrigger 清理**：
+   ```typescript
+   // gsapAnimations.ts - 清理特定触发器
+   export function cleanupSectionAnimations() {
+     ScrollTrigger.getAll()
+       .filter((trigger) => 
+         typeof trigger.vars.id === "string" && 
+         trigger.vars.id.startsWith(SECTION_TRIGGER_PREFIX)
+       )
+       .forEach((trigger) => trigger.kill());
+   }
+   
+   // 全局清理
+   export function cleanupScrollTriggers() {
+     ScrollTrigger.getAll().forEach((trigger) => trigger.kill());
+     gsap.globalTimeline.clear();
+   }
+   ```
+
+2. **事件监听器清理**：
+   ```typescript
+   // footerAnimation.ts - 返回清理函数
+   export function setupFooterAnimation(elements: FooterAnimationElements): () => void {
+     let trigger: ScrollTrigger | null = null;
+     trigger = ScrollTrigger.create({...});
+     
+     return () => {  // 清理函数
+       if (trigger) {
+         trigger.kill();
+         trigger = null;  // 释放引用
+       }
+     };
+   }
+   ```
+
+3. **IntersectionObserver 断开连接**：
+   ```typescript
+   // intersectionObserver.ts
+   return () => {
+     observer.disconnect();  // 清理观察器
+   };
+   ```
+
+4. **DynamicBackground 完整清理**：
+   ```typescript
+   // DynamicBackground.ts
+   public cleanup() {
+     this.container.classList.remove("is-ready");
+     this.svgContainer.classList.remove("css-hue-shift-active");
+     this.stopAnimation();  // 取消 RAF
+     if (this.mouseThrottleTimeout) cancelAnimationFrame(this.mouseThrottleTimeout);
+     this.cleanupListeners();  // 移除事件监听器
+     if (this.observer) this.observer.disconnect();  // 断开观察器
+     this.blobs = [];  // 清空数组引用
+   }
+   ```
+
+5. **setTimeout 清理**：
+   ```typescript
+   // scrollIndicator.ts
+   return () => {
+     if (fadeInTimeout !== null) {
+       clearTimeout(fadeInTimeout);
+       fadeInTimeout = null;
+     }
+   };
+   ```
+
+**Astro 生命周期集成**：
+```typescript
+// Layout.astro - 页面切换时清理
+document.addEventListener("astro:page-load", () => {
+  cleanupObserver = setupIntersectionObserver();
+});
+document.addEventListener("astro:before-swap", () => {
+  if (cleanupObserver) cleanupObserver();  // 页面切换前清理
+  cleanupObserver = undefined;
+});
+```
+
+#### 6.1.2 帧率控制 ⭐⭐⭐⭐⭐ (5/5)
+
+**帧率限制机制**：
+```typescript
+// DynamicBackground.ts
+private animate(timestamp: number) {
+  this.rafId = requestAnimationFrame(this.animate.bind(this));
+  
+  const { FPS } = ANIMATION_CONSTANTS;
+  const targetFrameInterval = 1000 / FPS.TARGET;  // 60fps = 16.67ms
+  
+  // 跳过过快的帧，保持目标帧率
+  const elapsedSinceLastExecution = timestamp - this.lastLogicExecutionTime;
+  if (elapsedSinceLastExecution < targetFrameInterval) {
+    return;  // 跳过此帧
+  }
+  this.lastLogicExecutionTime = timestamp - (elapsedSinceLastExecution % targetFrameInterval);
+  
+  // 执行动画逻辑...
+}
+```
+
+**帧率监控**：
+```typescript
+// 非移动设备上监控实际帧率
+if (!this.isMobileDevice && deltaTime > 0) {
+  const currentFps = 1000 / deltaTime;
+  this.fpsHistory.push(currentFps);
+  if (this.fpsHistory.length > FPS.HISTORY_LENGTH) {  // 保留60帧历史
+    this.fpsHistory.shift();
+  }
+}
+```
+
+**帧率常量配置**：
+```typescript
+// animationConstants.ts
+FPS: {
+  TARGET: 60,
+  HISTORY_LENGTH: 60,
+  LEVEL_1_MAX: 30,      // 性能降级阈值
+  LEVEL_1_RECOVERY: 35,
+  LEVEL_2_MAX: 40,
+  LEVEL_2_RECOVERY: 45,
+  LEVEL_3_MAX: 55,
+  LEVEL_4_MIN: 55,
+  LEVEL_4_DEGRADE: 50,
+  REQUIRED_FRAMES_FOR_SWITCH: 30,
+},
+```
+
+#### 6.1.3 算法复杂度 ⭐⭐⭐⭐☆ (4/5)
+
+**碰撞检测 - O(n²)**：
+```typescript
+// DynamicBackground.ts - updateBlob 方法
+if (this.config.enableCollisionDetection) {
+  const collisionPushForce = 0.01;
+  for (const otherBlob of this.blobs) {  // O(n) 内层循环
+    if (blob.id === otherBlob.id) continue;
+    
+    const dx = otherBlob.position.x - blob.position.x;
+    const dy = otherBlob.position.y - blob.position.y;
+    const distSquared = dx * dx + dy * dy;  // 避免 sqrt 优化
+    const minDistSquared = minDist * minDist;  // 平方比较避免 sqrt
+    
+    if (distSquared < minDistSquared && distSquared > 0) {
+      // 碰撞响应...
+    }
+  }
+}
+```
+
+**优化措施**：
+- ✅ 使用距离平方比较，避免昂贵的 `Math.sqrt()` 调用
+- ✅ Blob 数量限制（移动设备 3 个，桌面 4 个）
+- ⚠️ 对于少量对象，O(n²) 复杂度是可接受的
+
+**鼠标交互 - O(n)**：
+```typescript
+// 每个 Blob 与鼠标位置的距离计算
+if (this.config.enableMouseInteraction && this.mousePos) {
+  const dx = blob.position.x - this.mousePos.x;
+  const dy = blob.position.y - this.mousePos.y;
+  const distSquared = dx * dx + dy * dy;  // 避免 sqrt
+  // ...
+}
+```
+
+#### 6.1.4 可见性优化 ⭐⭐⭐⭐⭐ (5/5)
+
+**IntersectionObserver 暂停不可见动画**：
+```typescript
+// DynamicBackground.ts
+private setupIntersectionObserver() {
+  this.observer = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((entry) => {
+        this.isVisible = entry.isIntersecting;
+        if (this.isVisible) {
+          if (!this.rafId) this.startAnimation();  // 恢复动画
+        } else {
+          this.stopAnimation();  // 暂停动画，节省 CPU/GPU
+        }
+      });
+    },
+    { threshold: 0 }
+  );
+  this.observer.observe(this.container);
+}
+```
+
+**一次性观察优化**：
+```typescript
+// intersectionObserver.ts - 元素可见后停止观察
+const observerCallback: IntersectionObserverCallback = (entries, observer) => {
+  entries.forEach((entry) => {
+    if (entry.isIntersecting) {
+      entry.target.classList.add("visible");
+      observer.unobserve(entry.target);  // 不再需要观察
+    }
+  });
+};
+```
+
+#### 6.1.5 移动设备优化 ⭐⭐⭐⭐⭐ (5/5)
+
+```typescript
+// DynamicBackground.ts
+this.isMobileDevice = 
+  ("maxTouchPoints" in navigator && navigator.maxTouchPoints > 0) || 
+  window.innerWidth < 1024;
+
+this.config = {
+  numBlobs: this.isMobileDevice ? 3 : 4,        // 减少 Blob 数量
+  speedMultiplier: this.isMobileDevice ? 0.5 : 1, // 降低速度
+  // ...
+};
+```
+
+#### 6.1.6 DOM 操作优化 ⭐⭐⭐⭐⭐ (5/5)
+
+**批量 DOM 更新**：
+```typescript
+// 使用 transform 属性进行位置更新（触发 GPU 加速）
+blob.pathElement.setAttribute(
+  "transform",
+  `translate(${blob.position.x}, ${blob.position.y}) rotate(${blob.angle})`
+);
+```
+
+**缓存 DOM 计算**：
+```typescript
+private cachedContainerRect = { width: 0, height: 0, left: 0, top: 0 };
+private needsRectUpdate = true;
+
+private updateCachedRect() {
+  if (this.needsRectUpdate) {
+    const rect = this.svgContainer.getBoundingClientRect();
+    this.cachedContainerRect = { width: rect.width, height: rect.height, ... };
+    this.needsRectUpdate = false;
+  }
+}
+
+// 只在窗口 resize 时标记需要更新
+window.addEventListener("resize", () => { this.needsRectUpdate = true; });
+```
+
+#### 6.1.7 事件节流 ⭐⭐⭐⭐⭐ (5/5)
+
+```typescript
+// DynamicBackground.ts - 使用 RAF 节流鼠标事件
+const mousemoveHandler = (event: MouseEvent) => {
+  if (this.config.enableMouseInteraction) {
+    if (this.mouseThrottleTimeout) cancelAnimationFrame(this.mouseThrottleTimeout);
+    this.mouseThrottleTimeout = requestAnimationFrame(() => {
+      // 处理鼠标移动...
+    });
+  }
+};
+```
+
+#### 6.1.8 CSS 动画优化 ⭐⭐⭐⭐⭐ (5/5)
+
+**GPU 加速属性**：
+```css
+/* global.css */
+.scroll-reveal-animate {
+  transform: translateY(20px) translateZ(0);  /* translateZ(0) 触发 GPU 层 */
+  will-change: opacity, filter, transform;    /* 提示浏览器优化 */
+}
+
+.scroll-reveal-animate.visible {
+  transform: translateY(0) translateZ(0);
+}
+```
+
+**CSS 纯动画替代 JS**：
+```css
+/* DynamicBackground.astro */
+@keyframes hue-rotate-anim {
+  from { filter: hue-rotate(0deg); }
+  to { filter: hue-rotate(360deg); }
+}
+
+#dynamic-background-svg.css-hue-shift-active {
+  animation: hue-rotate-anim 50s linear infinite;  /* 纯 CSS，无 JS 开销 */
+}
+```
+
+#### 6.1.9 Reduced Motion 支持 ⭐⭐⭐⭐⭐ (5/5)
+
+**一致的减少动画检测**：
+```typescript
+// motionPreferences.ts - 集中工具函数
+export function prefersReducedMotion(): boolean {
+  if (typeof window === "undefined" || typeof window.matchMedia === "undefined") {
+    return false;
+  }
+  return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+}
+```
+
+**全局应用**：
+- `DynamicBackground.ts` - 静态模式
+- `gsapAnimations.ts` - 跳过动画设置
+- `intersectionObserver.ts` - 直接显示内容
+- `footerAnimation.ts` - 直接设置最终状态
+- `scrollIndicator.ts` - 使用原生滚动
+
+**CSS 媒体查询回退**：
+```css
+@media (prefers-reduced-motion: reduce) {
+  .scroll-reveal-animate,
+  .scroll-reveal-animate.visible {
+    opacity: 1;
+    filter: none;
+    transform: none;
+    transition: none;
+  }
+}
+```
+
+---
+
+### 动画性能总结
+
+| 方面 | 评分 | 说明 |
+|------|------|------|
+| 内存管理 | ⭐⭐⭐⭐⭐ | 完善的清理机制，无内存泄漏 |
+| 帧率控制 | ⭐⭐⭐⭐⭐ | 60fps 目标，自适应跳帧 |
+| 算法复杂度 | ⭐⭐⭐⭐☆ | O(n²) 碰撞检测，但 n 很小 |
+| 可见性优化 | ⭐⭐⭐⭐⭐ | 不可见时暂停动画 |
+| 移动端优化 | ⭐⭐⭐⭐⭐ | 自动降低复杂度 |
+| DOM 操作 | ⭐⭐⭐⭐⭐ | transform + 缓存 |
+| 事件节流 | ⭐⭐⭐⭐⭐ | RAF 节流 |
+| CSS 优化 | ⭐⭐⭐⭐⭐ | GPU 加速 + will-change |
+| 无障碍 | ⭐⭐⭐⭐⭐ | prefers-reduced-motion 支持 |
+
+**动画性能评分：4.9/5**
+
+---
+
 ### 7. 文档与可读性 ⭐⭐⭐⭐⭐ (5/5)
 
 **优点：**
