@@ -1,7 +1,6 @@
 import { getCollection, getEntry, type CollectionEntry } from "astro:content";
 import type { AstroComponentFactory } from "astro/runtime/server/index.js";
 import type { ContactItem } from "./contactViewModel";
-import { parseDate } from "../lib/utils/dateUtils";
 import { sortByOrder } from "../lib/utils/sortUtils";
 
 
@@ -151,23 +150,23 @@ export async function getHomeViewModel(): Promise<HomeViewModel> {
   // Filter and sort featured projects by explicit order
   const featuredProjects = sortByOrder(
     allProjects.filter((p) => p.data.isFeatured),
-    (p) => p.data.order
+    {
+      getOrder: (p) => p.data.order,
+    }
   );
 
 
-  // Filter timeline highlights and drop invalid dates
+  // Filter timeline highlights and sort using sortByOrder
   const highlightEvents = allEvents.filter((e) => e.data.isHighlight);
 
-  const highlightsWithDate = highlightEvents
-    .map((event) => ({ event, dateValue: parseDate(event.data.date) }))
-    .filter(({ dateValue }) => dateValue > 0)
-    .sort((a, b) => b.dateValue - a.dateValue);
-
-  const topHighlights = highlightsWithDate.slice(0, 3);
+  // Sort by date (descending) and take top 3
+  const sortedHighlights = sortByOrder(highlightEvents, {
+    getDate: (e) => e.data.date,
+  }).slice(0, 3);
 
   // Render content for highlights in parallel
   const highlights: TimelineHighlight[] = await Promise.all(
-    topHighlights.map(async ({ event }) => {
+    sortedHighlights.map(async (event) => {
       const rendered = await event.render();
       return { ...event, Content: rendered.Content };
     })
@@ -177,7 +176,9 @@ export async function getHomeViewModel(): Promise<HomeViewModel> {
   const listEntries = contactEntries.filter(
     (entry): entry is ContactListEntry => entry.data.kind === "list"
   );
-  const sortedListEntries = sortByOrder(listEntries, (e) => e.data.order);
+  const sortedListEntries = sortByOrder(listEntries, {
+    getOrder: (e) => e.data.order,
+  });
 
   const contactItemsWithOrder = sortByOrder(
     sortedListEntries.flatMap((entry, sectionIndex) => {

@@ -48,7 +48,9 @@ export async function getContactViewModel(): Promise<ContactViewModel> {
   // Pick the first intro by order (if present)
   let intro: ContactIntro | undefined;
   if (introEntries.length > 0) {
-    sortByOrder(introEntries, (e) => e.data.order);
+    sortByOrder(introEntries, {
+      getOrder: (e) => e.data.order,
+    });
     const introEntry = introEntries[0] as CollectionEntry<"contact">;
 
     const { Content } = await introEntry.render();
@@ -72,7 +74,9 @@ export async function getContactViewModel(): Promise<ContactViewModel> {
   );
 
   // Sort sections by order
-  sortByOrder(sections);
+  sortByOrder(sections, {
+    getOrder: (s) => s.order,
+  });
 
 
   return {
@@ -96,7 +100,9 @@ export async function getContactFooterItems(): Promise<ContactItem[]> {
 
   const listEntries = contactEntries.filter(isListEntry);
 
-  const sortedListEntries = sortByOrder(listEntries, (e) => e.data.order);
+  const sortedListEntries = sortByOrder(listEntries, {
+    getOrder: (e) => e.data.order,
+  });
 
   const items = sortedListEntries.flatMap((entry, sectionIndex) => {
     const baseOrder = entry.data.order ?? sectionIndex;
@@ -109,6 +115,8 @@ export async function getContactFooterItems(): Promise<ContactItem[]> {
       .filter((item) => item.showOnFooter !== false && item.href);
   });
 
-  return sortByOrder(items);
+  return sortByOrder(items, {
+    getOrder: (i) => i.order,
+  });
 }
 

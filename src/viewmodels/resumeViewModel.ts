@@ -22,6 +22,12 @@ export type ResumeEntryItem = {
   Content?: AstroComponentFactory;
 };
 
+export type AwardItem = {
+  title: string;
+  date?: string;
+  order?: number;
+};
+
 type TextResumeSection = {
   id: string;
   title: string;
@@ -129,7 +135,10 @@ export async function getResumeViewModel(): Promise<{
       };
     })
   );
-  const sortedEducation = sortByOrder(education);
+  const sortedEducation = sortByOrder(education, {
+    getOrder: (e) => e.order,
+    getDate: (e) => e.date,
+  });
 
 
   // Filter experience entries
@@ -149,7 +158,10 @@ export async function getResumeViewModel(): Promise<{
       };
     })
   );
-  const sortedExperience = sortByOrder(experience);
+  const sortedExperience = sortByOrder(experience, {
+    getOrder: (e) => e.order,
+    getDate: (e) => e.date,
+  });
 
 
   // Filter project entries
@@ -168,7 +180,10 @@ export async function getResumeViewModel(): Promise<{
       };
     })
   );
-  const sortedProjects = sortByOrder(projects);
+  const sortedProjects = sortByOrder(projects, {
+    getOrder: (e) => e.order,
+    getDate: (e) => e.date,
+  });
 
 
   // Fetch awards data
@@ -220,7 +235,10 @@ export async function getResumeViewModel(): Promise<{
       title: awardsEntry.data.title,
       type: "entries",
       variant: "awards",
-      content: awardsEntry.data.content,
+      content: sortByOrder(awardsEntry.data.content, {
+        getOrder: (a) => a.order,
+        getDate: (a) => a.date,
+      }),
     },
     {
       id: "experience",

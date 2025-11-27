@@ -25,7 +25,9 @@ export async function getProjectsViewModel() {
   // Sort projects by order field (if specified)
   // Projects with order come first, sorted by order value
   // Projects without order come after, in their original order
-  sortByOrder(projects, (p) => p.data.order);
+  sortByOrder(projects, {
+    getOrder: (p) => p.data.order,
+  });
 
 
   return {

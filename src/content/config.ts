@@ -5,7 +5,7 @@ const projects = defineCollection({
   schema: ({ image }) =>
     z.object({
       title: z.string(),
-      timeframe: z.string().optional(),
+      date: z.string().optional(),
       githubUrl: z.string().url().optional(),
       githubRepos: z
         .array(
@@ -89,6 +89,7 @@ const resume = defineCollection({
         z.object({
           title: z.string(),
           date: z.string().optional(),
+          order: z.number().optional(),
         })
       ),
     }),
