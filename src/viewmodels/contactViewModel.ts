@@ -1,5 +1,7 @@
 import { getCollection, type CollectionEntry } from "astro:content";
 import { getPageMetadata, type PageMetadata } from "../lib/viewmodels/baseViewModel";
+import { sortByOrder } from "../lib/utils/sortUtils";
+
 
 export interface ContactItem {
   icon: string;
@@ -46,8 +48,9 @@ export async function getContactViewModel(): Promise<ContactViewModel> {
   // Pick the first intro by order (if present)
   let intro: ContactIntro | undefined;
   if (introEntries.length > 0) {
-    introEntries.sort((a, b) => (a.data.order ?? Infinity) - (b.data.order ?? Infinity));
+    sortByOrder(introEntries, (e) => e.data.order);
     const introEntry = introEntries[0] as CollectionEntry<"contact">;
+
     const { Content } = await introEntry.render();
     intro = {
       order: introEntry.data.order ?? Infinity,
@@ -69,7 +72,8 @@ export async function getContactViewModel(): Promise<ContactViewModel> {
   );
 
   // Sort sections by order
-  sections.sort((a, b) => a.order - b.order);
+  sortByOrder(sections);
+
 
   return {
     metadata,
@@ -92,17 +96,19 @@ export async function getContactFooterItems(): Promise<ContactItem[]> {
 
   const listEntries = contactEntries.filter(isListEntry);
 
-  return listEntries
-    .sort((a, b) => (a.data.order ?? 0) - (b.data.order ?? 0))
-    .flatMap((entry, sectionIndex) => {
-      const baseOrder = entry.data.order ?? sectionIndex;
-      const items = entry.data.items || [];
-      return items
-        .map((item, idx) => ({
-          ...item,
-          order: baseOrder * 100 + idx,
-        }))
-        .filter((item) => item.showOnFooter !== false && item.href);
-    })
-    .sort((a, b) => a.order - b.order);
+  const sortedListEntries = sortByOrder(listEntries, (e) => e.data.order);
+
+  const items = sortedListEntries.flatMap((entry, sectionIndex) => {
+    const baseOrder = entry.data.order ?? sectionIndex;
+    const items = entry.data.items || [];
+    return items
+      .map((item, idx) => ({
+        ...item,
+        order: baseOrder * 100 + idx,
+      }))
+      .filter((item) => item.showOnFooter !== false && item.href);
+  });
+
+  return sortByOrder(items);
 }
+

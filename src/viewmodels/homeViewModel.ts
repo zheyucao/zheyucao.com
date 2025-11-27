@@ -2,6 +2,8 @@ import { getCollection, getEntry, type CollectionEntry } from "astro:content";
 import type { AstroComponentFactory } from "astro/runtime/server/index.js";
 import type { ContactItem } from "./contactViewModel";
 import { parseDate } from "../lib/utils/dateUtils";
+import { sortByOrder } from "../lib/utils/sortUtils";
+
 
 // Hero section requires specific fields
 type HeroData = {
@@ -147,9 +149,11 @@ export async function getHomeViewModel(): Promise<HomeViewModel> {
   };
 
   // Filter and sort featured projects by explicit order
-  const featuredProjects = allProjects
-    .filter((p) => p.data.isFeatured)
-    .sort((a, b) => (a.data.order ?? 0) - (b.data.order ?? 0));
+  const featuredProjects = sortByOrder(
+    allProjects.filter((p) => p.data.isFeatured),
+    (p) => p.data.order
+  );
+
 
   // Filter timeline highlights and drop invalid dates
   const highlightEvents = allEvents.filter((e) => e.data.isHighlight);
@@ -173,9 +177,10 @@ export async function getHomeViewModel(): Promise<HomeViewModel> {
   const listEntries = contactEntries.filter(
     (entry): entry is ContactListEntry => entry.data.kind === "list"
   );
-  const contactItemsWithOrder = listEntries
-    .sort((a, b) => (a.data.order ?? Infinity) - (b.data.order ?? Infinity))
-    .flatMap((entry, sectionIndex) => {
+  const sortedListEntries = sortByOrder(listEntries, (e) => e.data.order);
+
+  const contactItemsWithOrder = sortByOrder(
+    sortedListEntries.flatMap((entry, sectionIndex) => {
       const items = entry.data.items;
       return items
         .map((item, itemIndex) => ({
@@ -187,8 +192,8 @@ export async function getHomeViewModel(): Promise<HomeViewModel> {
         }))
         .filter(({ item }) => item.showOnHome !== false);
     })
-    .sort((a, b) => a.order - b.order)
-    .map(({ item }) => item);
+  ).map(({ item }) => item);
+
 
   return {
     hero,

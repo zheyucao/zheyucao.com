@@ -62,8 +62,8 @@ export type ResumeSection =
   | SkillsResumeSection
   | ContactResumeSection;
 
-const sortByOrder = <T extends { order?: number }>(items: T[]) =>
-  items.sort((a, b) => (a.order ?? Infinity) - (b.order ?? Infinity));
+import { sortByOrder } from "../lib/utils/sortUtils";
+
 
 const getOrder = (entry: ResumeCollectionEntry): number | undefined =>
   "order" in entry.data ? entry.data.order : undefined;
@@ -129,7 +129,8 @@ export async function getResumeViewModel(): Promise<{
       };
     })
   );
-  sortByOrder(education);
+  const sortedEducation = sortByOrder(education);
+
 
   // Filter experience entries
   const experienceEntries = allResumeContent.filter(
@@ -148,7 +149,8 @@ export async function getResumeViewModel(): Promise<{
       };
     })
   );
-  sortByOrder(experience);
+  const sortedExperience = sortByOrder(experience);
+
 
   // Filter project entries
   const projectEntries = allResumeContent.filter(
@@ -166,7 +168,8 @@ export async function getResumeViewModel(): Promise<{
       };
     })
   );
-  sortByOrder(projects);
+  const sortedProjects = sortByOrder(projects);
+
 
   // Fetch awards data
   const awardsEntry = allResumeContent.find(
@@ -209,7 +212,8 @@ export async function getResumeViewModel(): Promise<{
       title: "Education",
       type: "entries",
       variant: "education",
-      content: education,
+      content: sortedEducation,
+
     },
     {
       id: "awards",
@@ -223,14 +227,16 @@ export async function getResumeViewModel(): Promise<{
       title: "Experience",
       type: "entries",
       variant: "experience",
-      content: experience,
+      content: sortedExperience,
+
     },
     {
       id: "projects",
       title: "Projects",
       type: "entries",
       variant: "projects",
-      content: projects,
+      content: sortedProjects,
+
     },
   ];
 
