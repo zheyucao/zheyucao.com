@@ -6,9 +6,9 @@ import { sortByOrder } from "../lib/utils/sortUtils";
 
 // Hero section requires specific fields
 type HeroData = {
-  greeting: string;
+  greeting?: string;
   name: string;
-  description: string;
+  description?: string;
 };
 
 // Section with content requires title and cta
@@ -96,8 +96,8 @@ export async function getHomeViewModel(): Promise<HomeViewModel> {
 
   // Validate hero data has required fields
   const heroData = heroEntry.data;
-  if (!heroData.greeting || !heroData.name || !heroData.description) {
-    throw new Error("Hero section is missing required fields (greeting, name, description).");
+  if (!heroData.name) {
+    throw new Error("Hero section is missing required fields (name).");
   }
 
   const hero: HeroData = {
