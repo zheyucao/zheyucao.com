@@ -22,8 +22,8 @@ export interface SortOptions<T> {
  */
 export function sortByOrder<T>(items: T[], options: SortOptions<T> = {}): T[] {
     const {
-        getOrder = (item) => (item as any).order,
-        getDate = (item) => (item as any).date,
+        getOrder = (item) => (item as Partial<Orderable>).order,
+        getDate = (item) => (item as { date?: string }).date,
     } = options;
 
     // Map to store original index for stable sort fallback
