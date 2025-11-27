@@ -1,7 +1,9 @@
 .timeline-event {
   position: relative;
-  padding-left: 3rem; /* Space for marker and line */
-  padding-bottom: 2.5rem; /* Space between events */
+  padding-left: 3rem;
+  /* Space for marker and line */
+  padding-bottom: 2.5rem;
+  /* Space between events */
   list-style: none;
 }
 
@@ -9,9 +11,12 @@
 .timeline-event:not(.is-last)::before {
   content: "";
   position: absolute;
-  left: 11px; /* Aligned with center of marker */
-  top: 0.5rem; /* Start below the marker */
-  bottom: -0.5rem; /* Extend past the bottom padding */
+  left: 11px;
+  /* Aligned with center of marker */
+  top: 0.5rem;
+  /* Start below the marker */
+  bottom: -0.5rem;
+  /* Extend past the bottom padding */
   width: 2px;
   background-color: var(--timeline-line-color);
   transform: translateX(-50%);
@@ -21,7 +26,8 @@
 .timeline-marker {
   position: absolute;
   left: 11px;
-  top: 0.5rem; /* Align vertically with text */
+  top: 0.5rem;
+  /* Align vertically with text */
   width: 0.5rem;
   height: 0.5rem;
   background-color: var(--timeline-marker-bg-color);
@@ -64,7 +70,8 @@
 }
 
 .timeline-description {
-  font-size: 1.1rem;
+  font-size: 1.2rem;
   line-height: 1.7;
 }
+
 /* Removed global p selector as set:html applies directly */

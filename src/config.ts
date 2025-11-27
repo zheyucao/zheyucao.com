@@ -15,9 +15,9 @@ export interface SiteConfig {
 
 export const siteConfig: SiteConfig = {
   metadata: {
-    title: "Zheyu Cao",
+    title: "Zheyu Cao's Personal Website",
     description:
-      "Currently a fourth-year student at Northwestern Polytechnical University, pursuing a Bachelor's degree in Computer Science and Technology.",
+      "A website showcasing Zheyu Cao's work, projects, updates and résumé.",
     author: "Zheyu Cao",
     siteUrl: "https://zheyucao.com", // Update with actual URL if different
   },

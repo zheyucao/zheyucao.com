@@ -168,6 +168,14 @@ const ui_strings = defineCollection({
   }),
 });
 
+const footer = defineCollection({
+  type: "data",
+  schema: z.object({
+    author: z.string(),
+    description: z.string(),
+  }),
+});
+
 export const collections = {
   projects,
   timeline,
@@ -176,4 +184,5 @@ export const collections = {
   contact,
   "ui-strings": ui_strings,
   "page-metadata": page_metadata,
+  footer,
 };
