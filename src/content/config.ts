@@ -81,18 +81,6 @@ const resume = defineCollection({
         })
       ),
     }),
-    // Awards
-    z.object({
-      type: z.literal("awards"),
-      title: z.string(),
-      content: z.array(
-        z.object({
-          title: z.string(),
-          date: z.string().optional(),
-          order: z.number().optional(),
-        })
-      ),
-    }),
     // Contact
     z.object({
       type: z.literal("contact"),
@@ -108,7 +96,7 @@ const resume = defineCollection({
         })
       ),
     }),
-    // Standard Entry (Experience, Education, Projects, Profile, Metadata)
+    // Standard Entry (Experience, Education, Projects, Awards, Profile, Metadata)
     z.object({
       title: z.string(),
       subtitle: z.string().optional(),

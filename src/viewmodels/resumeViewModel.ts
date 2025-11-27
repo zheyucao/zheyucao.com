@@ -9,7 +9,6 @@ type ResumeCollectionData = ResumeCollectionEntry["data"];
 
 type TypedResumeData = Extract<ResumeCollectionData, { type: string }>;
 type StandardEntryData = Exclude<ResumeCollectionData, TypedResumeData>;
-type AwardsEntryData = Extract<ResumeCollectionData, { type: "awards" }>;
 type SkillsEntryData = Extract<ResumeCollectionData, { type: "skills" }>;
 type ContactEntryData = Extract<ResumeCollectionData, { type: "contact" }>;
 
@@ -22,11 +21,7 @@ export type ResumeEntryItem = {
   Content?: AstroComponentFactory;
 };
 
-export type AwardItem = {
-  title: string;
-  date?: string;
-  order?: number;
-};
+
 
 type TextResumeSection = {
   id: string;
@@ -80,11 +75,7 @@ const isStandardEntry = (
   data: StandardEntryData;
 } => !("type" in entry.data);
 
-const isAwardsEntry = (
-  entry: ResumeCollectionEntry
-): entry is ResumeCollectionEntry & {
-  data: AwardsEntryData;
-} => "type" in entry.data && entry.data.type === "awards";
+
 
 const isSkillsEntry = (
   entry: ResumeCollectionEntry
@@ -185,16 +176,27 @@ export async function getResumeViewModel(): Promise<{
     getDate: (e) => e.date,
   });
 
-
-  // Fetch awards data
-  const awardsEntry = allResumeContent.find(
-    (entry): entry is ResumeCollectionEntry & { data: AwardsEntryData } =>
-      entry.id === "awards.mdx" && isAwardsEntry(entry)
+  // Filter awards entries
+  const awardsEntries = allResumeContent.filter(
+    (entry): entry is ResumeCollectionEntry & { data: StandardEntryData } =>
+      entry.id.startsWith("awards/") && isStandardEntry(entry)
   );
-  if (!awardsEntry) {
-    console.error("Awards entry has wrong type or missing");
-    throw new Error("Awards entry invalid type");
-  }
+  const awards: ResumeEntryItem[] = await Promise.all(
+    awardsEntries.map(async (entry) => {
+      const { Content } = await entry.render();
+      return {
+        title: entry.data.title,
+        subtitle: entry.data.subtitle,
+        date: entry.data.date,
+        order: getOrder(entry),
+        Content,
+      };
+    })
+  );
+  const sortedAwards = sortByOrder(awards, {
+    getOrder: (e) => e.order,
+    getDate: (e) => e.date,
+  });
 
   // Fetch skills data
   const skillsEntry = allResumeContent.find(
@@ -232,13 +234,10 @@ export async function getResumeViewModel(): Promise<{
     },
     {
       id: "awards",
-      title: awardsEntry.data.title,
+      title: "Honors & Awards",
       type: "entries",
       variant: "awards",
-      content: sortByOrder(awardsEntry.data.content, {
-        getOrder: (a) => a.order,
-        getDate: (a) => a.date,
-      }),
+      content: sortedAwards,
     },
     {
       id: "experience",
