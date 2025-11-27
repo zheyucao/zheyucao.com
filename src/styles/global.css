@@ -6,7 +6,8 @@
   --link-color: var(--text-color);
   --link-hover-color: #101010;
   --link-visited-color: #101010;
-  --footer-bg: #f8f9faaa; /* Light footer */
+  --footer-bg: #f8f9faaa;
+  /* Light footer */
   --footer-text: #343a40;
   --footer-heading: #212529;
   --footer-link: #384044;
@@ -26,7 +27,7 @@
   --timeline-marker-bg-color: #333;
   --timeline-line-color: #3333;
 
-  --font-family-serif: "EB Garamond", Garamond, "Times New Roman", serif;
+  --font-family-serif: "EB Garamond", "Garamond", "Times New Roman", serif;
   --font-family-sans:
     "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif,
     "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
@@ -34,7 +35,8 @@
 
 html.dark {
   /* Dark Theme Overrides */
-  --bg-color: #121212; /* Slightly off-black */
+  --bg-color: #121212;
+  /* Slightly off-black */
   --text-color: #e3e3e3;
   --text-muted: #d4d4d4;
   --link-color: var(--text-color);
@@ -63,7 +65,8 @@ html.dark {
 
 html {
   /* Ensure no overscroll rule here */
-  background-color: var(--bg-color); /* Use CSS variable */
+  background-color: var(--bg-color);
+  /* Use CSS variable */
 }
 
 html,
@@ -72,7 +75,8 @@ body {
   width: 100%;
   height: 100%;
   font-family: var(--font-family-serif);
-  color: var(--text-color); /* Apply base text color */
+  color: var(--text-color);
+  /* Apply base text color */
   /* Ensure smooth transitions for color changes */
   transition:
     background-color 0.3s ease,
@@ -82,7 +86,8 @@ body {
 .page-wrapper {
   height: 100vh;
   overflow-y: auto;
-  position: relative; /* Context for absolutely positioned children if needed */
+  position: relative;
+  /* Context for absolutely positioned children if needed */
   overscroll-behavior-y: contain;
 }
 
@@ -112,6 +117,7 @@ body {
     filter 0.8s ease-out,
     transform 0.8s ease-out;
 }
+
 .scroll-reveal-animate.visible {
   /* Final state */
   opacity: 1;
@@ -138,6 +144,7 @@ body {
 }
 
 @media (prefers-reduced-motion: reduce) {
+
   .scroll-reveal-animate,
   .scroll-reveal-animate.visible {
     opacity: 1;
@@ -156,8 +163,10 @@ body {
 /* Base link style */
 a {
   color: var(--text-color);
-  text-decoration: underline; /* Add default underline */
-  text-underline-offset: 0.2em; /* Add default offset */
+  text-decoration: underline;
+  /* Add default underline */
+  text-underline-offset: 0.2em;
+  /* Add default offset */
   transition: color 0.2s ease;
 }
 
@@ -166,6 +175,8 @@ a:hover,
 a:focus,
 a:active {
   color: var(--link-hover-color);
-  text-decoration: underline; /* Ensure underline persists */
-  text-underline-offset: 0.2em; /* Ensure offset persists */
+  text-decoration: underline;
+  /* Ensure underline persists */
+  text-underline-offset: 0.2em;
+  /* Ensure offset persists */
 }
