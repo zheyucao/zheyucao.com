@@ -51,17 +51,17 @@ const { title, entries, variant = "default" } = Astro.props;
 
 <style>
   .resume-section {
-    margin-bottom: 4rem;
+    margin-bottom: 3rem;
   }
   h2 {
     font-size: clamp(1.8rem, 1.5rem + 1.5vw, 2.8rem);
-    margin-bottom: 2rem;
+    margin-bottom: 1.5rem;
     font-weight: 600;
     border-bottom: 1px solid var(--text-muted);
     padding-bottom: 0.5rem;
   }
   .entry-item {
-    margin-bottom: 2.5rem;
+    margin-bottom: 1rem;
   }
   .entry-item:last-child {
     margin-bottom: 0;
@@ -70,18 +70,21 @@ const { title, entries, variant = "default" } = Astro.props;
     display: flex;
     justify-content: space-between;
     flex-wrap: wrap;
-    font-size: 1.2rem;
+    font-size: 1.4rem;
     align-items: baseline;
-    margin-bottom: 0.8rem;
   }
   .title {
-    font-weight: bold;
+    font-weight: normal;
     margin-right: 0.5rem;
   }
   .subtitle {
-    font-size: 1.1rem;
-    margin-bottom: 0.8rem;
+    font-size: 1.2rem;
+    margin-bottom: 0.2rem;
   }
+  .subtitle :global(p) {
+    margin: 0;
+  }
+
   .date {
     font-family: var(--font-family-sans);
     color: var(--text-muted);
@@ -90,27 +93,15 @@ const { title, entries, variant = "default" } = Astro.props;
   }
   .details {
     margin-top: 0.8rem;
-    font-size: 1.1rem;
-    line-height: 1.8;
+    font-size: 1rem;
+    line-height: 1.6;
   }
-
-  /* Awards variant - simpler layout */
-  .awards-entry {
-    margin-bottom: 1.5rem;
+  .details :global(p) {
+    margin-top: 0;
+    margin-bottom: 0.5rem;
   }
-
-  .awards-entry:last-child {
+  .details :global(p:last-child) {
     margin-bottom: 0;
-  }
-
-  .awards-entry .title-row {
-    font-size: 1.1rem;
-    line-height: 1;
-    margin-bottom: 0;
-  }
-
-  .awards-entry .title {
-    font-weight: normal;
   }
 
   @media (max-width: 600px) {

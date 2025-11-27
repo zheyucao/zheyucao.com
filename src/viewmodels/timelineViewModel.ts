@@ -1,6 +1,6 @@
 import { getCollection, getEntry } from "astro:content";
 import { getPageMetadata } from "../lib/viewmodels/baseViewModel";
-import { parseDate } from "../lib/utils/dateUtils";
+import { sortByOrder } from "../lib/utils/sortUtils";
 
 /**
  * Helper to parse dates robustly
@@ -25,8 +25,10 @@ export async function getTimelineViewModel() {
   // Calculate unique categories
   const categories = [...new Set(allEvents.map((event) => event.category).filter(Boolean))].sort();
 
-  // Initial sort (newest first)
-  const sortedEvents = [...allEvents].sort((a, b) => parseDate(b.date) - parseDate(a.date));
+  // Initial sort (newest first) using sortByOrder
+  const sortedEvents = sortByOrder(allEvents, {
+    getDate: (e) => e.date,
+  });
 
   // Fetch metadata and UI strings in parallel
   const [metadata, uiStrings] = await Promise.all([

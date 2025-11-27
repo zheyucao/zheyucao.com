@@ -1,5 +1,7 @@
 import { getCollection } from "astro:content";
 import { getPageMetadata } from "../lib/viewmodels/baseViewModel";
+import { sortByOrder } from "../lib/utils/sortUtils";
+
 
 /**
  * Projects page view model
@@ -23,11 +25,10 @@ export async function getProjectsViewModel() {
   // Sort projects by order field (if specified)
   // Projects with order come first, sorted by order value
   // Projects without order come after, in their original order
-  projects.sort((a, b) => {
-    const orderA = a.data.order ?? Infinity;
-    const orderB = b.data.order ?? Infinity;
-    return orderA - orderB;
+  sortByOrder(projects, {
+    getOrder: (p) => p.data.order,
   });
+
 
   return {
     metadata,

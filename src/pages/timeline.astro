@@ -6,13 +6,7 @@ import "../styles/timeline.css";
 import Button from "../components/common/Button.astro";
 
 const viewModel = await getTimelineViewModel();
-const {
-  categories,
-  initialEvents: initialFilteredEvents,
-  metadata,
-  filterAll,
-  events: allEvents,
-} = viewModel;
+const { categories, initialEvents: initialFilteredEvents, metadata, filterAll } = viewModel;
 ---
 
 <SubPageLayout title={metadata.title}>

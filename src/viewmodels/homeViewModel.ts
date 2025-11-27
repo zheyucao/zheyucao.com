@@ -1,13 +1,14 @@
 import { getCollection, getEntry, type CollectionEntry } from "astro:content";
 import type { AstroComponentFactory } from "astro/runtime/server/index.js";
 import type { ContactItem } from "./contactViewModel";
-import { parseDate } from "../lib/utils/dateUtils";
+import { sortByOrder } from "../lib/utils/sortUtils";
+
 
 // Hero section requires specific fields
 type HeroData = {
-  greeting: string;
+  greeting?: string;
   name: string;
-  description: string;
+  description?: string;
 };
 
 // Section with content requires title and cta
@@ -95,8 +96,8 @@ export async function getHomeViewModel(): Promise<HomeViewModel> {
 
   // Validate hero data has required fields
   const heroData = heroEntry.data;
-  if (!heroData.greeting || !heroData.name || !heroData.description) {
-    throw new Error("Hero section is missing required fields (greeting, name, description).");
+  if (!heroData.name) {
+    throw new Error("Hero section is missing required fields (name).");
   }
 
   const hero: HeroData = {
@@ -147,23 +148,25 @@ export async function getHomeViewModel(): Promise<HomeViewModel> {
   };
 
   // Filter and sort featured projects by explicit order
-  const featuredProjects = allProjects
-    .filter((p) => p.data.isFeatured)
-    .sort((a, b) => (a.data.order ?? 0) - (b.data.order ?? 0));
+  const featuredProjects = sortByOrder(
+    allProjects.filter((p) => p.data.isFeatured),
+    {
+      getOrder: (p) => p.data.order,
+    }
+  );
 
-  // Filter timeline highlights and drop invalid dates
+
+  // Filter timeline highlights and sort using sortByOrder
   const highlightEvents = allEvents.filter((e) => e.data.isHighlight);
 
-  const highlightsWithDate = highlightEvents
-    .map((event) => ({ event, dateValue: parseDate(event.data.date) }))
-    .filter(({ dateValue }) => dateValue > 0)
-    .sort((a, b) => b.dateValue - a.dateValue);
-
-  const topHighlights = highlightsWithDate.slice(0, 3);
+  // Sort by date (descending) and take top 3
+  const sortedHighlights = sortByOrder(highlightEvents, {
+    getDate: (e) => e.data.date,
+  }).slice(0, 3);
 
   // Render content for highlights in parallel
   const highlights: TimelineHighlight[] = await Promise.all(
-    topHighlights.map(async ({ event }) => {
+    sortedHighlights.map(async (event) => {
       const rendered = await event.render();
       return { ...event, Content: rendered.Content };
     })
@@ -173,9 +176,12 @@ export async function getHomeViewModel(): Promise<HomeViewModel> {
   const listEntries = contactEntries.filter(
     (entry): entry is ContactListEntry => entry.data.kind === "list"
   );
-  const contactItemsWithOrder = listEntries
-    .sort((a, b) => (a.data.order ?? Infinity) - (b.data.order ?? Infinity))
-    .flatMap((entry, sectionIndex) => {
+  const sortedListEntries = sortByOrder(listEntries, {
+    getOrder: (e) => e.data.order,
+  });
+
+  const contactItemsWithOrder = sortByOrder(
+    sortedListEntries.flatMap((entry, sectionIndex) => {
       const items = entry.data.items;
       return items
         .map((item, itemIndex) => ({
@@ -187,8 +193,8 @@ export async function getHomeViewModel(): Promise<HomeViewModel> {
         }))
         .filter(({ item }) => item.showOnHome !== false);
     })
-    .sort((a, b) => a.order - b.order)
-    .map(({ item }) => item);
+  ).map(({ item }) => item);
+
 
   return {
     hero,

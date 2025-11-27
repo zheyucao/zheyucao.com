@@ -4,13 +4,19 @@ import { siteConfig } from "../config";
 import { getEntry } from "astro:content";
 
 const currentYear = new Date().getFullYear();
-const { metadata, navigation } = siteConfig;
+const { navigation } = siteConfig;
 
 const uiStrings = await getEntry("ui-strings", "en");
 if (!uiStrings) {
   throw new Error("Could not find UI strings for 'en'");
 }
 const { footer: footerStrings } = uiStrings.data;
+
+const footerData = await getEntry("footer", "info");
+if (!footerData) {
+  throw new Error("Could not find footer data");
+}
+const { author, description } = footerData.data;
 
 // Load contact items for footer (single source of truth)
 import { getContactFooterItems } from "../viewmodels/contactViewModel";
@@ -21,13 +27,13 @@ const contactFooterItems = await getContactFooterItems();
 <footer class="site-footer">
   <div class="footer-content">
     <div class="footer-column footer-column-1">
-      <h4>{metadata.author}</h4>
+      <h4>{author}</h4>
       <p class="footer-description">
-        {metadata.description}
+        {description}
       </p>
       <p class="copyright">
         &copy; {currentYear}
-        {metadata.author}. {footerStrings.copyrightText}.
+        {author}. {footerStrings.copyrightText}.
       </p>
     </div>
     <div class="footer-column footer-column-2">

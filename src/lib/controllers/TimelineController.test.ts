@@ -2,7 +2,6 @@ import { describe, it, expect, beforeEach } from "vitest";
 import { TimelineController } from "./TimelineController";
 
 describe("TimelineController", () => {
-  let container: HTMLElement;
   let categoryTab1: HTMLElement;
   let categoryTabAll: HTMLElement;
 
@@ -25,7 +24,6 @@ describe("TimelineController", () => {
       <button class="category-tab" data-category="Cat2">Cat2</button>
     `;
 
-    container = document.getElementById("timeline-container")!;
     const tabs = document.querySelectorAll(".category-tab");
     categoryTabAll = tabs[0] as HTMLElement;
     categoryTab1 = tabs[1] as HTMLElement; // Cat1
