@@ -8,6 +8,9 @@ vi.mock('astro:content', () => ({
     getCollection: vi.fn(),
 }));
 
+const mockedGetEntry = vi.mocked(getEntry);
+const mockedGetCollection = vi.mocked(getCollection);
+
 describe('homeViewModel', () => {
     beforeEach(() => {
         vi.clearAllMocks();
@@ -43,7 +46,7 @@ describe('homeViewModel', () => {
             }
         ];
 
-        (getEntry as any).mockImplementation((collection: string, slug: string) => {
+        mockedGetEntry.mockImplementation((collection: string, slug: string) => {
             if (collection === 'home') {
                 if (slug === 'hero') return Promise.resolve(mockHero);
                 if (slug === 'meet-me') return Promise.resolve(mockMeetMe);
@@ -54,7 +57,7 @@ describe('homeViewModel', () => {
             return Promise.resolve(undefined);
         });
 
-        (getCollection as any).mockImplementation((collection: string) => {
+        mockedGetCollection.mockImplementation((collection: string) => {
             if (collection === 'projects') return Promise.resolve(mockProjects);
             if (collection === 'timeline') return Promise.resolve(mockEvents);
             if (collection === 'contact') return Promise.resolve(mockContact);
@@ -81,8 +84,8 @@ describe('homeViewModel', () => {
     });
 
     it('should throw error if required sections are missing', async () => {
-        (getEntry as any).mockResolvedValue(undefined);
-        (getCollection as any).mockResolvedValue([]);
+        mockedGetEntry.mockResolvedValue(undefined as never);
+        mockedGetCollection.mockResolvedValue([] as never);
 
         await expect(getHomeViewModel()).rejects.toThrow('Required homepage sections are missing.');
     });

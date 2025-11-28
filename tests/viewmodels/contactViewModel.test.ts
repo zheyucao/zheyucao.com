@@ -13,6 +13,9 @@ vi.mock('../../src/lib/viewmodels/baseViewModel', () => ({
     getPageMetadata: vi.fn(),
 }));
 
+const mockedGetCollection = vi.mocked(getCollection);
+const mockedGetPageMetadata = vi.mocked(getPageMetadata);
+
 describe('contactViewModel', () => {
     beforeEach(() => {
         vi.clearAllMocks();
@@ -21,7 +24,7 @@ describe('contactViewModel', () => {
     describe('getContactViewModel', () => {
         it('should return metadata, intro, and sections correctly', async () => {
             const mockMetadata = { title: 'Contact', description: 'Contact me' };
-            (getPageMetadata as any).mockResolvedValue(mockMetadata);
+            mockedGetPageMetadata.mockResolvedValue(mockMetadata as never);
 
             const mockContactEntries = [
                 {
@@ -33,7 +36,7 @@ describe('contactViewModel', () => {
                     render: vi.fn().mockResolvedValue({ Content: 'SectionContent' }),
                 },
             ];
-            (getCollection as any).mockResolvedValue(mockContactEntries);
+            mockedGetCollection.mockResolvedValue(mockContactEntries as never);
 
             const result = await getContactViewModel();
 
@@ -48,8 +51,8 @@ describe('contactViewModel', () => {
         });
 
         it('should handle missing intro', async () => {
-            (getPageMetadata as any).mockResolvedValue({});
-            (getCollection as any).mockResolvedValue([]);
+            mockedGetPageMetadata.mockResolvedValue({} as never);
+            mockedGetCollection.mockResolvedValue([] as never);
 
             const result = await getContactViewModel();
 
@@ -82,7 +85,7 @@ describe('contactViewModel', () => {
                     }
                 }
             ];
-            (getCollection as any).mockResolvedValue(mockContactEntries);
+            mockedGetCollection.mockResolvedValue(mockContactEntries as never);
 
             const result = await getContactFooterItems();
 
@@ -93,7 +96,7 @@ describe('contactViewModel', () => {
         });
 
         it('should return empty array if no contact entries', async () => {
-            (getCollection as any).mockResolvedValue([]);
+            mockedGetCollection.mockResolvedValue([] as never);
 
             const result = await getContactFooterItems();
 

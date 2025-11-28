@@ -14,6 +14,10 @@ vi.mock('../../src/lib/viewmodels/baseViewModel', () => ({
     getPageMetadata: vi.fn(),
 }));
 
+const mockedGetCollection = vi.mocked(getCollection);
+const mockedGetEntry = vi.mocked(getEntry);
+const mockedGetPageMetadata = vi.mocked(getPageMetadata);
+
 describe('timelineViewModel', () => {
     beforeEach(() => {
         vi.clearAllMocks();
@@ -21,7 +25,7 @@ describe('timelineViewModel', () => {
 
     it('should return timeline view model correctly', async () => {
         const mockMetadata = { title: 'Timeline', description: 'My Timeline' };
-        (getPageMetadata as any).mockResolvedValue(mockMetadata);
+        mockedGetPageMetadata.mockResolvedValue(mockMetadata as never);
 
         const mockEvents = [
             {
@@ -33,7 +37,7 @@ describe('timelineViewModel', () => {
                 body: 'Description 2',
             },
         ];
-        (getCollection as any).mockResolvedValue(mockEvents);
+        mockedGetCollection.mockResolvedValue(mockEvents as never);
 
         const mockUiStrings = {
             data: {
@@ -44,7 +48,7 @@ describe('timelineViewModel', () => {
                 },
             },
         };
-        (getEntry as any).mockResolvedValue(mockUiStrings);
+        mockedGetEntry.mockResolvedValue(mockUiStrings as never);
 
         const result = await getTimelineViewModel();
 
@@ -59,8 +63,8 @@ describe('timelineViewModel', () => {
     });
 
     it('should throw error if UI strings are missing', async () => {
-        (getCollection as any).mockResolvedValue([]);
-        (getEntry as any).mockResolvedValue(undefined);
+        mockedGetCollection.mockResolvedValue([] as never);
+        mockedGetEntry.mockResolvedValue(undefined as never);
 
         await expect(getTimelineViewModel()).rejects.toThrow("Could not find UI strings for 'en'");
     });

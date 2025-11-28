@@ -13,6 +13,9 @@ vi.mock('../../src/lib/viewmodels/baseViewModel', () => ({
     getPageMetadata: vi.fn(),
 }));
 
+const mockedGetCollection = vi.mocked(getCollection);
+const mockedGetPageMetadata = vi.mocked(getPageMetadata);
+
 describe('projectsViewModel', () => {
     beforeEach(() => {
         vi.clearAllMocks();
@@ -20,7 +23,7 @@ describe('projectsViewModel', () => {
 
     it('should return projects view model correctly', async () => {
         const mockMetadata = { title: 'Projects', description: 'My Projects' };
-        (getPageMetadata as any).mockResolvedValue(mockMetadata);
+        mockedGetPageMetadata.mockResolvedValue(mockMetadata as never);
 
         const mockProjects = [
             {
@@ -32,7 +35,7 @@ describe('projectsViewModel', () => {
                 render: vi.fn().mockResolvedValue({ Content: 'Project2Content' }),
             },
         ];
-        (getCollection as any).mockResolvedValue(mockProjects);
+        mockedGetCollection.mockResolvedValue(mockProjects as never);
 
         const result = await getProjectsViewModel();
 
