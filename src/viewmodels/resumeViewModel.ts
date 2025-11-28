@@ -18,6 +18,7 @@ export type ResumeEntryItem = {
   subtitle?: string;
   date?: string;
   startDate?: string; // For sorting
+  endDate?: string; // For sorting when available
   details?: string[];
   order?: number;
   Content?: AstroComponentFactory;
@@ -124,6 +125,7 @@ export async function getResumeViewModel(): Promise<{
         subtitle: entry.data.subtitle,
         date: formatDateRange(entry.data.startDate, entry.data.endDate),
         startDate: entry.data.startDate,
+        endDate: entry.data.endDate,
         order: getOrder(entry),
         Content,
       };
@@ -131,7 +133,7 @@ export async function getResumeViewModel(): Promise<{
   );
   const sortedEducation = sortByOrder(education, {
     getOrder: (e) => e.order,
-    getDate: (e) => e.startDate,
+    getDate: (e) => e.endDate ?? e.startDate,
   });
 
 
@@ -148,6 +150,7 @@ export async function getResumeViewModel(): Promise<{
         subtitle: entry.data.subtitle,
         date: formatDateRange(entry.data.startDate, entry.data.endDate),
         startDate: entry.data.startDate,
+        endDate: entry.data.endDate,
         order: getOrder(entry),
         Content,
       };
@@ -155,7 +158,7 @@ export async function getResumeViewModel(): Promise<{
   );
   const sortedExperience = sortByOrder(experience, {
     getOrder: (e) => e.order,
-    getDate: (e) => e.startDate,
+    getDate: (e) => e.endDate ?? e.startDate,
   });
 
 
@@ -171,6 +174,7 @@ export async function getResumeViewModel(): Promise<{
         title: entry.data.title,
         date: formatDateRange(entry.data.startDate, entry.data.endDate),
         startDate: entry.data.startDate,
+        endDate: entry.data.endDate,
         order: getOrder(entry),
         Content,
       };
@@ -178,7 +182,7 @@ export async function getResumeViewModel(): Promise<{
   );
   const sortedProjects = sortByOrder(projects, {
     getOrder: (e) => e.order,
-    getDate: (e) => e.startDate,
+    getDate: (e) => e.endDate ?? e.startDate,
   });
 
   // Filter awards entries
@@ -194,6 +198,7 @@ export async function getResumeViewModel(): Promise<{
         subtitle: entry.data.subtitle,
         date: formatDateRange(entry.data.startDate, entry.data.endDate),
         startDate: entry.data.startDate,
+        endDate: entry.data.endDate,
         order: getOrder(entry),
         Content,
       };
@@ -201,7 +206,7 @@ export async function getResumeViewModel(): Promise<{
   );
   const sortedAwards = sortByOrder(awards, {
     getOrder: (e) => e.order,
-    getDate: (e) => e.startDate,
+    getDate: (e) => e.endDate ?? e.startDate,
   });
 
   // Fetch skills data

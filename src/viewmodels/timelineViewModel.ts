@@ -21,6 +21,7 @@ export async function getTimelineViewModel() {
   const allEvents = rawEvents.map((event) => ({
     ...event.data,
     description: event.body,
+    date: formatDateRange(event.data.startDate, event.data.endDate),
     dateRange: formatDateRange(event.data.startDate, event.data.endDate),
   }));
 
@@ -29,7 +30,7 @@ export async function getTimelineViewModel() {
 
   // Initial sort (newest first) using sortByOrder
   const sortedEvents = sortByOrder(allEvents, {
-    getDate: (e) => e.startDate,
+    getDate: (e) => e.endDate ?? e.startDate,
   });
 
   // Fetch metadata and UI strings in parallel

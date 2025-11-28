@@ -2,7 +2,7 @@
 // Content for the "Highlights & Updates" section
 import Button from "../../common/Button.astro";
 import RichText from "../../common/RichText.astro";
-import { formatTimelineDate } from "../../../lib/utils/dateUtils";
+import { formatDateRange, formatTimelineDate } from "../../../lib/utils/dateUtils";
 import type { CollectionEntry } from "astro:content";
 import type { AstroComponentFactory } from "astro/runtime/server/index.js";
 
@@ -35,8 +35,13 @@ const highlightsToShow = events;
         {highlightsToShow.map((event) => (
           <li class="highlight-item-enhanced">
             <div class="highlight-meta">
-              <time datetime={event.data.date} class="highlight-date">
-                {formatTimelineDate(event.data.date)}
+              <time
+                datetime={event.data.endDate ?? event.data.startDate ?? ""}
+                class="highlight-date"
+              >
+                {event.data.date ||
+                  formatDateRange(event.data.startDate, event.data.endDate) ||
+                  formatTimelineDate(event.data.startDate || event.data.endDate || "")}
               </time>
             </div>
             <div class="highlight-body">

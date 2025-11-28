@@ -32,7 +32,7 @@ export async function getProjectsViewModel() {
   // Projects without order come after, sorted by date (newest first)
   projects = sortByOrder(projects, {
     getOrder: (p) => p.data.order,
-    getDate: (p) => p.data.startDate,
+    getDate: (p) => p.data.endDate ?? p.data.startDate,
   });
 
 

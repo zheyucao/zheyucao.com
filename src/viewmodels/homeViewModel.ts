@@ -2,6 +2,7 @@ import { getCollection, getEntry, type CollectionEntry } from "astro:content";
 import type { AstroComponentFactory } from "astro/runtime/server/index.js";
 import type { ContactItem } from "./contactViewModel";
 import { sortByOrder } from "../lib/utils/sortUtils";
+import { formatDateRange } from "../lib/utils/dateUtils";
 
 
 // Hero section requires specific fields
@@ -161,14 +162,19 @@ export async function getHomeViewModel(): Promise<HomeViewModel> {
 
   // Sort by date (descending) and take top 3
   const sortedHighlights = sortByOrder(highlightEvents, {
-    getDate: (e) => e.data.startDate,
+    getDate: (e) => e.data.endDate ?? e.data.startDate,
   }).slice(0, 3);
 
   // Render content for highlights in parallel
   const highlights: TimelineHighlight[] = await Promise.all(
     sortedHighlights.map(async (event) => {
       const rendered = await event.render();
-      return { ...event, Content: rendered.Content };
+      const formattedDate = formatDateRange(event.data.startDate, event.data.endDate);
+      return {
+        ...event,
+        data: { ...event.data, date: formattedDate },
+        Content: rendered.Content,
+      };
     })
   );
 
