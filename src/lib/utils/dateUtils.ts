@@ -25,21 +25,69 @@ export function parseDate(dateStr: string): number {
 }
 
 /**
- * Formats a date string (YYYY-MM) into "Month Year" (e.g., "January 2024").
+ * Formats a date string (YYYY-MM or YYYY) into "Month Year" (e.g., "January 2024").
  * Returns the original string if it doesn't match the expected format.
  */
-export function formatTimelineDate(dateStr: string): string {
-  if (!dateStr || !dateStr.includes("-")) return dateStr;
+export function formatDate(dateStr: string): string {
+  if (!dateStr) return "";
 
-  const [year, month] = dateStr.split("-").map(Number);
+  // Handle "Present" case
+  if (dateStr.toLowerCase() === "present") {
+    return "Present";
+  }
+
+  const parts = dateStr.split("-");
+  const year = Number(parts[0]);
+  const month = parts[1] ? Number(parts[1]) : 1;
 
   if (isNaN(year) || isNaN(month)) return dateStr;
 
   // Create date object for formatting
-  // We use local time here as toLocaleString works with it,
-  // but since we only care about month/year, it's generally safe.
-  // Using UTC for formatting can be tricky with toLocaleString without options.
   const dateObj = new Date(year, month - 1);
 
   return dateObj.toLocaleString("en-US", { month: "long", year: "numeric" });
+}
+
+/**
+ * Formats a date range for display.
+ * Examples:
+ * - ("2024-11", undefined) → "November 2024"
+ * - ("2024-11", "present") → "November 2024 – Present"
+ * - ("2024-09", "2024-11") → "September 2024 – November 2024"
+ * - ("2024-09", "2024-09") → "September 2024" (same month)
+ */
+export function formatDateRange(startDate?: string, endDate?: string): string {
+  if (!startDate) return "";
+
+  const formattedStart = formatDate(startDate);
+
+  // No end date - just return start date
+  if (!endDate) {
+    return formattedStart;
+  }
+
+  // Same date - just return start date
+  if (startDate === endDate) {
+    return formattedStart;
+  }
+
+  const formattedEnd = formatDate(endDate);
+
+  return `${formattedStart} – ${formattedEnd}`;
+}
+
+/**
+ * Get sortable timestamp from startDate (for sorting by most recent).
+ * Uses startDate for sorting. If you want to sort by end date, pass endDate as first argument.
+ */
+export function getDateTimestamp(startDate: string, endDate?: string): number {
+  return parseDate(startDate);
+}
+
+/**
+ * @deprecated Use formatDate instead
+ * Formats a date string (YYYY-MM) into "Month Year" (e.g., "January 2024").
+ */
+export function formatTimelineDate(dateStr: string): string {
+  return formatDate(dateStr);
 }

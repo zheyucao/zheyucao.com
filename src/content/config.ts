@@ -5,7 +5,8 @@ const projects = defineCollection({
   schema: ({ image }) =>
     z.object({
       title: z.string(),
-      date: z.string().optional(),
+      startDate: z.string().optional(), // YYYY-MM format
+      endDate: z.string().optional(), // YYYY-MM or "present"
       githubUrl: z.string().url().optional(),
       githubRepos: z
         .array(
@@ -29,8 +30,8 @@ const projects = defineCollection({
 const timeline = defineCollection({
   type: "content",
   schema: z.object({
-    date: z.string(), // YYYY-MM
-    dateRange: z.string().optional(),
+    startDate: z.string(), // YYYY-MM format
+    endDate: z.string().optional(), // YYYY-MM or "present"
     title: z.string(),
     category: z.enum(["Experiences", "Honors"]),
     isHighlight: z.boolean().default(false),
@@ -100,7 +101,8 @@ const resume = defineCollection({
     z.object({
       title: z.string(),
       subtitle: z.string().optional(),
-      date: z.string().optional(),
+      startDate: z.string().optional(), // YYYY-MM format
+      endDate: z.string().optional(), // YYYY-MM or "present"
       order: z.number().optional(), // Manual ordering
       actions: z.array(actionSchema).optional(),
     }),

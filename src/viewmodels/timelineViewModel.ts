@@ -1,6 +1,7 @@
 import { getCollection, getEntry } from "astro:content";
 import { getPageMetadata } from "../lib/viewmodels/baseViewModel";
 import { sortByOrder } from "../lib/utils/sortUtils";
+import { formatDateRange } from "../lib/utils/dateUtils";
 
 /**
  * Helper to parse dates robustly
@@ -20,6 +21,7 @@ export async function getTimelineViewModel() {
   const allEvents = rawEvents.map((event) => ({
     ...event.data,
     description: event.body,
+    dateRange: formatDateRange(event.data.startDate, event.data.endDate),
   }));
 
   // Calculate unique categories
@@ -27,7 +29,7 @@ export async function getTimelineViewModel() {
 
   // Initial sort (newest first) using sortByOrder
   const sortedEvents = sortByOrder(allEvents, {
-    getDate: (e) => e.date,
+    getDate: (e) => e.startDate,
   });
 
   // Fetch metadata and UI strings in parallel

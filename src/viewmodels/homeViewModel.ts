@@ -161,7 +161,7 @@ export async function getHomeViewModel(): Promise<HomeViewModel> {
 
   // Sort by date (descending) and take top 3
   const sortedHighlights = sortByOrder(highlightEvents, {
-    getDate: (e) => e.data.date,
+    getDate: (e) => e.data.startDate,
   }).slice(0, 3);
 
   // Render content for highlights in parallel
