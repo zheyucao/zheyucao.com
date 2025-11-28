@@ -22,10 +22,9 @@ const { items = [] } = Astro.props;
 <div class="contact-icons">
   {
     items.map((item) => {
-      const value = item.content || item.href || item.label || "Link";
-      const primaryLabel = item.description || value;
-      const copyValue = item.href ? undefined : item.content || item.label || item.href;
-      const secondary = copyValue ? value : undefined;
+      const primaryLabel = item.content || item.href || "";
+      const secondary = item.description || undefined;
+      const copyValue = item.href ? undefined : item.content || item.href;
       return (
         <Tooltip label={primaryLabel} position="bottom">
           <div slot="bubble">
@@ -181,13 +180,42 @@ const { items = [] } = Astro.props;
   const linkListeners = new Map();
 
   document.addEventListener("astro:page-load", () => {
+    const isCoarsePointer = window.matchMedia("(hover: none) and (pointer: coarse)").matches;
     const copyTargets = document.querySelectorAll(".contact-icons [data-copy-value]");
     copyTargets.forEach((el) => {
+      const copyValue = el.getAttribute("data-copy-value") || "";
+      if (isCoarsePointer && copyValue) {
+        // On mobile, show value as primary and add a dedicated "Copied" secondary line
+        const tooltip = el.closest(".tooltip");
+        const labelEl = tooltip?.querySelector("[data-tooltip-label]");
+        const descEl = tooltip?.querySelector("[data-tooltip-desc]");
+        const bubble = tooltip?.querySelector(".tooltip-bubble");
+        const newPrimary = copyValue;
+        const newSecondary = "Copied";
+
+        if (labelEl) {
+          labelEl.textContent = newPrimary;
+          labelEl.setAttribute("data-original-label", newPrimary);
+        }
+
+        let secondaryEl = descEl;
+        if (!secondaryEl && bubble) {
+          secondaryEl = document.createElement("div");
+          secondaryEl.className = "tooltip-desc";
+          secondaryEl.setAttribute("data-tooltip-desc", "");
+          bubble.appendChild(secondaryEl);
+        }
+
+        if (secondaryEl) {
+          secondaryEl.textContent = newSecondary;
+          secondaryEl.setAttribute("data-original-desc", newSecondary);
+        }
+      }
+
       const handler = (event: Event) => {
-        const value = el.getAttribute("data-copy-value");
-        if (!value) return;
+        if (!copyValue) return;
         event.preventDefault();
-        handleCopy(el, value);
+        handleCopy(el, copyValue);
       };
       el.addEventListener("click", handler);
       copyListeners.set(el, handler);
