@@ -76,13 +76,6 @@ export function formatDateRange(startDate?: string, endDate?: string): string {
   return `${formattedStart} – ${formattedEnd}`;
 }
 
-/**
- * Get sortable timestamp from startDate (for sorting by most recent).
- * Uses startDate for sorting. If you want to sort by end date, pass endDate as first argument.
- */
-export function getDateTimestamp(startDate: string, endDate?: string): number {
-  return parseDate(startDate);
-}
 
 /**
  * @deprecated Use formatDate instead
