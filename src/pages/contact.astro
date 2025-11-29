@@ -2,7 +2,6 @@
 import SubPageLayout from "../layouts/SubPageLayout.astro";
 import { getContactViewModel } from "../viewmodels/contactViewModel";
 import { Icon } from "astro-icon/components";
-import Tooltip from "../components/common/Tooltip.astro";
 import Button from "../components/common/Button.astro";
 
 const { intro, sections, metadata } = await getContactViewModel();
@@ -49,7 +48,7 @@ const { intro, sections, metadata } = await getContactViewModel();
                 {(() => {
                   const value = item.content || "";
                   const description = item.description;
-                  const copyValue = item.href ? undefined : value;
+                  const copyValue = undefined;
 
                   if (item.href) {
                     return (
@@ -65,19 +64,9 @@ const { intro, sections, metadata } = await getContactViewModel();
                   if (copyValue) {
                     return (
                       <>
-                        <Tooltip
-                          class="copy-only-tooltip"
-                          label="Copied!"
-                          position="bottom"
-                          trigger="click"
-                        >
-                          <span
-                            class:list={["copyable", { clickable: true }]}
-                            data-copy-value={copyValue}
-                          >
-                            {value}
-                          </span>
-                        </Tooltip>
+                        <span class:list={["copyable", { clickable: true }]}>
+                          {value}
+                        </span>
                         {description && <span class="inline-desc">&nbsp;{description}</span>}
                       </>
                     );
@@ -169,43 +158,3 @@ const { intro, sections, metadata } = await getContactViewModel();
 
   /* Remove label styles as they are no longer used */
 </style>
-
-<script>
-  const handleCopy = async (el: HTMLElement, value: string) => {
-    if (!value) return;
-    const tooltip = el.closest(".tooltip");
-    const bubble = tooltip?.querySelector(".tooltip-bubble");
-    const labelEl = tooltip?.querySelector("[data-tooltip-label]");
-    const descEl = tooltip?.querySelector("[data-tooltip-desc]") as HTMLElement | null;
-
-    try {
-      await navigator.clipboard.writeText(value);
-      if (labelEl) {
-        const originalLabel =
-          labelEl.getAttribute("data-original-label") || labelEl.textContent || "Copied!";
-        labelEl.textContent = "Copied!";
-        if (descEl) descEl.style.display = "none";
-        if (bubble) bubble.classList.add("copy-active");
-        setTimeout(() => {
-          labelEl.textContent = originalLabel;
-          if (descEl) descEl.style.display = "";
-          if (bubble) bubble.classList.remove("copy-active");
-        }, 1200);
-      }
-    } catch (e) {
-      console.error("Unable to copy contact value:", e);
-    }
-  };
-
-  document.addEventListener("astro:page-load", () => {
-    const copyTargets = document.querySelectorAll<HTMLElement>(".contact-list [data-copy-value]");
-    copyTargets.forEach((el) => {
-      el.addEventListener("click", (event) => {
-        const value = el.getAttribute("data-copy-value");
-        if (!value) return;
-        event.preventDefault();
-        handleCopy(el, value);
-      });
-    });
-  });
-</script>
