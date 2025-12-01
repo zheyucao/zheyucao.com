@@ -12,6 +12,13 @@
   let backgroundManager: DynamicBackgroundManager | null = null;
 
   function initBackground() {
+    const isFirefox = /Firefox|FxiOS/i.test(navigator.userAgent);
+    if (isFirefox) {
+      cleanupBackground();
+      document.getElementById("dynamic-background-container")?.remove();
+      return;
+    }
+
     const container = document.getElementById("dynamic-background-container");
 
     if (!container) {
