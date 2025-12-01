@@ -88,6 +88,7 @@ export class DynamicBackgroundManager {
   private isVisible = true;
   private prefersReducedMotion = false;
   private cleanupListeners: () => void = () => {};
+  private forceStaticMode = false;
 
   constructor(containerId: string, svgId: string) {
     const container = document.getElementById(containerId);
@@ -120,13 +121,14 @@ export class DynamicBackgroundManager {
       enableMouseInteraction: true,
     };
 
+    this.forceStaticMode = !this.detectChromium();
     this.prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
     this.init();
   }
 
   private init() {
-    if (this.prefersReducedMotion) {
+    if (this.prefersReducedMotion || this.forceStaticMode) {
       this.initStatic();
     } else {
       this.svgContainer.classList.add("css-hue-shift-active");
@@ -175,7 +177,7 @@ export class DynamicBackgroundManager {
   }
 
   private startAnimation() {
-    if (!this.rafId && this.isVisible && !this.prefersReducedMotion) {
+    if (!this.rafId && this.isVisible && !this.prefersReducedMotion && !this.forceStaticMode) {
       this.lastTimestamp = performance.now();
       this.lastLogicExecutionTime = performance.now();
       this.rafId = requestAnimationFrame(this.animate.bind(this));
@@ -577,5 +579,28 @@ export class DynamicBackgroundManager {
       window.removeEventListener("mousemove", mousemoveHandler);
       window.removeEventListener("mouseleave", mouseleaveHandler);
     };
+  }
+
+  // Chromium detection so we can keep heavy animation off Safari/Firefox
+  private detectChromium(): boolean {
+    const nav = navigator as Navigator & {
+      userAgentData?: { brands?: { brand: string; version: string }[] };
+    };
+
+    const brands = nav.userAgentData?.brands;
+    if (brands?.length) {
+      return brands.some(({ brand }) =>
+        /Chromium|Chrome|Google Chrome|Microsoft Edge|Brave|Opera/i.test(brand)
+      );
+    }
+
+    const ua = navigator.userAgent;
+    const isIos = /\b(iPad|iPhone|iPod)\b/.test(ua);
+    if (isIos) return false;
+
+    const isChromeLike = /Chrome\/|CriOS\//.test(ua);
+    const isEdge = /Edg\//.test(ua);
+    const isOpera = /OPR\//.test(ua);
+    return isChromeLike || isEdge || isOpera;
   }
 }
