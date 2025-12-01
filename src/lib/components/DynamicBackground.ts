@@ -88,7 +88,7 @@ export class DynamicBackgroundManager {
   private isVisible = true;
   private prefersReducedMotion = false;
   private cleanupListeners: () => void = () => {};
-  private forceStaticMode = false;
+  private forceStaticMode = false; // For non-supported browsers (currently Firefox)
 
   constructor(containerId: string, svgId: string) {
     const container = document.getElementById(containerId);
@@ -121,7 +121,7 @@ export class DynamicBackgroundManager {
       enableMouseInteraction: true,
     };
 
-    this.forceStaticMode = !this.detectChromium();
+    this.forceStaticMode = this.detectFirefox();
     this.prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
     this.init();
@@ -581,26 +581,9 @@ export class DynamicBackgroundManager {
     };
   }
 
-  // Chromium detection so we can keep heavy animation off Safari/Firefox
-  private detectChromium(): boolean {
-    const nav = navigator as Navigator & {
-      userAgentData?: { brands?: { brand: string; version: string }[] };
-    };
-
-    const brands = nav.userAgentData?.brands;
-    if (brands?.length) {
-      return brands.some(({ brand }) =>
-        /Chromium|Chrome|Google Chrome|Microsoft Edge|Brave|Opera/i.test(brand)
-      );
-    }
-
+  // Firefox detection so we skip heavy animation there
+  private detectFirefox(): boolean {
     const ua = navigator.userAgent;
-    const isIos = /\b(iPad|iPhone|iPod)\b/.test(ua);
-    if (isIos) return false;
-
-    const isChromeLike = /Chrome\/|CriOS\//.test(ua);
-    const isEdge = /Edg\//.test(ua);
-    const isOpera = /OPR\//.test(ua);
-    return isChromeLike || isEdge || isOpera;
+    return /Firefox|FxiOS/i.test(ua);
   }
 }
