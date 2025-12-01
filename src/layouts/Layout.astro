@@ -40,7 +40,7 @@ const showScrollIndicator =
     <title>{pageTitle}</title>
     <meta name="description" content={siteConfig.metadata.description} />
     <meta name="author" content={siteConfig.metadata.author} />
-    <ClientRouter fallback="swap" />
+    <ClientRouter fallback="none" />
     <!-- START Insert Theme Detection Script Here -->
     <script is:inline>
       // Immediate theme application to prevent flash
