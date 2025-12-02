@@ -1,68 +1,9 @@
 import { ANIMATION_CONSTANTS } from "../../constants/animationConstants";
-
-interface Vector {
-  x: number;
-  y: number;
-}
-
-interface HSLColor {
-  h: number;
-  s: number;
-  l: number;
-}
-
-interface BlobShape {
-  id: number;
-  position: Vector;
-  velocity: Vector;
-  radius: number;
-  color: string;
-  hsl: HSLColor;
-  points: Vector[];
-  path: Path2D;
-  angle: number;
-  angularVelocity: number;
-  baseAngles: number[];
-  baseRadii: number[];
-  deformationTime: number;
-  deformationSpeed: number;
-  deformationAmplitude: number;
-}
-
-interface ColorScheme {
-  [key: string]: string[];
-}
-
-interface DynamicBackgroundConfig {
-  numBlobs: number;
-  baseLargeMinBlobSize: number;
-  baseLargeMaxBlobSize: number;
-  baseSmallMinBlobSize: number;
-  baseSmallMaxBlobSize: number;
-  referenceWidth: number;
-  minScaleFactor: number;
-  maxScaleFactor: number;
-  speedMultiplier: number;
-  mouseInfluenceRadius: number;
-  mouseForce: number;
-  opacity: number;
-  enableShapeChanging: boolean;
-  enableCollisionDetection: boolean;
-  enableMouseInteraction: boolean;
-}
-
-const colorScheme: ColorScheme = {
-  reds: ["#FF6B6B", "#FFD93D", "#F2bF47", "#F2B707", "#F28706", "#F26430"],
-  oranges: ["#FFa700", "#FF9B58", "#F27149", "#F9c443", "#faD93D"],
-  yellows: ["#FFD700", "#FFDB58", "#F2E109", "#F9D423", "#caD93D"],
-  greens: ["#90EE90", "#6BCB77", "#3CB371", "#32CD32", "#a0e9c4"],
-  cyans: ["#40E0D0", "#AFEEEE", "#7FFFD4", "#B3E0F2", "#9EfDF2"],
-  blues: ["#87CEEB", "#64f5ED", "#7De6FF", "#42d5FF", "#7299f9"],
-  forest: ["#64f5ED", "#F2E109", "#32CD32", "#32CD32", "#a0e9c4"],
-  purples: ["#996BcB", "#c2aFF7", "#8267d7", "#FF55ff", "#e264d0"],
-  browns: ["#8B4513", "#A0522D", "#D2691E", "#DAA520", "#8B3030"],
-  winter: ["#87CEEB", "#64f5ED", "#7De6FF", "#cccccc", "#ffffff"],
-};
+import { createConfig } from "./dynamicBackground/config";
+import { pickInitialColors } from "./dynamicBackground/colorSchemes";
+import { buildPathFromPoints, createBlobPoints } from "./dynamicBackground/geometry";
+import { hexToHsl, random } from "./dynamicBackground/utils";
+import type { BlobShape, DynamicBackgroundConfig, Vector } from "./dynamicBackground/types";
 
 export class DynamicBackgroundManager {
   private container: HTMLElement;
@@ -107,23 +48,7 @@ export class DynamicBackgroundManager {
     this.isMobileDevice =
       ("maxTouchPoints" in navigator && navigator.maxTouchPoints > 0) || window.innerWidth < 1024;
 
-    this.config = {
-      numBlobs: this.isMobileDevice ? 3 : 4,
-      baseLargeMinBlobSize: 1000,
-      baseLargeMaxBlobSize: 1600,
-      baseSmallMinBlobSize: 600,
-      baseSmallMaxBlobSize: 1000,
-      referenceWidth: 1440,
-      minScaleFactor: 0.5,
-      maxScaleFactor: 1.5,
-      speedMultiplier: this.isMobileDevice ? 0.5 : 1,
-      mouseInfluenceRadius: 580,
-      mouseForce: -800,
-      opacity: 0.8,
-      enableShapeChanging: false,
-      enableCollisionDetection: true,
-      enableMouseInteraction: true,
-    };
+    this.config = createConfig(this.isMobileDevice);
 
     this.forceStaticMode = this.detectFirefox();
     this.prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -373,15 +298,7 @@ export class DynamicBackgroundManager {
     const currentSmallMinSize = this.config.baseSmallMinBlobSize * scaleFactor;
     const currentSmallMaxSize = this.config.baseSmallMaxBlobSize * scaleFactor;
 
-    const initialBlobColorsHex: string[] = [];
-    const schemeNames = Object.keys(colorScheme);
-    const selectedSchemeName = schemeNames[Math.floor(Math.random() * schemeNames.length)];
-    const availableColors = colorScheme[selectedSchemeName] || [];
-    const shuffledColors = this.shuffleArray([...availableColors]);
-
-    for (let i = 0; i < this.config.numBlobs; i++) {
-      initialBlobColorsHex.push(shuffledColors[i % shuffledColors.length] || "#90EE90");
-    }
+    const initialBlobColorsHex = pickInitialColors(this.config.numBlobs);
 
     const largeBlobCount = Math.ceil(this.config.numBlobs / 2);
     for (let i = 0; i < largeBlobCount; i++) {
@@ -415,23 +332,23 @@ export class DynamicBackgroundManager {
     containerWidth: number,
     containerHeight: number
   ) {
-    const radius = this.random(minSize / 2, maxSize / 2);
+    const radius = random(minSize / 2, maxSize / 2);
     const safeWidth = Math.max(containerWidth, radius * 2);
     const safeHeight = Math.max(containerHeight, radius * 2);
     const position: Vector = {
-      x: this.random(radius, safeWidth - radius),
-      y: this.random(radius, safeHeight - radius),
+      x: random(radius, safeWidth - radius),
+      y: random(radius, safeHeight - radius),
     };
 
-    const initialHsl = this.hexToHsl(initialHex);
-    const initialGeometry = this.createBlobPoints(0, 0, radius, 0.3, 0.2, 8);
-    const path = this.buildPathFromPoints(initialGeometry.points);
+    const initialHsl = hexToHsl(initialHex);
+    const initialGeometry = createBlobPoints(0, 0, radius, 0.3, 0.2, 8);
+    const path = buildPathFromPoints(initialGeometry.points);
     const velocity: Vector = {
-      x: this.random(-1, 1) * this.config.speedMultiplier,
-      y: this.random(-1, 1) * this.config.speedMultiplier,
+      x: random(-1, 1) * this.config.speedMultiplier,
+      y: random(-1, 1) * this.config.speedMultiplier,
     };
-    const initialAngle = this.random(0, 360);
-    const angularVelocity = this.random(-0.15, 0.15);
+    const initialAngle = random(0, 360);
+    const angularVelocity = random(-0.15, 0.15);
 
     const blob: BlobShape = {
       id: blobIndex,
@@ -447,32 +364,11 @@ export class DynamicBackgroundManager {
       baseAngles: initialGeometry.angles,
       baseRadii: initialGeometry.radii,
       deformationTime: 0,
-      deformationSpeed: this.random(0.005, 0.015),
-      deformationAmplitude: radius * this.random(0.05, 0.15),
+      deformationSpeed: random(0.005, 0.015),
+      deformationAmplitude: radius * random(0.05, 0.15),
     };
 
     this.blobs.push(blob);
-  }
-
-  private buildPathFromPoints(points: Vector[]): Path2D {
-    const path = new Path2D();
-    if (points.length < 3) return path;
-
-    path.moveTo(points[0].x, points[0].y);
-    const n = points.length;
-    for (let i = 0; i < n; i++) {
-      const p0 = points[(i - 1 + n) % n];
-      const p1 = points[i];
-      const p2 = points[(i + 1) % n];
-      const p3 = points[(i + 2) % n];
-      const cp1x = p1.x + (p2.x - p0.x) / 6;
-      const cp1y = p1.y + (p2.y - p0.y) / 6;
-      const cp2x = p2.x - (p3.x - p1.x) / 6;
-      const cp2y = p2.y - (p3.y - p1.y) / 6;
-      path.bezierCurveTo(cp1x, cp1y, cp2x, cp2y, p2.x, p2.y);
-    }
-    path.closePath();
-    return path;
   }
 
   private setupEventListeners(staticMode = false) {
@@ -524,73 +420,6 @@ export class DynamicBackgroundManager {
       if (mousemoveHandler) window.removeEventListener("mousemove", mousemoveHandler);
       if (mouseleaveHandler) window.removeEventListener("mouseleave", mouseleaveHandler);
     };
-  }
-
-  private random(min: number, max: number): number {
-    return Math.random() * (max - min) + min;
-  }
-
-  private shuffleArray<T>(array: T[]): T[] {
-    for (let i = array.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [array[i], array[j]] = [array[j], array[i]];
-    }
-    return array;
-  }
-
-  private hexToHsl(hex: string): HSLColor | null {
-    hex = hex.replace(/^#/, "");
-    if (hex.length === 3) hex = hex[0] + hex[0] + hex[1] + hex[1] + hex[2] + hex[2];
-    if (hex.length !== 6) return null;
-    const r = parseInt(hex.substring(0, 2), 16) / 255;
-    const g = parseInt(hex.substring(2, 4), 16) / 255;
-    const b = parseInt(hex.substring(4, 6), 16) / 255;
-    const max = Math.max(r, g, b);
-    const min = Math.min(r, g, b);
-    let h = 0;
-    let s = 0;
-    const l = (max + min) / 2;
-    if (max !== min) {
-      const d = max - min;
-      s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
-      switch (max) {
-        case r:
-          h = (g - b) / d + (g < b ? 6 : 0);
-          break;
-        case g:
-          h = (b - r) / d + 2;
-          break;
-        case b:
-          h = (r - g) / d + 4;
-          break;
-      }
-      h /= 6;
-    }
-    return { h: Math.round(h * 360), s: Math.round(s * 100), l: Math.round(l * 100) };
-  }
-
-  private createBlobPoints(
-    cx: number,
-    cy: number,
-    r: number,
-    irr: number,
-    spk: number,
-    num: number
-  ) {
-    const points: Vector[] = [];
-    const angles: number[] = [];
-    const radii: number[] = [];
-    const angleStep = (Math.PI * 2) / num;
-    for (let i = 0; i < num; i++) {
-      const angle = i * angleStep;
-      angles.push(angle);
-      let radius = r + this.random(-irr, irr) * r;
-      radius += this.random(0, spk) * r;
-      radius = Math.max(r * 0.2, radius);
-      radii.push(radius);
-      points.push({ x: cx + Math.cos(angle) * radius, y: cy + Math.sin(angle) * radius });
-    }
-    return { points, angles, radii };
   }
 
   private detectFirefox(): boolean {
