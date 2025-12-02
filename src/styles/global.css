@@ -196,6 +196,7 @@ hr {
   pointer-events: none;
   background: var(--footer-bg);
   z-index: -1;
+  opacity: 0.8;
 }
 
 .main-content {
