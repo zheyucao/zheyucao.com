@@ -2,7 +2,7 @@
 
 ---
 
-<div id="dynamic-background-container">
+<div id="dynamic-background-container" transition:persist={true}>
   <canvas id="dynamic-background-canvas"></canvas>
 </div>
 
@@ -39,12 +39,11 @@
     }
   }
 
-  if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", initBackground, { once: true });
-  } else {
-    initBackground();
-  }
-  window.addEventListener("pagehide", cleanupBackground);
+  // Initialize (or check persistence) on page load
+  document.addEventListener("astro:page-load", initBackground);
+
+  // Remove before-swap cleanup to allow persistence
+  // document.addEventListener("astro:before-swap", cleanupBackground);
 </script>
 
 <style>
@@ -57,7 +56,6 @@
     z-index: -1;
     filter: blur(30px);
     opacity: var(--dynamic-bg-opacity);
-    view-transition-name: dynamic-background;
   }
 
   /* Medium screens (e.g., tablets) */

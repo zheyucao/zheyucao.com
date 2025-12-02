@@ -89,11 +89,9 @@ const { projects, metadata } = await getProjectsViewModel();
     }
   }
 
-  if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", smoothScrollToTarget, { once: true });
-  } else {
+  document.addEventListener("astro:page-load", () => {
     smoothScrollToTarget();
-  }
+  });
 </script>
 
 <style>

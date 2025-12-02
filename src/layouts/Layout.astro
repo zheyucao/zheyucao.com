@@ -1,4 +1,5 @@
 ---
+import { ClientRouter } from "astro:transitions";
 import DynamicBackground from "../components/DynamicBackground.astro";
 import ScrollIndicator from "../components/ScrollIndicator.astro";
 import Footer from "../components/Footer.astro";
@@ -36,10 +37,10 @@ const showScrollIndicator =
     <meta name="viewport" content="width=device-width" />
     <link rel="icon" type="image/png" href="/favicon.png" />
     <meta name="generator" content={Astro.generator} />
-    <meta name="view-transition" content="same-origin" />
     <title>{pageTitle}</title>
     <meta name="description" content={siteConfig.metadata.description} />
     <meta name="author" content={siteConfig.metadata.author} />
+    <ClientRouter fallback="none" />
     <!-- START Insert Theme Detection Script Here -->
     <script is:inline>
       // Immediate theme application to prevent flash
@@ -51,20 +52,13 @@ const showScrollIndicator =
     <script>
       import { initTheme } from "../lib/layout/theme";
       let cleanupTheme: (() => void) | undefined;
-      const setupTheme = () => {
-        cleanupTheme?.();
+      document.addEventListener("astro:page-load", () => {
         cleanupTheme = initTheme();
-      };
-      const teardownTheme = () => {
+      });
+      document.addEventListener("astro:before-swap", () => {
         cleanupTheme?.();
         cleanupTheme = undefined;
-      };
-      if (document.readyState === "loading") {
-        document.addEventListener("DOMContentLoaded", setupTheme, { once: true });
-      } else {
-        setupTheme();
-      }
-      window.addEventListener("pagehide", teardownTheme);
+      });
     </script>
 
     <!-- Intersection Observer for Scroll Reveal -->
@@ -73,20 +67,15 @@ const showScrollIndicator =
 
       let cleanupObserver: (() => void) | undefined;
 
-      const setupObserver = () => {
+      document.addEventListener("astro:page-load", () => {
         if (cleanupObserver) cleanupObserver();
         cleanupObserver = setupIntersectionObserver();
-      };
-      const teardownObserver = () => {
+      });
+
+      document.addEventListener("astro:before-swap", () => {
         if (cleanupObserver) cleanupObserver();
         cleanupObserver = undefined;
-      };
-      if (document.readyState === "loading") {
-        document.addEventListener("DOMContentLoaded", setupObserver, { once: true });
-      } else {
-        setupObserver();
-      }
-      window.addEventListener("pagehide", teardownObserver);
+      });
     </script>
 
     <!-- GSAP Section Animations -->
@@ -95,12 +84,8 @@ const showScrollIndicator =
 
       const runSectionAnimations = () => requestAnimationFrame(() => setupSectionAnimations());
 
-      if (document.readyState === "loading") {
-        document.addEventListener("DOMContentLoaded", runSectionAnimations, { once: true });
-      } else {
-        runSectionAnimations();
-      }
-      window.addEventListener("pagehide", cleanupScrollTriggers);
+      document.addEventListener("astro:page-load", runSectionAnimations);
+      document.addEventListener("astro:before-swap", cleanupScrollTriggers);
     </script>
   </head>
   <body>

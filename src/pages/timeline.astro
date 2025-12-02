@@ -61,19 +61,13 @@ const { categories, initialEvents: initialFilteredEvents, metadata, filterAll } 
 <script>
   import { TimelineController } from "../lib/controllers/TimelineController";
 
-  const initTimeline = () => {
+  document.addEventListener("astro:page-load", () => {
     try {
       new TimelineController("#timeline-container", ".category-tab");
     } catch (e) {
       console.error("Failed to initialize TimelineController", e);
     }
-  };
-
-  if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", initTimeline, { once: true });
-  } else {
-    initTimeline();
-  }
+  });
 </script>
 
 <style>
