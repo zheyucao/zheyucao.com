@@ -100,4 +100,15 @@ const safeDescription = sanitizeStrict(description);
   .hero-description em {
     font-weight: 600;
   }
+
+  @media (prefers-reduced-motion: reduce) {
+    .hero-greeting,
+    .hero-name,
+    .hero-description {
+      animation: none;
+      opacity: 1;
+      filter: none;
+      transform: none;
+    }
+  }
 </style>

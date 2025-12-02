@@ -24,7 +24,7 @@ export function setupScrollIndicator(elements: ScrollIndicatorElements): () => v
   const { SCROLL_INDICATOR, GSAP } = ANIMATION_CONSTANTS;
 
   if (prefersReducedMotion()) {
-    gsap.set(indicator, { opacity: 0.6 });
+    indicator.style.display = "none";
     return () => {};
   }
 

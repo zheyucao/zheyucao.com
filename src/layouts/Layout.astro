@@ -54,6 +54,14 @@ const showScrollIndicator =
       }
     </script>
     <ClientRouter fallback="swap" />
+    <script is:inline>
+      // Apply a class for reduced motion as early as possible and keep it in sync
+      const motionQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
+      const updateMotionClass = () =>
+        document.documentElement.classList.toggle("reduce-motion", motionQuery.matches);
+      updateMotionClass();
+      motionQuery.addEventListener("change", updateMotionClass);
+    </script>
     <!-- START Insert Theme Detection Script Here -->
     <script is:inline>
       // Immediate theme application to prevent flash

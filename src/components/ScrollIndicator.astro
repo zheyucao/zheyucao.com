@@ -58,12 +58,17 @@
 
   @media (prefers-reduced-motion: reduce) {
     .scroll-indicator {
+      display: none;
       transition: none;
     }
 
     .indicator-content {
       animation: none;
     }
+  }
+
+  html.reduce-motion .scroll-indicator {
+    display: none;
   }
 </style>
 

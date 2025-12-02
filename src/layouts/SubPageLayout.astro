@@ -130,4 +130,15 @@ const { title } = Astro.props;
     animation: pageLoadAnimate 0.8s ease-out 0.2s forwards;
   }
   /* page-actions animation removed */
+
+  @media (prefers-reduced-motion: reduce) {
+    .back-link-wrapper.page-load-initial-state,
+    .subpage-title.page-load-initial-state,
+    .subpage-content.page-load-initial-state {
+      animation: none;
+      opacity: 1;
+      filter: none;
+      transform: none;
+    }
+  }
 </style>
