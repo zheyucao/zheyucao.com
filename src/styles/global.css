@@ -187,18 +187,6 @@ hr {
   overscroll-behavior-y: contain;
 }
 
-.footer-overscroll-mask {
-  position: fixed;
-  left: 0;
-  right: 0;
-  bottom: -calc(140px + env(safe-area-inset-bottom));
-  height: calc(140px + env(safe-area-inset-bottom));
-  pointer-events: none;
-  background: var(--footer-bg);
-  z-index: -1;
-  opacity: 0.8;
-}
-
 .main-content {
   min-height: 100vh;
   padding: 0;
