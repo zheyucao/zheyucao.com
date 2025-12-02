@@ -195,20 +195,26 @@ const contactFooterItems = await getContactFooterItems();
 
   let cleanup: (() => void) | null = null;
 
-  document.addEventListener("astro:page-load", () => {
+  const setup = () => {
     const footer = document.querySelector(".site-footer") as HTMLElement | null;
     const scroller = document.querySelector(".page-wrapper") as HTMLElement | null;
 
     if (footer && scroller) {
       cleanup = setupFooterAnimation({ footer, scroller });
     }
-  });
+  };
 
-  // Cleanup on navigation
-  document.addEventListener("astro:before-swap", () => {
+  const teardown = () => {
     cleanup?.();
     cleanup = null;
-  });
+  };
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", setup, { once: true });
+  } else {
+    setup();
+  }
+  window.addEventListener("pagehide", teardown);
 </script>
 
 <script>
@@ -241,6 +247,9 @@ const contactFooterItems = await getContactFooterItems();
   }
 
   // Run update on initial load and after SPA navigations
-  document.addEventListener("astro:page-load", updateActiveFooterLink);
-  // updateActiveFooterLink(); // Initial call might still be needed
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", updateActiveFooterLink, { once: true });
+  } else {
+    updateActiveFooterLink();
+  }
 </script>

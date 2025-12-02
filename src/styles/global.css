@@ -33,6 +33,10 @@
     "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
 }
 
+@view-transition {
+  navigation: auto;
+}
+
 html.dark {
   /* Dark Theme Overrides */
   --bg-color: #121212;

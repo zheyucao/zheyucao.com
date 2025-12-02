@@ -234,7 +234,7 @@ const {
 <script>
   let currentIntersectionObserver: IntersectionObserver | null = null; // Added type annotation
 
-  document.addEventListener("astro:page-load", () => {
+  const setupObservers = () => {
     // 1. Disconnect old observer if it exists
     if (currentIntersectionObserver) {
       currentIntersectionObserver.disconnect();
@@ -270,5 +270,11 @@ const {
     // 4. Find and observe targets *on the current page*
     const targets = document.querySelectorAll(".project-card"); // Corrected selector was applied previously
     targets.forEach((target) => newObserver.observe(target));
-  });
+  };
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", setupObservers, { once: true });
+  } else {
+    setupObservers();
+  }
 </script>
