@@ -243,8 +243,13 @@ const {
   };
 
   const STATE_KEY = "__projectCardObserverState__";
-  const state: ObserverState = (window as any)[STATE_KEY] || { observer: null };
-  (window as any)[STATE_KEY] = state;
+  type ProjectCardWindow = Window & {
+    [STATE_KEY]?: ObserverState;
+  };
+
+  const observerWindow = window as ProjectCardWindow;
+  const state: ObserverState = observerWindow[STATE_KEY] || { observer: null };
+  observerWindow[STATE_KEY] = state;
 
   if (!state.pageLoadHandler) {
     const disconnectObserver = () => {
@@ -286,7 +291,7 @@ const {
       disconnectObserver();
       document.removeEventListener("astro:page-load", handlePageLoad);
       document.removeEventListener("astro:before-swap", handleBeforeSwap);
-      delete (window as any)[STATE_KEY];
+      delete observerWindow[STATE_KEY];
     };
 
     state.pageLoadHandler = handlePageLoad;

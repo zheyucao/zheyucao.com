@@ -65,9 +65,13 @@ const showScrollIndicator =
     <script>
       import { initTheme } from "../lib/layout/theme";
       const THEME_EVENTS_KEY = "__themeEventsRegistered__";
+      type LayoutWindow = Window & {
+        [THEME_EVENTS_KEY]?: boolean;
+      };
+      const layoutWindow = window as LayoutWindow;
 
-      if (!(window as any)[THEME_EVENTS_KEY]) {
-        (window as any)[THEME_EVENTS_KEY] = true;
+      if (!layoutWindow[THEME_EVENTS_KEY]) {
+        layoutWindow[THEME_EVENTS_KEY] = true;
 
         let cleanupTheme: (() => void) | undefined;
 
@@ -90,9 +94,13 @@ const showScrollIndicator =
       import { setupIntersectionObserver } from "../lib/layout/intersectionObserver";
 
       const INTERSECTION_EVENTS_KEY = "__intersectionObserverEventsRegistered__";
+      type LayoutWindowIntersection = Window & {
+        [INTERSECTION_EVENTS_KEY]?: boolean;
+      };
+      const layoutIntersectionWindow = window as LayoutWindowIntersection;
 
-      if (!(window as any)[INTERSECTION_EVENTS_KEY]) {
-        (window as any)[INTERSECTION_EVENTS_KEY] = true;
+      if (!layoutIntersectionWindow[INTERSECTION_EVENTS_KEY]) {
+        layoutIntersectionWindow[INTERSECTION_EVENTS_KEY] = true;
 
         let cleanupObserver: (() => void) | undefined;
 
@@ -116,9 +124,13 @@ const showScrollIndicator =
       import { setupSectionAnimations, cleanupScrollTriggers } from "../lib/layout/gsapAnimations";
 
       const GSAP_EVENTS_KEY = "__gsapSectionAnimationEventsRegistered__";
+      type LayoutWindowGsap = Window & {
+        [GSAP_EVENTS_KEY]?: boolean;
+      };
+      const layoutGsapWindow = window as LayoutWindowGsap;
 
-      if (!(window as any)[GSAP_EVENTS_KEY]) {
-        (window as any)[GSAP_EVENTS_KEY] = true;
+      if (!layoutGsapWindow[GSAP_EVENTS_KEY]) {
+        layoutGsapWindow[GSAP_EVENTS_KEY] = true;
 
         const runSectionAnimations = () => requestAnimationFrame(() => setupSectionAnimations());
 

@@ -194,9 +194,13 @@ const contactFooterItems = await getContactFooterItems();
   import { setupFooterAnimation } from "../lib/animations/footerAnimation";
 
   const FOOTER_ANIMATION_KEY = "__footerAnimationEventsRegistered__";
+  type FooterWindow = Window & {
+    [FOOTER_ANIMATION_KEY]?: boolean;
+  };
+  const footerWindow = window as FooterWindow;
 
-  if (!(window as any)[FOOTER_ANIMATION_KEY]) {
-    (window as any)[FOOTER_ANIMATION_KEY] = true;
+  if (!footerWindow[FOOTER_ANIMATION_KEY]) {
+    footerWindow[FOOTER_ANIMATION_KEY] = true;
 
     let cleanup: (() => void) | null = null;
 
@@ -225,9 +229,13 @@ const contactFooterItems = await getContactFooterItems();
 <script>
   // Client-side script to mark the active footer link
   const FOOTER_ACTIVE_LINK_KEY = "__footerActiveLinkEventsRegistered__";
+  type FooterLinkWindow = Window & {
+    [FOOTER_ACTIVE_LINK_KEY]?: boolean;
+  };
+  const footerLinkWindow = window as FooterLinkWindow;
 
-  if (!(window as any)[FOOTER_ACTIVE_LINK_KEY]) {
-    (window as any)[FOOTER_ACTIVE_LINK_KEY] = true;
+  if (!footerLinkWindow[FOOTER_ACTIVE_LINK_KEY]) {
+    footerLinkWindow[FOOTER_ACTIVE_LINK_KEY] = true;
 
     const updateActiveFooterLink = () => {
       const currentPath = window.location.pathname;
