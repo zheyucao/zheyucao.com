@@ -1,7 +1,5 @@
 import { ANIMATION_CONSTANTS } from "../../constants/animationConstants";
 
-const svgNS = "http://www.w3.org/2000/svg";
-
 interface Vector {
   x: number;
   y: number;
@@ -13,16 +11,15 @@ interface HSLColor {
   l: number;
 }
 
-// Data-only interface
 interface BlobShape {
   id: number;
-  pathElement: SVGPathElement;
   position: Vector;
   velocity: Vector;
   radius: number;
   color: string;
   hsl: HSLColor;
   points: Vector[];
+  path: Path2D;
   angle: number;
   angularVelocity: number;
   baseAngles: number[];
@@ -69,8 +66,8 @@ const colorScheme: ColorScheme = {
 
 export class DynamicBackgroundManager {
   private container: HTMLElement;
-  private svgContainer: SVGElement;
-  private svgGroup: SVGGElement | null = null;
+  private canvas: HTMLCanvasElement;
+  private ctx: CanvasRenderingContext2D;
   private blobs: BlobShape[] = [];
   private rafId: number | null = null;
   private mouseThrottleTimeout: number | null = null;
@@ -88,18 +85,25 @@ export class DynamicBackgroundManager {
   private isVisible = true;
   private prefersReducedMotion = false;
   private cleanupListeners: () => void = () => {};
-  private forceStaticMode = false; // For non-supported browsers (currently Firefox)
+  private forceStaticMode = false;
+  private dpr = 1;
 
-  constructor(containerId: string, svgId: string) {
+  constructor(containerId: string, canvasId: string) {
     const container = document.getElementById(containerId);
-    const svg = document.getElementById(svgId) as SVGElement | null;
+    const canvas = document.getElementById(canvasId) as HTMLCanvasElement | null;
 
-    if (!container || !svg) {
+    if (!container || !canvas) {
       throw new Error("DynamicBackground elements not found");
     }
 
+    const ctx = canvas.getContext("2d");
+    if (!ctx) {
+      throw new Error("Canvas 2D context not available");
+    }
+
     this.container = container;
-    this.svgContainer = svg;
+    this.canvas = canvas;
+    this.ctx = ctx;
     this.isMobileDevice =
       ("maxTouchPoints" in navigator && navigator.maxTouchPoints > 0) || window.innerWidth < 1024;
 
@@ -128,17 +132,19 @@ export class DynamicBackgroundManager {
   }
 
   private init() {
+    this.ensureCanvasSize();
+
     if (this.prefersReducedMotion || this.forceStaticMode) {
       this.initStatic();
+      this.setupEventListeners(true);
     } else {
-      this.svgContainer.classList.add("css-hue-shift-active");
+      this.canvas.classList.add("css-hue-shift-active");
       this.initBlobs();
       this.setupEventListeners();
       this.setupIntersectionObserver();
       this.startAnimation();
     }
 
-    // Trigger fade-in
     requestAnimationFrame(() => {
       this.container.classList.add("is-ready");
     });
@@ -146,17 +152,21 @@ export class DynamicBackgroundManager {
 
   private initStatic() {
     this.config.numBlobs = 3;
+    this.config.enableMouseInteraction = false;
     this.initBlobs();
+    this.drawFrame();
   }
 
   public cleanup() {
     this.container.classList.remove("is-ready");
-    this.svgContainer.classList.remove("css-hue-shift-active");
+    this.canvas.classList.remove("css-hue-shift-active");
     this.stopAnimation();
     if (this.mouseThrottleTimeout) cancelAnimationFrame(this.mouseThrottleTimeout);
     this.cleanupListeners();
     if (this.observer) this.observer.disconnect();
     this.blobs = [];
+    this.ctx.setTransform(1, 0, 0, 1, 0, 0);
+    this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
   }
 
   private setupIntersectionObserver() {
@@ -191,17 +201,21 @@ export class DynamicBackgroundManager {
     }
   }
 
-  private updateCachedRect() {
-    if (this.needsRectUpdate) {
-      const rect = this.svgContainer.getBoundingClientRect();
-      this.cachedContainerRect = {
-        width: rect.width,
-        height: rect.height,
-        left: rect.left,
-        top: rect.top,
-      };
-      this.needsRectUpdate = false;
-    }
+  private ensureCanvasSize() {
+    if (!this.needsRectUpdate) return;
+    const rect = this.container.getBoundingClientRect();
+    this.cachedContainerRect = {
+      width: rect.width,
+      height: rect.height,
+      left: rect.left,
+      top: rect.top,
+    };
+    this.dpr = window.devicePixelRatio || 1;
+    this.canvas.width = Math.max(1, Math.floor(rect.width * this.dpr));
+    this.canvas.height = Math.max(1, Math.floor(rect.height * this.dpr));
+    this.canvas.style.width = `${rect.width}px`;
+    this.canvas.style.height = `${rect.height}px`;
+    this.needsRectUpdate = false;
   }
 
   private animate(timestamp: number) {
@@ -228,38 +242,51 @@ export class DynamicBackgroundManager {
     }
 
     try {
-      this.updateCachedRect();
+      this.ensureCanvasSize();
       const containerWidth = this.cachedContainerRect.width;
       const containerHeight = this.cachedContainerRect.height;
 
-      if (this.svgGroup) {
-        const offsetLerpFactor = 0.05;
-        this.currentOffset.x += (this.targetOffset.x - this.currentOffset.x) * offsetLerpFactor;
-        this.currentOffset.y += (this.targetOffset.y - this.currentOffset.y) * offsetLerpFactor;
-        this.svgGroup.setAttribute(
-          "transform",
-          `translate(${this.currentOffset.x}, ${this.currentOffset.y})`
-        );
-      }
+      const offsetLerpFactor = 0.05;
+      this.currentOffset.x += (this.targetOffset.x - this.currentOffset.x) * offsetLerpFactor;
+      this.currentOffset.y += (this.targetOffset.y - this.currentOffset.y) * offsetLerpFactor;
 
-      // Call updateBlob for each blob
       this.blobs.forEach((blob) => this.updateBlob(blob, containerWidth, containerHeight));
+      this.drawFrame();
     } catch (e) {
       console.error("Error in animation loop:", e);
       this.stopAnimation();
     }
   }
 
+  private drawFrame() {
+    this.ensureCanvasSize();
+    const ctx = this.ctx;
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
+    ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+    ctx.setTransform(this.dpr, 0, 0, this.dpr, 0, 0);
+    ctx.translate(this.currentOffset.x, this.currentOffset.y);
+    ctx.globalAlpha = this.config.opacity;
+
+    for (const blob of this.blobs) {
+      ctx.save();
+      ctx.translate(blob.position.x, blob.position.y);
+      ctx.rotate((blob.angle * Math.PI) / 180);
+      ctx.fillStyle = blob.color;
+      ctx.fill(blob.path);
+      ctx.restore();
+    }
+
+    ctx.globalAlpha = 1;
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
+  }
+
   private updateBlob(blob: BlobShape, containerWidth: number, containerHeight: number) {
-    // --- Deformation ---
     blob.deformationTime += 1;
 
-    // --- Movement (Update position based on PREVIOUS velocity) ---
     blob.position.x += blob.velocity.x;
     blob.position.y += blob.velocity.y;
     blob.angle += blob.angularVelocity;
 
-    // --- Mouse Interaction ---
     if (this.config.enableMouseInteraction && this.mousePos) {
       const dx = blob.position.x - this.mousePos.x;
       const dy = blob.position.y - this.mousePos.y;
@@ -279,7 +306,6 @@ export class DynamicBackgroundManager {
       }
     }
 
-    // --- Velocity Limit ---
     const speed = Math.sqrt(blob.velocity.x ** 2 + blob.velocity.y ** 2);
     const maxSpeed = 1.5 * this.config.speedMultiplier;
     if (speed > maxSpeed) {
@@ -287,11 +313,9 @@ export class DynamicBackgroundManager {
       blob.velocity.y *= maxSpeed / speed;
     }
 
-    // --- Damping ---
     blob.velocity.x *= 0.99;
     blob.velocity.y *= 0.99;
 
-    // --- Collision Detection ---
     if (this.config.enableCollisionDetection) {
       const collisionPushForce = 0.01;
       for (const otherBlob of this.blobs) {
@@ -316,7 +340,6 @@ export class DynamicBackgroundManager {
       }
     }
 
-    // --- Boundary Check & Clamp ---
     const pushForce = 0.05 * this.config.speedMultiplier;
     if (blob.position.x < blob.radius) blob.velocity.x += pushForce;
     if (blob.position.x > containerWidth - blob.radius) blob.velocity.x -= pushForce;
@@ -331,23 +354,14 @@ export class DynamicBackgroundManager {
       blob.radius / 2,
       Math.min(containerHeight - blob.radius / 2, blob.position.y)
     );
-
-    // --- Update Transform ---
-    blob.pathElement.setAttribute(
-      "transform",
-      `translate(${blob.position.x}, ${blob.position.y}) rotate(${blob.angle})`
-    );
   }
 
   private initBlobs() {
     this.blobs = [];
-    this.svgContainer.innerHTML = "";
-    this.svgGroup = document.createElementNS(svgNS, "g");
-    this.svgContainer.appendChild(this.svgGroup);
+    this.needsRectUpdate = true;
+    this.ensureCanvasSize();
 
-    const { width: containerWidth, height: containerHeight } =
-      this.svgContainer.getBoundingClientRect();
-    // ... (rest of initBlobs)
+    const { width: containerWidth, height: containerHeight } = this.cachedContainerRect;
     const windowWidth = window.innerWidth;
 
     const scaleFactor = Math.max(
@@ -402,14 +416,16 @@ export class DynamicBackgroundManager {
     containerHeight: number
   ) {
     const radius = this.random(minSize / 2, maxSize / 2);
+    const safeWidth = Math.max(containerWidth, radius * 2);
+    const safeHeight = Math.max(containerHeight, radius * 2);
     const position: Vector = {
-      x: this.random(radius, containerWidth - radius),
-      y: this.random(radius, containerHeight - radius),
+      x: this.random(radius, safeWidth - radius),
+      y: this.random(radius, safeHeight - radius),
     };
 
     const initialHsl = this.hexToHsl(initialHex);
     const initialGeometry = this.createBlobPoints(0, 0, radius, 0.3, 0.2, 8);
-    const pathData = this.createPathString(initialGeometry.points);
+    const path = this.buildPathFromPoints(initialGeometry.points);
     const velocity: Vector = {
       x: this.random(-1, 1) * this.config.speedMultiplier,
       y: this.random(-1, 1) * this.config.speedMultiplier,
@@ -417,25 +433,15 @@ export class DynamicBackgroundManager {
     const initialAngle = this.random(0, 360);
     const angularVelocity = this.random(-0.15, 0.15);
 
-    const pathElement = document.createElementNS(svgNS, "path");
-    pathElement.setAttribute("d", pathData);
-    pathElement.setAttribute("fill", initialHex);
-    pathElement.setAttribute(
-      "transform",
-      `translate(${position.x}, ${position.y}) rotate(${initialAngle})`
-    );
-    pathElement.style.opacity = String(this.config.opacity);
-    this.svgGroup!.appendChild(pathElement);
-
     const blob: BlobShape = {
       id: blobIndex,
-      pathElement,
       position,
       velocity,
       radius,
       color: initialHex,
       hsl: initialHsl || { h: 0, s: 0, l: 50 },
       points: initialGeometry.points,
+      path,
       angle: initialAngle,
       angularVelocity,
       baseAngles: initialGeometry.angles,
@@ -448,7 +454,78 @@ export class DynamicBackgroundManager {
     this.blobs.push(blob);
   }
 
-  // Helpers
+  private buildPathFromPoints(points: Vector[]): Path2D {
+    const path = new Path2D();
+    if (points.length < 3) return path;
+
+    path.moveTo(points[0].x, points[0].y);
+    const n = points.length;
+    for (let i = 0; i < n; i++) {
+      const p0 = points[(i - 1 + n) % n];
+      const p1 = points[i];
+      const p2 = points[(i + 1) % n];
+      const p3 = points[(i + 2) % n];
+      const cp1x = p1.x + (p2.x - p0.x) / 6;
+      const cp1y = p1.y + (p2.y - p0.y) / 6;
+      const cp2x = p2.x - (p3.x - p1.x) / 6;
+      const cp2y = p2.y - (p3.y - p1.y) / 6;
+      path.bezierCurveTo(cp1x, cp1y, cp2x, cp2y, p2.x, p2.y);
+    }
+    path.closePath();
+    return path;
+  }
+
+  private setupEventListeners(staticMode = false) {
+    const resizeHandler = () => {
+      this.needsRectUpdate = true;
+      if (staticMode || (!this.rafId && (this.prefersReducedMotion || this.forceStaticMode))) {
+        this.drawFrame();
+      }
+    };
+    window.addEventListener("resize", resizeHandler);
+
+    let mousemoveHandler: ((event: MouseEvent) => void) | null = null;
+    let mouseleaveHandler: (() => void) | null = null;
+
+    if (this.config.enableMouseInteraction && !staticMode) {
+      mousemoveHandler = (event: MouseEvent) => {
+        if (this.mouseThrottleTimeout) cancelAnimationFrame(this.mouseThrottleTimeout);
+        this.mouseThrottleTimeout = requestAnimationFrame(() => {
+          try {
+            this.ensureCanvasSize();
+            const mouseX = event.clientX;
+            const mouseY = event.clientY;
+            this.mousePos = {
+              x: mouseX - this.cachedContainerRect.left,
+              y: mouseY - this.cachedContainerRect.top,
+            };
+            const centerX = window.innerWidth / 2;
+            const centerY = window.innerHeight / 2;
+            const offsetScale = -0.03;
+            this.targetOffset.x = (mouseX - centerX) * offsetScale;
+            this.targetOffset.y = (mouseY - centerY) * offsetScale;
+          } catch (e) {
+            console.error("Error in mousemove handler:", e);
+          }
+        });
+      };
+      window.addEventListener("mousemove", mousemoveHandler);
+
+      mouseleaveHandler = () => {
+        this.mousePos = null;
+        this.targetOffset.x = 0;
+        this.targetOffset.y = 0;
+      };
+      window.addEventListener("mouseleave", mouseleaveHandler);
+    }
+
+    this.cleanupListeners = () => {
+      window.removeEventListener("resize", resizeHandler);
+      if (mousemoveHandler) window.removeEventListener("mousemove", mousemoveHandler);
+      if (mouseleaveHandler) window.removeEventListener("mouseleave", mouseleaveHandler);
+    };
+  }
+
   private random(min: number, max: number): number {
     return Math.random() * (max - min) + min;
   }
@@ -468,10 +545,10 @@ export class DynamicBackgroundManager {
     const r = parseInt(hex.substring(0, 2), 16) / 255;
     const g = parseInt(hex.substring(2, 4), 16) / 255;
     const b = parseInt(hex.substring(4, 6), 16) / 255;
-    const max = Math.max(r, g, b),
-      min = Math.min(r, g, b);
-    let h = 0,
-      s = 0;
+    const max = Math.max(r, g, b);
+    const min = Math.min(r, g, b);
+    let h = 0;
+    let s = 0;
     const l = (max + min) / 2;
     if (max !== min) {
       const d = max - min;
@@ -516,72 +593,6 @@ export class DynamicBackgroundManager {
     return { points, angles, radii };
   }
 
-  private createPathString(points: Vector[]): string {
-    if (points.length < 3) return "";
-    let d = `M ${points[0].x} ${points[0].y}`;
-    const n = points.length;
-    for (let i = 0; i < n; i++) {
-      const p0 = points[(i - 1 + n) % n];
-      const p1 = points[i];
-      const p2 = points[(i + 1) % n];
-      const p3 = points[(i + 2) % n];
-      const cp1x = p1.x + (p2.x - p0.x) / 6;
-      const cp1y = p1.y + (p2.y - p0.y) / 6;
-      const cp2x = p2.x - (p3.x - p1.x) / 6;
-      const cp2y = p2.y - (p3.y - p1.y) / 6;
-      d += ` C ${cp1x} ${cp1y}, ${cp2x} ${cp2y}, ${p2.x} ${p2.y}`;
-    }
-    d += " Z";
-    return d;
-  }
-
-  private setupEventListeners() {
-    const resizeHandler = () => {
-      this.needsRectUpdate = true;
-    };
-    window.addEventListener("resize", resizeHandler);
-
-    const mousemoveHandler = (event: MouseEvent) => {
-      if (this.config.enableMouseInteraction) {
-        if (this.mouseThrottleTimeout) cancelAnimationFrame(this.mouseThrottleTimeout);
-        this.mouseThrottleTimeout = requestAnimationFrame(() => {
-          try {
-            this.updateCachedRect();
-            const mouseX = event.clientX;
-            const mouseY = event.clientY;
-            this.mousePos = {
-              x: mouseX - this.cachedContainerRect.left,
-              y: mouseY - this.cachedContainerRect.top,
-            };
-            const centerX = window.innerWidth / 2;
-            const centerY = window.innerHeight / 2;
-            const offsetScale = -0.03;
-            this.targetOffset.x = (mouseX - centerX) * offsetScale;
-            this.targetOffset.y = (mouseY - centerY) * offsetScale;
-          } catch (e) {
-            console.error("Error in mousemove handler:", e);
-          }
-        });
-      }
-    };
-    window.addEventListener("mousemove", mousemoveHandler);
-
-    const mouseleaveHandler = () => {
-      this.mousePos = null;
-      this.targetOffset.x = 0;
-      this.targetOffset.y = 0;
-    };
-    window.addEventListener("mouseleave", mouseleaveHandler);
-
-    // Store cleanup function
-    this.cleanupListeners = () => {
-      window.removeEventListener("resize", resizeHandler);
-      window.removeEventListener("mousemove", mousemoveHandler);
-      window.removeEventListener("mouseleave", mouseleaveHandler);
-    };
-  }
-
-  // Firefox detection so we skip heavy animation there
   private detectFirefox(): boolean {
     const ua = navigator.userAgent;
     return /Firefox|FxiOS/i.test(ua);

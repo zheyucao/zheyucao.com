@@ -3,7 +3,7 @@
 ---
 
 <div id="dynamic-background-container">
-  <svg id="dynamic-background-svg" width="100%" height="100%"></svg>
+  <canvas id="dynamic-background-canvas"></canvas>
 </div>
 
 <script>
@@ -12,13 +12,6 @@
   let backgroundManager: DynamicBackgroundManager | null = null;
 
   function initBackground() {
-    const isFirefox = /Firefox|FxiOS/i.test(navigator.userAgent);
-    if (isFirefox) {
-      cleanupBackground();
-      document.getElementById("dynamic-background-container")?.remove();
-      return;
-    }
-
     const container = document.getElementById("dynamic-background-container");
 
     if (!container) {
@@ -32,7 +25,7 @@
     try {
       backgroundManager = new DynamicBackgroundManager(
         "dynamic-background-container",
-        "dynamic-background-svg"
+        "dynamic-background-canvas"
       );
     } catch (e) {
       console.error("Failed to initialize DynamicBackground:", e);
@@ -81,8 +74,10 @@
     }
   }
 
-  #dynamic-background-svg {
-    display: block; /* Prevents extra space below SVG */
+  #dynamic-background-canvas {
+    display: block; /* Prevents extra space below canvas */
+    width: 100%;
+    height: 100%;
   }
 
   @keyframes hue-rotate-anim {
@@ -94,7 +89,7 @@
     }
   }
 
-  #dynamic-background-svg.css-hue-shift-active {
+  #dynamic-background-canvas.css-hue-shift-active {
     animation: hue-rotate-anim 50s linear infinite;
   }
 </style>
