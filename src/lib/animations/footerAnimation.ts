@@ -34,7 +34,7 @@ export function setupFooterAnimation(elements: FooterAnimationElements): () => v
     trigger: footer,
     scroller: scroller,
     start: "top 95%",
-    end: "bottom bottom",
+    end: "95% bottom",
     scrub: ANIMATION_CONSTANTS.GSAP.FOOTER_SCRUB,
     animation: gsap.fromTo(footer, { opacity: 0, y: 15 }, { opacity: 0.8, y: 0, ease: "power1.in" }),
     onLeave: () => gsap.set(footer, { opacity: 0.8, y: 0 }),
