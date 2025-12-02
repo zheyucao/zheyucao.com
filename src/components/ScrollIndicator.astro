@@ -76,7 +76,7 @@
   let cleanup: (() => void) | null = null;
   let clickCleanup: (() => void) | null = null;
 
-  document.addEventListener("astro:page-load", () => {
+  const handlePageLoad = () => {
     const indicator = document.querySelector("#scroll-indicator");
     const scroller = document.querySelector(".page-wrapper");
 
@@ -91,13 +91,18 @@
         scroller: scroller as HTMLElement,
       });
     }
-  });
+  };
 
   // Cleanup on navigation
-  document.addEventListener("astro:before-swap", () => {
+  const handleBeforeSwap = () => {
     if (cleanup) cleanup();
     if (clickCleanup) clickCleanup();
     cleanup = null;
     clickCleanup = null;
-  });
+    document.removeEventListener("astro:page-load", handlePageLoad);
+    document.removeEventListener("astro:before-swap", handleBeforeSwap);
+  };
+
+  document.addEventListener("astro:page-load", handlePageLoad);
+  document.addEventListener("astro:before-swap", handleBeforeSwap);
 </script>

@@ -193,54 +193,76 @@ const contactFooterItems = await getContactFooterItems();
 <script>
   import { setupFooterAnimation } from "../lib/animations/footerAnimation";
 
-  let cleanup: (() => void) | null = null;
+  const FOOTER_ANIMATION_KEY = "__footerAnimationEventsRegistered__";
 
-  document.addEventListener("astro:page-load", () => {
-    const footer = document.querySelector(".site-footer") as HTMLElement | null;
-    const scroller = document.querySelector(".page-wrapper") as HTMLElement | null;
+  if (!(window as any)[FOOTER_ANIMATION_KEY]) {
+    (window as any)[FOOTER_ANIMATION_KEY] = true;
 
-    if (footer && scroller) {
-      cleanup = setupFooterAnimation({ footer, scroller });
-    }
-  });
+    let cleanup: (() => void) | null = null;
 
-  // Cleanup on navigation
-  document.addEventListener("astro:before-swap", () => {
-    cleanup?.();
-    cleanup = null;
-  });
+    const handlePageLoad = () => {
+      cleanup?.();
+
+      const footer = document.querySelector(".site-footer") as HTMLElement | null;
+      const scroller = document.querySelector(".page-wrapper") as HTMLElement | null;
+
+      if (footer && scroller) {
+        cleanup = setupFooterAnimation({ footer, scroller });
+      }
+    };
+
+    // Cleanup on navigation, but keep listeners so they can re-run on the next page
+    const handleBeforeSwap = () => {
+      cleanup?.();
+      cleanup = null;
+    };
+
+    document.addEventListener("astro:page-load", handlePageLoad);
+    document.addEventListener("astro:before-swap", handleBeforeSwap);
+  }
 </script>
 
 <script>
   // Client-side script to mark the active footer link
-  function updateActiveFooterLink() {
-    const currentPath = window.location.pathname;
-    const normalizedPath = "/" + currentPath.replace(/^\/+|\/+$/g, "");
-    const rootPath = "/";
-    const links = document.querySelectorAll(".footer-column-2 ul li a");
+  const FOOTER_ACTIVE_LINK_KEY = "__footerActiveLinkEventsRegistered__";
 
-    links.forEach((link) => {
-      const linkHref = link.getAttribute("href");
-      const linkParentLi = link.closest("li");
-      if (!linkHref || !linkParentLi) return;
-      const normalizedHref = "/" + linkHref.replace(/^\/+|\/+$/g, "");
+  if (!(window as any)[FOOTER_ACTIVE_LINK_KEY]) {
+    (window as any)[FOOTER_ACTIVE_LINK_KEY] = true;
 
-      linkParentLi.classList.remove("active"); // Remove active from all first
+    const updateActiveFooterLink = () => {
+      const currentPath = window.location.pathname;
+      const normalizedPath = "/" + currentPath.replace(/^\/+|\/+$/g, "");
+      const rootPath = "/";
+      const links = document.querySelectorAll(".footer-column-2 ul li a");
 
-      if (linkHref === rootPath && (currentPath === rootPath || currentPath === "/index.html")) {
-        linkParentLi.classList.add("active");
-      } else if (
-        linkHref !== rootPath &&
-        linkHref.startsWith("/") &&
-        !linkHref.includes("#") &&
-        normalizedHref === normalizedPath
-      ) {
-        linkParentLi.classList.add("active");
-      }
-    });
+      links.forEach((link) => {
+        const linkHref = link.getAttribute("href");
+        const linkParentLi = link.closest("li");
+        if (!linkHref || !linkParentLi) return;
+        const normalizedHref = "/" + linkHref.replace(/^\/+|\/+$/g, "");
+
+        linkParentLi.classList.remove("active"); // Remove active from all first
+
+        if (linkHref === rootPath && (currentPath === rootPath || currentPath === "/index.html")) {
+          linkParentLi.classList.add("active");
+        } else if (
+          linkHref !== rootPath &&
+          linkHref.startsWith("/") &&
+          !linkHref.includes("#") &&
+          normalizedHref === normalizedPath
+        ) {
+          linkParentLi.classList.add("active");
+        }
+      });
+    };
+
+    // Run update on initial load and after SPA navigations
+    const handlePageLoad = () => updateActiveFooterLink();
+    const handleBeforeSwap = () => {
+      // Keep listeners alive; just ensure the current run finishes cleanly
+    };
+
+    document.addEventListener("astro:page-load", handlePageLoad);
+    document.addEventListener("astro:before-swap", handleBeforeSwap);
   }
-
-  // Run update on initial load and after SPA navigations
-  document.addEventListener("astro:page-load", updateActiveFooterLink);
-  // updateActiveFooterLink(); // Initial call might still be needed
 </script>

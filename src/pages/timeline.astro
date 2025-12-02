@@ -61,13 +61,21 @@ const { categories, initialEvents: initialFilteredEvents, metadata, filterAll } 
 <script>
   import { TimelineController } from "../lib/controllers/TimelineController";
 
-  document.addEventListener("astro:page-load", () => {
+  const handlePageLoad = () => {
     try {
       new TimelineController("#timeline-container", ".category-tab");
     } catch (e) {
       console.error("Failed to initialize TimelineController", e);
     }
-  });
+  };
+
+  const handleBeforeSwap = () => {
+    document.removeEventListener("astro:page-load", handlePageLoad);
+    document.removeEventListener("astro:before-swap", handleBeforeSwap);
+  };
+
+  document.addEventListener("astro:page-load", handlePageLoad);
+  document.addEventListener("astro:before-swap", handleBeforeSwap);
 </script>
 
 <style>

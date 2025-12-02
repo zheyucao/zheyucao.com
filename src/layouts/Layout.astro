@@ -64,41 +64,67 @@ const showScrollIndicator =
     <!-- Theme Handling -->
     <script>
       import { initTheme } from "../lib/layout/theme";
-      let cleanupTheme: (() => void) | undefined;
-      document.addEventListener("astro:page-load", () => {
-        cleanupTheme = initTheme();
-      });
-      document.addEventListener("astro:before-swap", () => {
-        cleanupTheme?.();
-        cleanupTheme = undefined;
-      });
+      const THEME_EVENTS_KEY = "__themeEventsRegistered__";
+
+      if (!(window as any)[THEME_EVENTS_KEY]) {
+        (window as any)[THEME_EVENTS_KEY] = true;
+
+        let cleanupTheme: (() => void) | undefined;
+
+        const handlePageLoad = () => {
+          cleanupTheme = initTheme();
+        };
+
+        const handleBeforeSwap = () => {
+          cleanupTheme?.();
+          cleanupTheme = undefined;
+        };
+
+        document.addEventListener("astro:page-load", handlePageLoad);
+        document.addEventListener("astro:before-swap", handleBeforeSwap);
+      }
     </script>
 
     <!-- Intersection Observer for Scroll Reveal -->
     <script>
       import { setupIntersectionObserver } from "../lib/layout/intersectionObserver";
 
-      let cleanupObserver: (() => void) | undefined;
+      const INTERSECTION_EVENTS_KEY = "__intersectionObserverEventsRegistered__";
 
-      document.addEventListener("astro:page-load", () => {
-        if (cleanupObserver) cleanupObserver();
-        cleanupObserver = setupIntersectionObserver();
-      });
+      if (!(window as any)[INTERSECTION_EVENTS_KEY]) {
+        (window as any)[INTERSECTION_EVENTS_KEY] = true;
 
-      document.addEventListener("astro:before-swap", () => {
-        if (cleanupObserver) cleanupObserver();
-        cleanupObserver = undefined;
-      });
+        let cleanupObserver: (() => void) | undefined;
+
+        const handlePageLoad = () => {
+          if (cleanupObserver) cleanupObserver();
+          cleanupObserver = setupIntersectionObserver();
+        };
+
+        const handleBeforeSwap = () => {
+          if (cleanupObserver) cleanupObserver();
+          cleanupObserver = undefined;
+        };
+
+        document.addEventListener("astro:page-load", handlePageLoad);
+        document.addEventListener("astro:before-swap", handleBeforeSwap);
+      }
     </script>
 
     <!-- GSAP Section Animations -->
     <script>
       import { setupSectionAnimations, cleanupScrollTriggers } from "../lib/layout/gsapAnimations";
 
-      const runSectionAnimations = () => requestAnimationFrame(() => setupSectionAnimations());
+      const GSAP_EVENTS_KEY = "__gsapSectionAnimationEventsRegistered__";
 
-      document.addEventListener("astro:page-load", runSectionAnimations);
-      document.addEventListener("astro:before-swap", cleanupScrollTriggers);
+      if (!(window as any)[GSAP_EVENTS_KEY]) {
+        (window as any)[GSAP_EVENTS_KEY] = true;
+
+        const runSectionAnimations = () => requestAnimationFrame(() => setupSectionAnimations());
+
+        document.addEventListener("astro:page-load", runSectionAnimations);
+        document.addEventListener("astro:before-swap", cleanupScrollTriggers);
+      }
     </script>
   </head>
   <body>

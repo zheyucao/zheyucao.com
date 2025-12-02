@@ -231,43 +231,68 @@ const {
 </style>
 
 <script>
-  let currentIntersectionObserver: IntersectionObserver | null = null; // Added type annotation
+  /**
+   * Guard against registering one IntersectionObserver per card instance.
+   * This keeps a single observer in memory across navigations and cleans
+   * it up on swap to avoid accumulating listeners.
+   */
+  type ObserverState = {
+    observer: IntersectionObserver | null;
+    pageLoadHandler?: () => void;
+    beforeSwapHandler?: () => void;
+  };
 
-  document.addEventListener("astro:page-load", () => {
-    // 1. Disconnect old observer if it exists
-    if (currentIntersectionObserver) {
-      currentIntersectionObserver.disconnect();
-    }
+  const STATE_KEY = "__projectCardObserverState__";
+  const state: ObserverState = (window as any)[STATE_KEY] || { observer: null };
+  (window as any)[STATE_KEY] = state;
 
-    // 2. Set up the new observer for the current page
-    const pageWrapper = document.querySelector(".page-wrapper");
-    if (!pageWrapper) {
-      console.error("Page wrapper element not found for IntersectionObserver.");
-      return;
-    }
-    const observerOptions = {
-      root: pageWrapper, // Observe intersections within the page-wrapper
-      rootMargin: "0px",
-      threshold: 0.2,
+  if (!state.pageLoadHandler) {
+    const disconnectObserver = () => {
+      state.observer?.disconnect();
+      state.observer = null;
     };
 
-    const observerCallback: IntersectionObserverCallback = (entries, observer) => {
-      entries.forEach((entry) => {
-        // console.log("Observing:", entry.target, "Is intersecting:", entry.isIntersecting); // Removed debug log
-        if (entry.isIntersecting) {
-          entry.target.classList.add("visible");
-          observer.unobserve(entry.target);
-        }
-      });
+    const handlePageLoad = () => {
+      disconnectObserver();
+
+      const pageWrapper = document.querySelector(".page-wrapper");
+      if (!pageWrapper) {
+        console.error("Page wrapper element not found for IntersectionObserver.");
+        return;
+      }
+
+      const observerOptions = {
+        root: pageWrapper,
+        rootMargin: "0px",
+        threshold: 0.2,
+      };
+
+      const observerCallback: IntersectionObserverCallback = (entries, observer) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add("visible");
+            observer.unobserve(entry.target);
+          }
+        });
+      };
+
+      const observer = new IntersectionObserver(observerCallback, observerOptions);
+      state.observer = observer;
+
+      document.querySelectorAll(".project-card").forEach((target) => observer.observe(target));
     };
 
-    const newObserver = new IntersectionObserver(observerCallback, observerOptions);
+    const handleBeforeSwap = () => {
+      disconnectObserver();
+      document.removeEventListener("astro:page-load", handlePageLoad);
+      document.removeEventListener("astro:before-swap", handleBeforeSwap);
+      delete (window as any)[STATE_KEY];
+    };
 
-    // 3. Store the new observer instance
-    currentIntersectionObserver = newObserver;
+    state.pageLoadHandler = handlePageLoad;
+    state.beforeSwapHandler = handleBeforeSwap;
 
-    // 4. Find and observe targets *on the current page*
-    const targets = document.querySelectorAll(".project-card"); // Corrected selector was applied previously
-    targets.forEach((target) => newObserver.observe(target));
-  });
+    document.addEventListener("astro:page-load", handlePageLoad);
+    document.addEventListener("astro:before-swap", handleBeforeSwap);
+  }
 </script>

@@ -47,12 +47,17 @@
   }
 
   // Initialize (or check persistence) on page load
-  document.addEventListener("astro:page-load", initBackground);
+  const handlePageLoad = () => initBackground();
 
   // Clean up on fallback swaps (Safari) where the element can't persist.
-  document.addEventListener("astro:before-swap", () => {
+  const handleBeforeSwap = () => {
     if (!supportsViewTransitions) cleanupBackground();
-  });
+    document.removeEventListener("astro:page-load", handlePageLoad);
+    document.removeEventListener("astro:before-swap", handleBeforeSwap);
+  };
+
+  document.addEventListener("astro:page-load", handlePageLoad);
+  document.addEventListener("astro:before-swap", handleBeforeSwap);
 </script>
 
 <style>
