@@ -61,21 +61,40 @@ const { categories, initialEvents: initialFilteredEvents, metadata, filterAll } 
 <script>
   import { TimelineController } from "../lib/controllers/TimelineController";
 
-  const handlePageLoad = () => {
-    try {
-      new TimelineController("#timeline-container", ".category-tab");
-    } catch (e) {
-      console.error("Failed to initialize TimelineController", e);
-    }
+  const TIMELINE_EVENTS_KEY = "__timelineEventsRegistered__";
+  type TimelineWindow = Window & {
+    [TIMELINE_EVENTS_KEY]?: boolean;
   };
+  const timelineWindow = window as TimelineWindow;
 
-  const handleBeforeSwap = () => {
-    document.removeEventListener("astro:page-load", handlePageLoad);
-    document.removeEventListener("astro:before-swap", handleBeforeSwap);
-  };
+  if (!timelineWindow[TIMELINE_EVENTS_KEY]) {
+    timelineWindow[TIMELINE_EVENTS_KEY] = true;
 
-  document.addEventListener("astro:page-load", handlePageLoad);
-  document.addEventListener("astro:before-swap", handleBeforeSwap);
+    let controller: TimelineController | null = null;
+
+    const initTimeline = () => {
+      try {
+        // Clean up any previous instance before creating a new one
+        controller?.destroy();
+        const containerExists = document.querySelector("#timeline-container");
+        const tabsExist = document.querySelectorAll(".category-tab").length > 0;
+        if (!containerExists || !tabsExist) return;
+        controller = new TimelineController("#timeline-container", ".category-tab");
+      } catch (e) {
+        console.error("Failed to initialize TimelineController", e);
+      }
+    };
+
+    const cleanupTimeline = () => {
+      controller?.destroy();
+      controller = null;
+    };
+
+    // Run immediately in case the event fired before this script executes
+    initTimeline();
+    document.addEventListener("astro:page-load", initTimeline);
+    document.addEventListener("astro:before-swap", cleanupTimeline);
+  }
 </script>
 
 <style>

@@ -3,12 +3,14 @@ export class TimelineController {
   private currentFilter: string = "all";
   private categoryTabs: NodeListOf<HTMLElement>;
   private reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+  private boundCategoryClick: (e: Event) => void;
 
   constructor(containerId: string, categoryTabsSelector: string) {
     const container = document.querySelector(containerId);
     if (!container) throw new Error(`Timeline container not found: ${containerId}`);
     this.container = container as HTMLElement;
     this.categoryTabs = document.querySelectorAll(categoryTabsSelector);
+    this.boundCategoryClick = (e: Event) => this.handleCategoryClick(e);
 
     this.init();
   }
@@ -21,7 +23,7 @@ export class TimelineController {
 
   private setupEventListeners() {
     this.categoryTabs.forEach((tab) => {
-      tab.addEventListener("click", (e) => this.handleCategoryClick(e));
+      tab.addEventListener("click", this.boundCategoryClick);
     });
   }
 
@@ -77,5 +79,12 @@ export class TimelineController {
         el.style.display = "none";
       }
     });
+  }
+
+  public destroy() {
+    this.categoryTabs.forEach((tab) => {
+      tab.removeEventListener("click", this.boundCategoryClick);
+    });
+    this.container.classList.remove("is-updating");
   }
 }
