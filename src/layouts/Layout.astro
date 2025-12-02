@@ -40,7 +40,20 @@ const showScrollIndicator =
     <title>{pageTitle}</title>
     <meta name="description" content={siteConfig.metadata.description} />
     <meta name="author" content={siteConfig.metadata.author} />
-    <ClientRouter fallback="none" />
+    <script is:inline>
+      // Safari view transitions can flicker; force fallback swap there.
+      const ua = navigator.userAgent;
+      const isSafari = /Safari\//.test(ua) && !/Chrome\//.test(ua);
+      if (isSafari) {
+        try {
+          // @ts-expect-error Override to disable View Transitions, which have flicker issues in these browsers.
+          document.startViewTransition = undefined;
+        } catch {
+          /* ignore */
+        }
+      }
+    </script>
+    <ClientRouter fallback="swap" />
     <!-- START Insert Theme Detection Script Here -->
     <script is:inline>
       // Immediate theme application to prevent flash

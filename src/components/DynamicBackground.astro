@@ -10,6 +10,7 @@
   import { DynamicBackgroundManager } from "../lib/components/DynamicBackground";
 
   let backgroundManager: DynamicBackgroundManager | null = null;
+  const supportsViewTransitions = "startViewTransition" in document;
 
   function initBackground() {
     const container = document.getElementById("dynamic-background-container");
@@ -20,7 +21,13 @@
       return;
     }
 
-    if (backgroundManager) return; // Prevent double init if already running
+    // On browsers without View Transitions the DOM is swapped,
+    // so tear down before re-initializing to avoid dangling canvas references.
+    if (!supportsViewTransitions && backgroundManager) {
+      cleanupBackground();
+    }
+
+    if (backgroundManager) return; // Prevent double init if already running on supported VT
 
     try {
       backgroundManager = new DynamicBackgroundManager(
@@ -42,8 +49,10 @@
   // Initialize (or check persistence) on page load
   document.addEventListener("astro:page-load", initBackground);
 
-  // Remove before-swap cleanup to allow persistence
-  // document.addEventListener("astro:before-swap", cleanupBackground);
+  // Clean up on fallback swaps (Safari) where the element can't persist.
+  document.addEventListener("astro:before-swap", () => {
+    if (!supportsViewTransitions) cleanupBackground();
+  });
 </script>
 
 <style>
