@@ -2,6 +2,7 @@ export class TimelineController {
   private container: HTMLElement;
   private currentFilter: string = "all";
   private categoryTabs: NodeListOf<HTMLElement>;
+  private reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
 
   constructor(containerId: string, categoryTabsSelector: string) {
     const container = document.querySelector(containerId);
@@ -30,7 +31,7 @@ export class TimelineController {
     if (category && category !== this.currentFilter) {
       this.currentFilter = category;
       this.updateUI();
-      this.applyFilter();
+      this.runFilterAnimation();
     }
   }
 
@@ -42,6 +43,23 @@ export class TimelineController {
       } else {
         tab.removeAttribute("aria-pressed");
       }
+    });
+  }
+
+  private runFilterAnimation() {
+    if (this.reduceMotion.matches) {
+      this.applyFilter();
+      return;
+    }
+
+    this.container.classList.add("is-updating");
+
+    // Let the opacity transition start before applying the new filter
+    requestAnimationFrame(() => {
+      setTimeout(() => {
+        this.applyFilter();
+        this.container.classList.remove("is-updating");
+      }, 300);
     });
   }
 
