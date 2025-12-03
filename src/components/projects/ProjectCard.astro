@@ -28,7 +28,7 @@ const {
 } = Astro.props;
 ---
 
-<article id={id} class="project-card">
+<article id={id} class="project-card scroll-reveal-animate">
   {
     imageSrc && (
       <div class="project-image-wrapper">
@@ -229,75 +229,3 @@ const {
     list-style: disc;
   }
 </style>
-
-<script>
-  /**
-   * Guard against registering one IntersectionObserver per card instance.
-   * This keeps a single observer in memory across navigations and cleans
-   * it up on swap to avoid accumulating listeners.
-   */
-  type ObserverState = {
-    observer: IntersectionObserver | null;
-    pageLoadHandler?: () => void;
-    beforeSwapHandler?: () => void;
-  };
-
-  const STATE_KEY = "__projectCardObserverState__";
-  type ProjectCardWindow = Window & {
-    [STATE_KEY]?: ObserverState;
-  };
-
-  const observerWindow = window as ProjectCardWindow;
-  const state: ObserverState = observerWindow[STATE_KEY] || { observer: null };
-  observerWindow[STATE_KEY] = state;
-
-  if (!state.pageLoadHandler) {
-    const disconnectObserver = () => {
-      state.observer?.disconnect();
-      state.observer = null;
-    };
-
-    const handlePageLoad = () => {
-      disconnectObserver();
-
-      const pageWrapper = document.querySelector(".page-wrapper");
-      if (!pageWrapper) {
-        console.error("Page wrapper element not found for IntersectionObserver.");
-        return;
-      }
-
-      const observerOptions = {
-        root: pageWrapper,
-        rootMargin: "0px",
-        threshold: 0.2,
-      };
-
-      const observerCallback: IntersectionObserverCallback = (entries, observer) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            entry.target.classList.add("visible");
-            observer.unobserve(entry.target);
-          }
-        });
-      };
-
-      const observer = new IntersectionObserver(observerCallback, observerOptions);
-      state.observer = observer;
-
-      document.querySelectorAll(".project-card").forEach((target) => observer.observe(target));
-    };
-
-    const handleBeforeSwap = () => {
-      disconnectObserver();
-      document.removeEventListener("astro:page-load", handlePageLoad);
-      document.removeEventListener("astro:before-swap", handleBeforeSwap);
-      delete observerWindow[STATE_KEY];
-    };
-
-    state.pageLoadHandler = handlePageLoad;
-    state.beforeSwapHandler = handleBeforeSwap;
-
-    document.addEventListener("astro:page-load", handlePageLoad);
-    document.addEventListener("astro:before-swap", handleBeforeSwap);
-  }
-</script>
