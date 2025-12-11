@@ -3,7 +3,15 @@
 // Acts as a reusable layout for homepage sections with consistent style & animation
 ---
 
-<section class="section-wrapper homepage-section">
+<section 
+  class="section-wrapper homepage-section"
+  style="
+    --section-title-size: clamp(2rem, 2rem + 2vw, 4rem);
+    --section-content-size: 1.25rem;
+    --section-content-max-width: 65ch;
+    --section-content-line-height: 1.6;
+  "
+>
   <slot name="title" />
   <slot />
 </section>
@@ -12,11 +20,5 @@
   .homepage-section {
     padding: 15vh 5vw;
     min-height: 70vh;
-    
-    /* Define CSS custom properties that child components can use */
-    --section-title-size: clamp(2rem, 2rem + 2vw, 4rem);
-    --section-content-size: 1.25rem;
-    --section-content-max-width: 65ch;
-    --section-content-line-height: 1.6;
   }
 </style>
