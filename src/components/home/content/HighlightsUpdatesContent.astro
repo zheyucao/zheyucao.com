@@ -70,11 +70,38 @@ const highlightsToShow = events;
   </div>
 </div>
 
-<style is:global>
+<style>
+  .about-title {
+    font-size: var(--section-title-size, clamp(2rem, 2rem + 2vw, 4rem));
+    font-weight: normal;
+    margin-bottom: 1em;
+  }
+
+  .about-content {
+    font-size: var(--section-content-size, 1.25rem);
+    line-height: var(--section-content-line-height, 1.6);
+    max-width: var(--section-content-max-width, 65ch);
+  }
+
+  .about-content :global(p) {
+    font-size: inherit;
+    margin-bottom: 1.5em;
+  }
+
+  .about-content :global(ul) {
+    list-style: none;
+    padding-left: 0;
+    margin-top: 1rem;
+  }
+
+  .about-content :global(li) {
+    margin-bottom: 0.75rem;
+  }
+
   .highlights-list-enhanced {
     list-style: none;
     padding-left: 0;
-    margin-top: 0; /* Remove potential default margin */
+    margin-top: 0;
   }
 
   .highlight-item-enhanced {
@@ -111,8 +138,9 @@ const highlightsToShow = events;
     line-height: 1.5;
   }
 
-  .about-section .about-content .highlight-summary p,
-  .about-section .about-content .highlight-description p {
+  /* Override the inherited 1.25rem with 1rem for highlights */
+  .highlight-summary :global(p),
+  .highlight-description :global(p) {
     font-size: 1rem;
     color: var(--theme-text);
     margin: 0;

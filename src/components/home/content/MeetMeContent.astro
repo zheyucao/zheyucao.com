@@ -42,13 +42,40 @@ const { title, cta, Content, socialItems } = data;
 </div>
 
 <style>
+  .about-title {
+    font-size: var(--section-title-size, clamp(2rem, 2rem + 2vw, 4rem));
+    font-weight: normal;
+    margin-bottom: 1em;
+  }
+
+  .about-content {
+    font-size: var(--section-content-size, 1.25rem);
+    line-height: var(--section-content-line-height, 1.6);
+    max-width: var(--section-content-max-width, 65ch);
+  }
+
+  .about-content :global(p) {
+    font-size: inherit;
+    margin-bottom: 1.5em;
+  }
+
+  .about-content :global(ul) {
+    list-style: none;
+    padding-left: 0;
+    margin-top: 1rem;
+  }
+
+  .about-content :global(li) {
+    margin-bottom: 0.75rem;
+  }
+
   .connect-icon-links {
     margin: 2rem 0;
   }
 
   .button-group {
     display: flex;
-    gap: 1rem; /* Adjust spacing as needed */
+    gap: 1rem;
     margin-top: 2rem;
   }
 </style>
