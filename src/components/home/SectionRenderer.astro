@@ -1,0 +1,56 @@
+---
+import Hero from "./Hero.astro";
+import MeetMeContent from "./content/MeetMeContent.astro";
+import FeaturedWorksContent from "./content/FeaturedWorksContent.astro";
+import HighlightsUpdatesContent from "./content/HighlightsUpdatesContent.astro";
+import SectionWrapper from "./SectionWrapper.astro";
+import type { HomepageSection } from "../../viewmodels/homepageSectionsViewModel";
+
+interface Props {
+  section: HomepageSection;
+}
+
+const { section } = Astro.props;
+---
+
+{
+  section.type === "hero" ? (
+    <Hero data={section} />
+  ) : section.type === "text-content" ? (
+    <SectionWrapper>
+      <MeetMeContent
+        data={{
+          title: section.title || "",
+          cta: section.cta || { text: "", href: "" },
+          Content: section.Content,
+          socialItems: section.contactIcons,
+        }}
+      />
+    </SectionWrapper>
+  ) : section.type === "collection-showcase" ? (
+    <SectionWrapper>
+      {section.componentType === "cards" ? (
+        <FeaturedWorksContent
+          data={{
+            section: {
+              title: section.title || "",
+              cta: section.cta || { text: "", href: "" },
+            },
+            projects: section.items,
+          }}
+        />
+      ) : (
+        <HighlightsUpdatesContent
+          data={{
+            section: {
+              title: section.title || "",
+              cta: section.cta || { text: "", href: "" },
+              fallback: section.fallback || "No items available.",
+            },
+            events: section.items,
+          }}
+        />
+      )}
+    </SectionWrapper>
+  ) : null
+}

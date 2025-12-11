@@ -39,6 +39,67 @@ const timeline = defineCollection({
   }),
 });
 
+// Homepage sections collection - dynamic section system
+const homepage_sections = defineCollection({
+  type: "content",
+  schema: z.discriminatedUnion("type", [
+    // Hero section
+    z.object({
+      type: z.literal("hero"),
+      order: z.number(),
+      visible: z.boolean().default(true),
+      greeting: z.string().optional(),
+      name: z.string(),
+      description: z.string().optional(),
+    }),
+    // Text content section (for Meet Me, Connect, custom content)
+    z.object({
+      type: z.literal("text-content"),
+      order: z.number(),
+      visible: z.boolean().default(true),
+      title: z.string().optional(),
+      cta: z
+        .object({
+          text: z.string(),
+          href: z.string(),
+        })
+        .optional(),
+      // Supplementary data sources (e.g., contact icons)
+      supplementaryData: z
+        .object({
+          contactIcons: z
+            .object({
+              sourceCollection: z.string(),
+              filter: z.record(z.any()).optional(),
+              itemFilter: z.record(z.any()).optional(),
+            })
+            .optional(),
+        })
+        .optional(),
+    }),
+    // Collection showcase section (for featured projects, timeline highlights, etc.)
+    z.object({
+      type: z.literal("collection-showcase"),
+      order: z.number(),
+      visible: z.boolean().default(true),
+      title: z.string().optional(),
+      cta: z
+        .object({
+          text: z.string(),
+          href: z.string(),
+        })
+        .optional(),
+      fallback: z.string().optional(), // Fallback text when no items
+      sourceCollection: z.string(), // e.g., "projects", "timeline"
+      filter: z.record(z.any()).optional(), // e.g., { isFeatured: true }
+      sortBy: z.string().optional(), // e.g., "order", "date"
+      sortOrder: z.enum(["asc", "desc"]).optional(),
+      limit: z.number().optional(),
+      componentType: z.enum(["cards", "list"]), // "cards" for projects, "list" for timeline
+    }),
+  ]),
+});
+
 const home = defineCollection({
   type: "content",
   schema: z.object({
@@ -182,6 +243,7 @@ export const collections = {
   projects,
   timeline,
   home,
+  "homepage-sections": homepage_sections,
   resume,
   contact,
   "ui-strings": ui_strings,

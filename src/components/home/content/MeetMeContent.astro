@@ -1,7 +1,9 @@
 ---
-// Content for the "Meet me!" section
+// Content for text-content sections (Meet me, Connect, custom content)
 import Button from "../../common/Button.astro";
+import ContactIcons from "../../contact/ContactIcons.astro";
 import type { AstroComponentFactory } from "astro/runtime/server/index.js";
+import type { ContactItem } from "../../../viewmodels/contactViewModel";
 
 interface Props {
   data: {
@@ -11,11 +13,12 @@ interface Props {
       href: string;
     };
     Content: AstroComponentFactory;
+    socialItems?: ContactItem[];
   };
 }
 
 const { data } = Astro.props;
-const { title, cta, Content } = data;
+const { title, cta, Content, socialItems } = data;
 ---
 
 <h2 slot="title" class="about-title scroll-target-title">{title}</h2>
@@ -25,15 +28,28 @@ const { title, cta, Content } = data;
     <Content />
   </div>
 
+  {
+    socialItems?.length ? (
+      <div class="connect-icon-links">
+        <ContactIcons items={socialItems} />
+      </div>
+    ) : null
+  }
+
   <div class="button-group">
     <Button class="button" href={cta.href} text={cta.text} wrapperClass="meet-me-cta-button" />
   </div>
 </div>
 
 <style>
+  .connect-icon-links {
+    margin: 2rem 0;
+  }
+
   .button-group {
     display: flex;
     gap: 1rem; /* Adjust spacing as needed */
     margin-top: 2rem;
   }
 </style>
+

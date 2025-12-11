@@ -70,7 +70,7 @@ const highlightsToShow = events;
   </div>
 </div>
 
-<style>
+<style is:global>
   .highlights-list-enhanced {
     list-style: none;
     padding-left: 0;
@@ -111,8 +111,8 @@ const highlightsToShow = events;
     line-height: 1.5;
   }
 
-  .highlight-summary :global(p),
-  .highlight-description :global(p) {
+  .about-section .about-content .highlight-summary p,
+  .about-section .about-content .highlight-description p {
     font-size: 1rem;
     color: var(--theme-text);
     margin: 0;

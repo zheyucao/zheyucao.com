@@ -1,35 +1,14 @@
 ---
 import Layout from "../layouts/Layout.astro";
-import Hero from "../components/home/Hero.astro";
-import SectionWrapper from "../components/home/SectionWrapper.astro";
-import MeetMeContent from "../components/home/content/MeetMeContent.astro";
-import FeaturedWorksContent from "../components/home/content/FeaturedWorksContent.astro";
-import HighlightsUpdatesContent from "../components/home/content/HighlightsUpdatesContent.astro";
-import ConnectContent from "../components/home/content/ConnectContent.astro";
-import { getHomeViewModel } from "../viewmodels/homeViewModel";
+import SectionRenderer from "../components/home/SectionRenderer.astro";
+import { getHomepageSectionsViewModel } from "../viewmodels/homepageSectionsViewModel";
 
-const viewModel = await getHomeViewModel();
+const sections = await getHomepageSectionsViewModel();
 ---
 
 <Layout title="Homepage">
   <main class="homepage-content">
-    <Hero data={viewModel.hero} />
-
-    <SectionWrapper>
-      <MeetMeContent data={viewModel.meetMe} />
-    </SectionWrapper>
-
-    <SectionWrapper>
-      <FeaturedWorksContent data={viewModel.featuredWorks} />
-    </SectionWrapper>
-
-    <SectionWrapper>
-      <HighlightsUpdatesContent data={viewModel.highlights} />
-    </SectionWrapper>
-
-    <SectionWrapper>
-      <ConnectContent data={{ ...viewModel.connect, socialItems: viewModel.connectSocialItems }} />
-    </SectionWrapper>
+    {sections.map((section) => <SectionRenderer section={section} />)}
   </main>
 </Layout>
 
