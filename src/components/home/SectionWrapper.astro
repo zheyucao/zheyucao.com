@@ -3,22 +3,53 @@
 // Acts as a reusable layout for homepage sections with consistent style & animation
 ---
 
-<section 
-  class="section-wrapper homepage-section"
-  style="
-    --section-title-size: clamp(2rem, 2rem + 2vw, 4rem);
-    --section-content-size: 1.25rem;
-    --section-content-max-width: 65ch;
-    --section-content-line-height: 1.6;
-  "
->
+<section class="section-wrapper about-section">
   <slot name="title" />
   <slot />
 </section>
 
+{/* Scoped styles for the wrapper itself */}
 <style>
-  .homepage-section {
+  .about-section {
     padding: 15vh 5vw;
     min-height: 70vh;
+  }
+</style>
+
+{/* Global styles for the content PASSED INTO the slots */}
+<style is:global>
+  /* Target title passed into the slot */
+  .about-section .about-title {
+    font-size: clamp(2rem, 2rem + 2vw, 4rem);
+    font-weight: normal;
+    margin-bottom: 1em;
+  }
+
+  /* Target content div passed into the slot */
+  .about-section .about-content {
+    font-size: 1.25rem;
+    line-height: 1.6;
+    max-width: 65ch;
+  }
+
+  /* Target common elements INSIDE the slotted content div */
+  .about-section .about-content p {
+    font-size: inherit;
+    margin-bottom: 1.5em;
+  }
+
+  /* Exception: Highlight summaries should be smaller */
+  .about-section .about-content .highlight-summary p,
+  .about-section .about-content .highlight-description p {
+    font-size: 1rem;
+  }
+
+  .about-section .about-content ul {
+    list-style: none;
+    padding-left: 0;
+    margin-top: 1rem;
+  }
+  .about-section .about-content li {
+    margin-bottom: 0.75rem;
   }
 </style>
