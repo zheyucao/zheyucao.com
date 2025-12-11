@@ -23,11 +23,11 @@ const { title, cta } = section;
 const featuredProjects = projects;
 ---
 
-<h2 slot="title" class="about-title scroll-target-title">{title}</h2>
+<h2 slot="title" class="section-title scroll-target-title">{title}</h2>
 
 <div
   class:list={[
-    "about-content scroll-target-content featured-works-container",
+    "section-content scroll-target-content featured-works-container",
     featuredProjects.length % 2 !== 0 ? "single-column" : "double-column",
   ]}
 >
@@ -50,13 +50,13 @@ const featuredProjects = projects;
 </div>
 
 <style>
-  .about-title {
+  .section-title {
     font-size: var(--section-title-size, clamp(2rem, 2rem + 2vw, 4rem));
     font-weight: normal;
     margin-bottom: 1em;
   }
 
-  .about-content {
+  .section-content {
     font-size: var(--section-content-size, 1.25rem);
     line-height: var(--section-content-line-height, 1.6);
     max-width: var(--section-content-max-width, 65ch);

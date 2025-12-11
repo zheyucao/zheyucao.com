@@ -21,9 +21,9 @@ const { data } = Astro.props;
 const { title, cta, Content, socialItems } = data;
 ---
 
-<h2 slot="title" class="about-title scroll-target-title">{title}</h2>
+<h2 slot="title" class="section-title scroll-target-title">{title}</h2>
 
-<div class="about-content scroll-target-content">
+<div class="section-content scroll-target-content">
   <div class="rich-text">
     <Content />
   </div>
@@ -42,30 +42,30 @@ const { title, cta, Content, socialItems } = data;
 </div>
 
 <style>
-  .about-title {
+  .section-title {
     font-size: var(--section-title-size, clamp(2rem, 2rem + 2vw, 4rem));
     font-weight: normal;
     margin-bottom: 1em;
   }
 
-  .about-content {
+  .section-content {
     font-size: var(--section-content-size, 1.25rem);
     line-height: var(--section-content-line-height, 1.6);
     max-width: var(--section-content-max-width, 65ch);
   }
 
-  .about-content :global(p) {
+  .section-content :global(p) {
     font-size: inherit;
     margin-bottom: 1.5em;
   }
 
-  .about-content :global(ul) {
+  .section-content :global(ul) {
     list-style: none;
     padding-left: 0;
     margin-top: 1rem;
   }
 
-  .about-content :global(li) {
+  .section-content :global(li) {
     margin-bottom: 0.75rem;
   }
 
