@@ -19,13 +19,13 @@ interface Props {
 const { title, entries, variant = "default" } = Astro.props;
 ---
 
-<section class="resume-section scroll-reveal-animate">
-  <h2>{title}</h2>
+<section class="resume-section scroll-reveal-animate mb-12">
+  <h2 class="section-heading">{title}</h2>
   {
-    entries.map((entry) => (
-      <div class={`entry-item ${variant}-entry`}>
-        <div class="title-row">
-          <span class="title">
+    entries.map((entry, index) => (
+      <div class:list={["entry-item mb-4", index === entries.length - 1 && "!mb-0"]}>
+        <div class="title-row flex justify-between flex-wrap items-baseline">
+          <span class="title mr-2">
             <RichText content={entry.title} />
           </span>
           {entry.date && <span class="date">{entry.date}</span>}
@@ -36,11 +36,11 @@ const { title, entries, variant = "default" } = Astro.props;
           </div>
         )}
         {entry.Content ? (
-          <div class="details">
+          <div class="details mt-[0.8rem]">
             <entry.Content />
           </div>
         ) : entry.details ? (
-          <div class="details">
+          <div class="details mt-[0.8rem]">
             <RichText content={entry.details} />
           </div>
         ) : null}
@@ -50,33 +50,23 @@ const { title, entries, variant = "default" } = Astro.props;
 </section>
 
 <style>
-  .resume-section {
-    margin-bottom: 3rem;
-  }
-  h2 {
+  /* Visual styling - fonts, colors, borders */
+  .section-heading {
     font-size: clamp(1.8rem, 1.5rem + 1.5vw, 2.8rem);
     margin-bottom: 1.5rem;
     font-weight: 600;
     border-bottom: 1px solid var(--text-muted);
     padding-bottom: 0.5rem;
   }
-  .entry-item {
-    margin-bottom: 1rem;
-  }
-  .entry-item:last-child {
-    margin-bottom: 0;
-  }
+
   .title-row {
-    display: flex;
-    justify-content: space-between;
-    flex-wrap: wrap;
     font-size: 1.4rem;
-    align-items: baseline;
   }
+
   .title {
     font-weight: normal;
-    margin-right: 0.5rem;
   }
+
   .subtitle {
     font-size: 1.2rem;
     margin-bottom: 0.2rem;
@@ -91,8 +81,8 @@ const { title, entries, variant = "default" } = Astro.props;
     font-size: 1rem;
     white-space: nowrap;
   }
+
   .details {
-    margin-top: 0.8rem;
     font-size: 1rem;
     line-height: 1.6;
   }

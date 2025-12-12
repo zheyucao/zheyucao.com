@@ -17,15 +17,15 @@ interface Props {
 const { title, items } = Astro.props;
 ---
 
-<section class="resume-section scroll-reveal-animate">
-  <h2>{title}</h2>
-  <ul class="contact-list">
+<section class="resume-section scroll-reveal-animate mb-16 last:mb-0">
+  <h2 class="section-heading">{title}</h2>
+  <ul class="list-none pl-0 m-0">
     {
       items.map((item) => (
-        <li>
+        <li class="contact-item flex items-center mb-[0.8rem]">
           <Icon name={item.icon} class="contact-icon" />
           {item.href ? (
-            <a href={item.href} target={item.target} rel={item.rel}>
+            <a href={item.href} target={item.target} rel={item.rel} class="contact-link">
               {item.label}
             </a>
           ) : (
@@ -38,31 +38,19 @@ const { title, items } = Astro.props;
 </section>
 
 <style>
-  .resume-section {
-    margin-bottom: 4rem;
-  }
-  .resume-section:last-child {
-    margin-bottom: 0;
-  }
-  h2 {
+  /* Visual styling - fonts, colors, borders */
+  .section-heading {
     font-size: clamp(1.8rem, 1.5rem + 1.5vw, 2.8rem);
     margin-bottom: 2rem;
     font-weight: 600;
     border-bottom: 1px solid var(--text-muted);
     padding-bottom: 0.5rem;
   }
-  .contact-list {
-    list-style: none;
-    padding-left: 0;
-    margin: 0;
-    font-size: inherit;
+
+  .resume-section ul {
     line-height: 1.8;
   }
-  .contact-list li {
-    margin-bottom: 0.8rem;
-    display: flex;
-    align-items: center;
-  }
+
   .contact-icon {
     margin-right: 0.8em;
     font-size: 1.2em;
@@ -70,13 +58,14 @@ const { title, items } = Astro.props;
     opacity: 0.8;
     transform: translateY(0.1em);
   }
-  .contact-list a {
+
+  .contact-link {
     word-break: break-all;
     color: var(--link-color);
     text-decoration: none;
     transition: color 0.3s ease;
   }
-  .contact-list a:hover {
+  .contact-link:hover {
     color: var(--link-hover-color);
     text-decoration: underline;
   }
