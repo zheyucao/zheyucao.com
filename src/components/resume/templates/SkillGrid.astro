@@ -12,20 +12,16 @@ interface Props {
 const { title, categories } = Astro.props;
 ---
 
-<section class="resume-section scroll-reveal-animate mb-16">
-  <h2
-    class="text-[clamp(1.8rem,1.5rem+1.5vw,2.8rem)] mb-8 font-semibold border-b border-text-muted pb-2"
-  >
-    {title}
-  </h2>
-  <div class="grid grid-cols-[repeat(auto-fit,minmax(120px,1fr))] gap-8">
+<section class="resume-section scroll-reveal-animate">
+  <h2>{title}</h2>
+  <div class="skills-grid">
     {
       categories.map((category) => (
-        <div>
-          <h3 class="text-[1.4rem] font-semibold mb-4 text-text">{category.name}</h3>
-          <ul class="list-none pl-0 m-0 text-[1.2rem] leading-[1.7]">
+        <div class="skill-category">
+          <h3>{category.name}</h3>
+          <ul>
             {category.items.map((item) => (
-              <li class="mb-[0.4rem] text-text-muted">{item}</li>
+              <li>{item}</li>
             ))}
           </ul>
         </div>
@@ -33,3 +29,38 @@ const { title, categories } = Astro.props;
     }
   </div>
 </section>
+
+<style>
+  .resume-section {
+    margin-bottom: 4rem;
+  }
+  h2 {
+    font-size: clamp(1.8rem, 1.5rem + 1.5vw, 2.8rem);
+    margin-bottom: 2rem;
+    font-weight: 600;
+    border-bottom: 1px solid var(--text-muted);
+    padding-bottom: 0.5rem;
+  }
+  .skills-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: 2rem;
+  }
+  .skill-category h3 {
+    font-size: 1.4rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+    color: var(--text-color);
+  }
+  .skill-category ul {
+    list-style: none;
+    padding-left: 0;
+    margin: 0;
+    font-size: 1.2rem;
+    line-height: 1.7;
+  }
+  .skill-category li {
+    margin-bottom: 0.4rem;
+    color: var(--text-muted);
+  }
+</style>

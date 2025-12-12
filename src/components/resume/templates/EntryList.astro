@@ -19,36 +19,28 @@ interface Props {
 const { title, entries, variant = "default" } = Astro.props;
 ---
 
-<section class="resume-section scroll-reveal-animate mb-12">
-  <h2
-    class="text-[clamp(1.8rem,1.5rem+1.5vw,2.8rem)] mb-6 font-semibold border-b border-text-muted pb-2"
-  >
-    {title}
-  </h2>
+<section class="resume-section scroll-reveal-animate">
+  <h2>{title}</h2>
   {
-    entries.map((entry, index) => (
-      <div class:list={["mb-4", index === entries.length - 1 && "!mb-0"]}>
-        <div class="flex justify-between flex-wrap text-[1.4rem] items-baseline sm:flex-row flex-col items-start">
-          <span class="font-normal mr-2">
+    entries.map((entry) => (
+      <div class={`entry-item ${variant}-entry`}>
+        <div class="title-row">
+          <span class="title">
             <RichText content={entry.title} />
           </span>
-          {entry.date && (
-            <span class="font-sans text-text-muted text-base whitespace-nowrap sm:mt-0 mt-[0.3rem]">
-              {entry.date}
-            </span>
-          )}
+          {entry.date && <span class="date">{entry.date}</span>}
         </div>
         {entry.subtitle && (
-          <div class="text-[1.2rem] mb-[0.2rem] [&_p]:m-0">
+          <div class="subtitle">
             <RichText content={entry.subtitle} />
           </div>
         )}
         {entry.Content ? (
-          <div class="mt-[0.8rem] text-base leading-[1.6] [&_p]:mt-0 [&_p]:mb-2 [&_p:last-child]:mb-0">
+          <div class="details">
             <entry.Content />
           </div>
         ) : entry.details ? (
-          <div class="mt-[0.8rem] text-base leading-[1.6] [&_p]:mt-0 [&_p]:mb-2 [&_p:last-child]:mb-0">
+          <div class="details">
             <RichText content={entry.details} />
           </div>
         ) : null}
@@ -56,3 +48,69 @@ const { title, entries, variant = "default" } = Astro.props;
     ))
   }
 </section>
+
+<style>
+  .resume-section {
+    margin-bottom: 3rem;
+  }
+  h2 {
+    font-size: clamp(1.8rem, 1.5rem + 1.5vw, 2.8rem);
+    margin-bottom: 1.5rem;
+    font-weight: 600;
+    border-bottom: 1px solid var(--text-muted);
+    padding-bottom: 0.5rem;
+  }
+  .entry-item {
+    margin-bottom: 1rem;
+  }
+  .entry-item:last-child {
+    margin-bottom: 0;
+  }
+  .title-row {
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    font-size: 1.4rem;
+    align-items: baseline;
+  }
+  .title {
+    font-weight: normal;
+    margin-right: 0.5rem;
+  }
+  .subtitle {
+    font-size: 1.2rem;
+    margin-bottom: 0.2rem;
+  }
+  .subtitle :global(p) {
+    margin: 0;
+  }
+
+  .date {
+    font-family: var(--font-family-sans);
+    color: var(--text-muted);
+    font-size: 1rem;
+    white-space: nowrap;
+  }
+  .details {
+    margin-top: 0.8rem;
+    font-size: 1rem;
+    line-height: 1.6;
+  }
+  .details :global(p) {
+    margin-top: 0;
+    margin-bottom: 0.5rem;
+  }
+  .details :global(p:last-child) {
+    margin-bottom: 0;
+  }
+
+  @media (max-width: 600px) {
+    .title-row {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+    .date {
+      margin-top: 0.3rem;
+    }
+  }
+</style>

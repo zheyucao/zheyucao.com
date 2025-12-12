@@ -17,24 +17,15 @@ interface Props {
 const { title, items } = Astro.props;
 ---
 
-<section class="resume-section scroll-reveal-animate mb-16 last:mb-0">
-  <h2
-    class="text-[clamp(1.8rem,1.5rem+1.5vw,2.8rem)] mb-8 font-semibold border-b border-text-muted pb-2"
-  >
-    {title}
-  </h2>
-  <ul class="list-none pl-0 m-0 leading-[1.8]">
+<section class="resume-section scroll-reveal-animate">
+  <h2>{title}</h2>
+  <ul class="contact-list">
     {
       items.map((item) => (
-        <li class="mb-[0.8rem] flex items-center">
-          <Icon name={item.icon} class="mr-[0.8em] text-[1.2em] shrink-0 opacity-80 translate-y-[0.1em]" />
+        <li>
+          <Icon name={item.icon} class="contact-icon" />
           {item.href ? (
-            <a
-              href={item.href}
-              target={item.target}
-              rel={item.rel}
-              class="contact-link break-all"
-            >
+            <a href={item.href} target={item.target} rel={item.rel}>
               {item.label}
             </a>
           ) : (
@@ -47,13 +38,45 @@ const { title, items } = Astro.props;
 </section>
 
 <style>
-  /* Link colors - kept in CSS */
-  .contact-link {
+  .resume-section {
+    margin-bottom: 4rem;
+  }
+  .resume-section:last-child {
+    margin-bottom: 0;
+  }
+  h2 {
+    font-size: clamp(1.8rem, 1.5rem + 1.5vw, 2.8rem);
+    margin-bottom: 2rem;
+    font-weight: 600;
+    border-bottom: 1px solid var(--text-muted);
+    padding-bottom: 0.5rem;
+  }
+  .contact-list {
+    list-style: none;
+    padding-left: 0;
+    margin: 0;
+    font-size: inherit;
+    line-height: 1.8;
+  }
+  .contact-list li {
+    margin-bottom: 0.8rem;
+    display: flex;
+    align-items: center;
+  }
+  .contact-icon {
+    margin-right: 0.8em;
+    font-size: 1.2em;
+    flex-shrink: 0;
+    opacity: 0.8;
+    transform: translateY(0.1em);
+  }
+  .contact-list a {
+    word-break: break-all;
     color: var(--link-color);
     text-decoration: none;
     transition: color 0.3s ease;
   }
-  .contact-link:hover {
+  .contact-list a:hover {
     color: var(--link-hover-color);
     text-decoration: underline;
   }
