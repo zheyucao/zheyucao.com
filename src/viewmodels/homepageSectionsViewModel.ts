@@ -95,7 +95,7 @@ export async function getHomepageSectionsViewModel(): Promise<HomepageSection[]>
             if (filter) {
               filteredEntries = contactEntries.filter((entry) => {
                 return Object.entries(filter).every(([key, value]) => {
-                  return entry.data[key] === value;
+                  return (entry.data as Record<string, unknown>)[key] === value;
                 });
               });
             }
@@ -109,7 +109,7 @@ export async function getHomepageSectionsViewModel(): Promise<HomepageSection[]>
                   // Apply item filter (e.g., showOnHome: true)
                   if (itemFilter) {
                     const matches = Object.entries(itemFilter).every(([key, value]) => {
-                      return item[key] === value;
+                      return (item as Record<string, unknown>)[key] === value;
                     });
                     if (matches) {
                       items.push(item);
@@ -131,49 +131,84 @@ export async function getHomepageSectionsViewModel(): Promise<HomepageSection[]>
       if (type === "showcase") {
         const { sourceCollection, filter, sortBy, sortOrder, limit, componentType } = section.data;
 
-        // Dynamically query the specified collection
-        let items: Array<CollectionEntry<any>> = [];
-
+        // Handle projects collection
         if (sourceCollection === "projects") {
-          const allProjects = await getCollection("projects");
-          items = allProjects;
-        } else if (sourceCollection === "timeline") {
-          const allTimeline = await getCollection("timeline");
-          items = allTimeline;
-        }
+          let projectItems = await getCollection("projects");
 
-        // Apply filters
-        if (filter) {
-          items = items.filter((item) => {
-            return Object.entries(filter).every(([key, value]) => {
-              return item.data[key] === value;
+          // Apply filters
+          if (filter) {
+            projectItems = projectItems.filter((item) => {
+              return Object.entries(filter).every(([key, value]) => {
+                return (item.data as Record<string, unknown>)[key] === value;
+              });
             });
-          });
-        }
-
-        // Apply sorting
-        if (sortBy === "order") {
-          items = sortByOrder(items, {
-            getOrder: (item) => item.data.order,
-          });
-        } else if (sortBy === "date") {
-          items = sortByOrder(items, {
-            getDate: (item) => item.data.endDate ?? item.data.startDate,
-          });
-          if (sortOrder === "desc") {
-            items = items.reverse();
           }
+
+          // Apply sorting
+          if (sortBy === "order") {
+            projectItems = sortByOrder(projectItems, {
+              getOrder: (item) => item.data.order,
+            });
+          } else if (sortBy === "date") {
+            projectItems = sortByOrder(projectItems, {
+              getDate: (item) => item.data.endDate ?? item.data.startDate,
+            });
+            if (sortOrder === "desc") {
+              projectItems = projectItems.reverse();
+            }
+          }
+
+          // Apply limit
+          if (limit) {
+            projectItems = projectItems.slice(0, limit);
+          }
+
+          return {
+            type: "showcase" as const,
+            order: section.data.order,
+            title: section.data.title,
+            cta: section.data.cta,
+            fallback: section.data.fallback,
+            componentType,
+            items: projectItems,
+          };
         }
 
-        // Apply limit
-        if (limit) {
-          items = items.slice(0, limit);
-        }
-
-        // Render content for timeline items
+        // Handle timeline collection
         if (sourceCollection === "timeline") {
-          items = await Promise.all(
-            items.map(async (item) => {
+          let timelineItems = await getCollection("timeline");
+
+          // Apply filters
+          if (filter) {
+            timelineItems = timelineItems.filter((item) => {
+              return Object.entries(filter).every(([key, value]) => {
+                return (item.data as Record<string, unknown>)[key] === value;
+              });
+            });
+          }
+
+          // Apply sorting
+          if (sortBy === "order") {
+            timelineItems = sortByOrder(timelineItems, {
+              getOrder: (item) => (item.data as { order?: number }).order,
+            });
+          } else if (sortBy === "date") {
+            timelineItems = sortByOrder(timelineItems, {
+              getDate: (item) => item.data.endDate ?? item.data.startDate,
+            });
+            if (sortOrder === "desc") {
+              timelineItems = timelineItems.reverse();
+            }
+          }
+
+          // Apply limit
+          if (limit) {
+            timelineItems = timelineItems.slice(0, limit);
+          }
+
+          // Render content for timeline items
+          const renderedItems = await Promise.all(
+            timelineItems.map(async (item) => {
               const rendered = await item.render();
               const formattedDate = formatDateRange(item.data.startDate, item.data.endDate);
               return {
@@ -183,17 +218,19 @@ export async function getHomepageSectionsViewModel(): Promise<HomepageSection[]>
               };
             })
           );
+
+          return {
+            type: "showcase" as const,
+            order: section.data.order,
+            title: section.data.title,
+            cta: section.data.cta,
+            fallback: section.data.fallback,
+            componentType,
+            items: renderedItems,
+          };
         }
 
-        return {
-          type: "showcase" as const,
-          order: section.data.order,
-          title: section.data.title,
-          cta: section.data.cta,
-          fallback: section.data.fallback,
-          componentType,
-          items,
-        };
+        throw new Error(`Unknown source collection: ${sourceCollection}`);
       }
 
       throw new Error(`Unknown section type: ${type}`);

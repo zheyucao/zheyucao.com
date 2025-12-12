@@ -1,9 +1,21 @@
 import { getCollection, type CollectionEntry } from "astro:content";
 import type { AstroComponentFactory } from "astro/runtime/server/index.js";
-import type { SkillCategory as GridSkillCategory } from "../components/resume/templates/SkillGrid.astro";
-import type { ContactItem as ResumeContactItem } from "../components/resume/templates/ContactList.astro";
 import { getPageMetadata, type PageMetadata } from "../lib/viewmodels/baseViewModel";
 import { formatDateRange } from "../lib/utils/dateUtils";
+
+// Define types inline (can't import from .astro files)
+export type GridSkillCategory = {
+  name: string;
+  items: string[];
+};
+
+export type ResumeContactItem = {
+  icon: string;
+  label: string;
+  href?: string;
+  target?: string;
+  rel?: string;
+};
 
 type ResumeCollectionEntry = CollectionEntry<"resume">;
 type ResumeCollectionData = ResumeCollectionEntry["data"];
@@ -23,8 +35,6 @@ export type ResumeEntryItem = {
   order?: number;
   Content?: AstroComponentFactory;
 };
-
-
 
 type TextResumeSection = {
   id: string;
@@ -68,7 +78,6 @@ export type ResumeSection =
 
 import { sortByOrder } from "../lib/utils/sortUtils";
 
-
 const getOrder = (entry: ResumeCollectionEntry): number | undefined =>
   "order" in entry.data ? entry.data.order : undefined;
 
@@ -77,8 +86,6 @@ const isStandardEntry = (
 ): entry is ResumeCollectionEntry & {
   data: StandardEntryData;
 } => !("type" in entry.data);
-
-
 
 const isSkillsEntry = (
   entry: ResumeCollectionEntry
@@ -136,7 +143,6 @@ export async function getResumeViewModel(): Promise<{
     getDate: (e) => e.endDate ?? e.startDate,
   });
 
-
   // Filter experience entries
   const experienceEntries = allResumeContent.filter(
     (entry): entry is ResumeCollectionEntry & { data: StandardEntryData } =>
@@ -160,7 +166,6 @@ export async function getResumeViewModel(): Promise<{
     getOrder: (e) => e.order,
     getDate: (e) => e.endDate ?? e.startDate,
   });
-
 
   // Filter project entries
   const projectEntries = allResumeContent.filter(
@@ -241,7 +246,6 @@ export async function getResumeViewModel(): Promise<{
       type: "entries",
       variant: "education",
       content: sortedEducation,
-
     },
     {
       id: "awards",
@@ -256,7 +260,6 @@ export async function getResumeViewModel(): Promise<{
       type: "entries",
       variant: "experience",
       content: sortedExperience,
-
     },
     {
       id: "projects",
@@ -264,7 +267,6 @@ export async function getResumeViewModel(): Promise<{
       type: "entries",
       variant: "projects",
       content: sortedProjects,
-
     },
   ];
 
