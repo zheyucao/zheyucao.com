@@ -13,10 +13,9 @@ export interface EntryItem {
 interface Props {
   title: string;
   entries: EntryItem[];
-  variant?: "default" | "education" | "experience" | "awards" | "projects";
 }
 
-const { title, entries, variant = "default" } = Astro.props;
+const { title, entries } = Astro.props;
 ---
 
 <section class="resume-section scroll-reveal-animate mb-12">
