@@ -34,7 +34,6 @@ const iconText = typeof icon === "string" && !iconName ? icon : null;
 
 <div class:list={["button-wrapper", wrapperClass, { "no-margin": noMargin }]}>
   <a href={href} download={downloadAttr} class:list={["button button-link", className]} {...rest}>
-    {/* Add specific class to span based on position */}
     {
       iconPosition === "left" && icon ? (
         <span aria-hidden="true" class="button-icon icon-left">
@@ -69,9 +68,9 @@ const iconText = typeof icon === "string" && !iconName ? icon : null;
   }
 
   .button.button-link {
-    display: inline-flex; /* Use flex to align text and icon */
-    align-items: center; /* Vertically center icon and text */
-    justify-content: center; /* Center content if needed */
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
     padding: 0.6em 1.2em;
     border: 1px solid var(--button-border-color);
     color: var(--text-muted);
@@ -82,7 +81,7 @@ const iconText = typeof icon === "string" && !iconName ? icon : null;
     font-size: 0.9rem;
     transition: all 0.2s ease;
     cursor: pointer;
-    line-height: 1.4; /* Ensure consistent height */
+    line-height: 1.4;
   }
 
   .button.button-link:hover {
@@ -92,7 +91,7 @@ const iconText = typeof icon === "string" && !iconName ? icon : null;
   }
 
   .button-icon {
-    margin: 0; /* Reset margin */
+    margin: 0;
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -100,7 +99,6 @@ const iconText = typeof icon === "string" && !iconName ? icon : null;
     line-height: 0;
   }
 
-  /* Style based on explicit class */
   .button-icon.icon-left {
     margin-right: 0.5em;
   }
@@ -108,10 +106,8 @@ const iconText = typeof icon === "string" && !iconName ? icon : null;
     margin-left: 0.5em;
   }
 
-  /* Optional: Responsive adjustments if needed */
   @media (max-width: 600px) {
     .button-wrapper {
-      /* Keep mobile styles if they are generic enough */
       margin-bottom: 2rem;
     }
   }

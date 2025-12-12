@@ -24,25 +24,25 @@ import { getContactFooterItems } from "../viewmodels/contactViewModel";
 const contactFooterItems = await getContactFooterItems();
 ---
 
-<footer class="site-footer">
-  <div class="footer-content">
-    <div class="footer-column footer-column-1">
-      <h4>{author}</h4>
-      <p class="footer-description">
+<footer class="site-footer py-16 px-[10%] min-h-[40vh] flex items-center relative z-5 font-sans md:px-[20%]">
+  <div class="flex flex-wrap gap-8 w-full md:flex-nowrap md:gap-12">
+    <div class="footer-column basis-full md:flex-[4_1_0%]">
+      <h4 class="text-[var(--footer-heading)] mb-[1em] font-semibold">{author}</h4>
+      <p class="m-0 text-[0.9rem] leading-[1.6] md:w-[75%]">
         {description}
       </p>
-      <p class="copyright">
+      <p class="mt-8 text-[0.8rem] text-[var(--footer-copyright)]">
         &copy; {currentYear}
         {author}. {footerStrings.copyrightText}.
       </p>
     </div>
-    <div class="footer-column footer-column-2">
-      <h4>{footerStrings.linksHeading}</h4>
-      <ul>
+    <div class="footer-column flex-1 md:flex-[1_1_0%]">
+      <h4 class="text-[var(--footer-heading)] mb-[1em] font-semibold">{footerStrings.linksHeading}</h4>
+      <ul class="m-0 p-0 list-none text-[0.9rem] leading-[1.6]">
         {
           navigation.items.map((item) => (
-            <li>
-              <a href={item.href} data-astro-prefetch>
+            <li class="mb-[0.5em]">
+              <a href={item.href} class="footer-link" data-astro-prefetch>
                 {item.name}
               </a>
             </li>
@@ -52,13 +52,13 @@ const contactFooterItems = await getContactFooterItems();
     </div>
     {
       contactFooterItems.length > 0 && (
-        <div class="footer-column footer-column-3">
-          <h4>{footerStrings.connectHeading}</h4>
-          <ul>
+        <div class="footer-column flex-1 md:flex-[1_1_0%]">
+          <h4 class="text-[var(--footer-heading)] mb-[1em] font-semibold">{footerStrings.connectHeading}</h4>
+          <ul class="m-0 p-0 list-none text-[0.9rem] leading-[1.6]">
             {contactFooterItems.map((item) => (
-              <li>
+              <li class="mb-[0.5em]">
                 <a
-                  class="link"
+                  class="footer-link"
                   href={item.href}
                   target={item.target}
                   rel={item.rel}
@@ -76,117 +76,30 @@ const contactFooterItems = await getContactFooterItems();
 </footer>
 
 <style>
+  /* Footer background and link colors - kept in CSS */
   .site-footer {
     background-color: var(--footer-bg);
     color: var(--footer-text);
-    padding: 4rem 10%; /* Generous padding */
-    /* min-height: 40vh; */ /* Let padding/content determine height */
-    min-height: 40vh; /* Restore original height */
-    display: flex;
-    /* align-items: center; */ /* Remove vertical centering for now */
-    align-items: center; /* Restore vertical centering */
-    position: relative;
-    z-index: 5;
-    font-family: var(--font-family-sans);
     transition:
       background-color 0.3s ease,
-      color 0.3s ease; /* Smooth theme transition */
+      color 0.3s ease;
   }
 
-  .footer-content {
-    display: flex;
-    flex-wrap: wrap; /* Stack columns on mobile by default */
-    gap: 2rem; /* Gap between columns when wrapped/stacked */
-    width: 100%;
-  }
-
-  .footer-column {
-    margin-bottom: 1.5rem; /* Spacing when stacked */
-  }
-
-  /* Mobile Layout: Col 1 full width, Col 2 & 3 side-by-side below */
-  .footer-column-1 {
-    flex-basis: 100%; /* Force to full width */
-  }
-  .footer-column-2,
-  .footer-column-3 {
-    flex: 1; /* Allow growing to fill the second row */
-  }
-
-  .footer-column h4 {
-    color: var(--footer-heading);
-    margin-bottom: 1em;
-    font-weight: 600;
-  }
-
-  .footer-column p,
-  .footer-column ul {
-    margin: 0;
-    padding: 0;
-    list-style: none;
-    font-size: 0.9rem;
-    line-height: 1.6;
-  }
-
-  .footer-column ul li {
-    margin-bottom: 0.5em;
-  }
-
-  .footer-column a {
+  .footer-link {
     color: var(--footer-link);
     text-decoration: none;
     transition: color 0.2s ease;
   }
 
-  .footer-column a:hover,
-  .footer-column a:focus {
+  .footer-link:hover,
+  .footer-link:focus {
     color: var(--footer-link-hover);
     text-decoration: underline;
   }
 
-  .footer-column p.copyright {
-    margin-top: 2em;
-    font-size: 0.8rem;
-    color: var(--footer-copyright);
-  }
-
-  /* Style for the active footer link - Now hides the LI */
-  .footer-column-2 ul li.active {
-    /* Hide the entire list item */
+  /* Hide active footer link */
+  .footer-column:nth-child(2) ul li.active {
     display: none;
-    /* Remove previous styling properties */
-    /*
-    color: var(--footer-heading); 
-    font-weight: 600; 
-    text-decoration: none; 
-    pointer-events: none; 
-    cursor: default;
-    */
-  }
-
-  /* Desktop layout: 3 columns with 2:1:1 ratio */
-  @media (min-width: 768px) {
-    .site-footer {
-      padding: 4rem 20%; /* Generous padding */
-    }
-    .footer-content {
-      flex-wrap: nowrap; /* Prevent wrapping on desktop */
-      gap: 3rem; /* Adjust desktop gap */
-    }
-    .footer-column {
-      margin-bottom: 0; /* Remove stacking margin */
-    }
-    .footer-column-1 {
-      flex: 4 1 0%; /* 3 parts */
-    }
-    .footer-column-2,
-    .footer-column-3 {
-      flex: 1 1 0%; /* 1 part */
-    }
-
-    .footer-description {
-      width: 75%;
-    }
   }
 </style>
 
@@ -241,7 +154,7 @@ const contactFooterItems = await getContactFooterItems();
       const currentPath = window.location.pathname;
       const normalizedPath = "/" + currentPath.replace(/^\/+|\/+$/g, "");
       const rootPath = "/";
-      const links = document.querySelectorAll(".footer-column-2 ul li a");
+      const links = document.querySelectorAll(".footer-column:nth-child(2) ul li a");
 
       links.forEach((link) => {
         const linkHref = link.getAttribute("href");

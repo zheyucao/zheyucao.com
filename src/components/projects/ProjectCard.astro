@@ -28,31 +28,31 @@ const {
 } = Astro.props;
 ---
 
-<article id={id} class="project-card scroll-reveal-animate">
+<article id={id} class="project-card scroll-reveal-animate rounded-lg border border-card-border overflow-hidden flex flex-col mb-12">
   {
     imageSrc && (
-      <div class="project-image-wrapper">
-        <Image src={imageSrc} alt={imageAlt} class="project-image" />
+      <div class="aspect-[16/9] overflow-hidden bg-[var(--bg-muted)]">
+        <Image src={imageSrc} alt={imageAlt} class="w-full h-full object-cover object-top block" />
       </div>
     )
   }
-  <div class="project-content">
-    <header class="project-header">
-      <h3 class="project-title">{title}</h3>
+  <div class="p-8 flex flex-col">
+    <header class="mb-4">
+      <h3 class="text-[1.5rem] font-normal m-0 text-[var(--heading-color)] leading-[1.3]">{title}</h3>
     </header>
 
-    <div class="project-metadata">
-      {date && <span class="project-date">{date}</span>}
+    <div class="mb-4 flex flex-col gap-[0.8rem] font-sans">
+      {date && <span class="text-[0.9rem] text-text-muted block">{date}</span>}
       {
         techStack.length > 0 && (
-          <div class="project-tech-stack">
+          <div class="flex flex-wrap gap-[0.4rem] leading-[1.4] pt-[0.2em]">
             {techStack.map((tech) => (
-              <span class="tech-tag">{tech}</span>
+              <span class="bg-[var(--tag-bg-color)] text-[var(--tag-text-color)] text-[0.85rem] rounded">{tech}</span>
             ))}
           </div>
         )
       }
-      <div class="project-links">
+      <div class="project-links flex flex-wrap gap-[1.2rem] items-center">
         {
           githubRepos && githubRepos.length > 0 ? (
             githubRepos.map((repo) => (
@@ -61,6 +61,7 @@ const {
                 target="_blank"
                 rel="noopener noreferrer"
                 title={`View ${repo.title || "source"} on GitHub`}
+                class="text-[var(--link-color)] no-underline text-[0.9rem] inline-flex items-center gap-[0.4em] hover:text-[var(--link-hover-color)] hover:underline"
               >
                 <Icon name="ri:github-line" /> {repo.title || "GitHub"}
               </a>
@@ -71,6 +72,7 @@ const {
               target="_blank"
               rel="noopener noreferrer"
               title="View source on GitHub"
+              class="text-[var(--link-color)] no-underline text-[0.9rem] inline-flex items-center gap-[0.4em] hover:text-[var(--link-hover-color)] hover:underline"
             >
               <Icon name="ri:github-line" /> GitHub
             </a>
@@ -78,7 +80,13 @@ const {
         }
         {
           projectUrl && (
-            <a href={projectUrl} target="_blank" rel="noopener noreferrer" title="Visit live site">
+            <a
+              href={projectUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              title="Visit live site"
+              class="text-[var(--link-color)] no-underline text-[0.9rem] inline-flex items-center gap-[0.4em] hover:text-[var(--link-hover-color)] hover:underline"
+            >
               <Icon name="ri:external-link-line" /> Live Site
             </a>
           )
@@ -86,38 +94,27 @@ const {
       </div>
     </div>
 
-    <div class="project-body">
+    <div class="project-body text-[1.2rem] leading-[1.8]">
       <slot />
     </div>
   </div>
 </article>
 
 <style>
+  /* Animation states - kept in CSS */
   .project-card {
-    border-radius: 8px;
-    border: 1px solid var(--card-border-color);
-    overflow: hidden;
-    display: flex;
-    flex-direction: column;
-    transition: all 0.2s ease-out;
-    margin-bottom: 3rem; /* Space below card */
-
-    /* Initial state */
     opacity: 0;
     filter: blur(5px);
     transform: translateY(20px) translateZ(0);
     will-change: auto;
-    /* Transition applied when .visible is added */
     transition:
       opacity 0.8s ease-out,
       filter 0.8s ease-out,
       transform 0.8s ease-out,
-      border-color 0.2s ease,
-      backdrop-filter 0.2s ease;
+      border-color 0.2s ease;
   }
 
   .project-card.visible {
-    /* Final state */
     opacity: 1;
     filter: blur(0px);
     transform: translateY(0) translateZ(0);
@@ -127,99 +124,10 @@ const {
     border-color: var(--card-border-hover-color);
   }
 
-  .project-image-wrapper {
-    aspect-ratio: 16 / 9; /* Force aspect ratio */
-    overflow: hidden;
-    background-color: var(--bg-muted); /* Placeholder bg */
-  }
-  .project-image {
-    width: 100%;
-    height: 100%;
-    object-fit: cover; /* Cover the area, cropping if needed */
-    object-position: top;
-    display: block;
-  }
-
-  .project-content {
-    padding: 2rem; /* Increased padding inside card */
-    display: flex;
-    flex-direction: column;
-    /* flex-grow: 1; Removed to prevent stretching */
-  }
-
-  .project-header {
-    margin-bottom: 1rem; /* Space below title */
-  }
-  .project-title {
-    font-size: 1.5rem;
-    font-weight: normal;
-    margin: 0;
-    color: var(--heading-color);
-    line-height: 1.3;
-  }
-
-  .project-metadata {
-    margin-bottom: 1rem; /* Reduced space below metadata */
-    display: flex;
-    flex-direction: column;
-    gap: 0.8rem; /* Reduced vertical gap between items */
-    font-family: var(--font-family-sans); /* Apply sans-serif font */
-  }
-
-  .project-date {
-    font-size: 0.9rem; /* Slightly smaller date */
-    color: var(--text-muted);
-    display: block;
-    font-family: inherit; /* Inherit sans-serif from parent */
-  }
-
-  .project-tech-stack {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.4rem; /* Reduced gap between tags */
-    font-family: inherit; /* Inherit sans-serif from parent */
-    line-height: 1.4; /* Adjusted line height */
-    padding: 0.2em 0 0;
-  }
-
-  .tech-tag {
-    background-color: var(--tag-bg-color);
-    color: var(--tag-text-color);
-    font-size: 0.85rem; /* Keep tags slightly smaller */
-    border-radius: 4px;
-    font-family: inherit; /* Inherit sans-serif from parent */
-  }
-
-  .project-links {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 1.2rem; /* Slightly reduced gap */
-    align-items: center;
-    font-family: inherit; /* Inherit sans-serif from parent */
-  }
-  .project-links a {
-    color: var(--link-color);
-    text-decoration: none;
-    font-size: 0.9rem; /* Align size with date */
-    display: inline-flex;
-    align-items: center;
-    gap: 0.4em;
-    transition: color 0.2s ease;
-    font-family: inherit; /* Inherit sans-serif from parent */
-  }
-  .project-links a:hover {
-    color: var(--link-hover-color);
-    text-decoration: underline;
-  }
   .project-links :global(svg) {
     font-size: 1.2em;
   }
 
-  .project-body {
-    font-size: 1.2rem;
-    line-height: 1.8;
-    /* flex-grow: 1; Removed */
-  }
   .project-body :global(p) {
     margin-bottom: 1em;
   }

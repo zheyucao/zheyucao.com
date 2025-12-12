@@ -18,17 +18,27 @@ interface Props {
 const { items = [] } = Astro.props;
 ---
 
-<div class="contact-icons">
+<div class="flex items-center gap-[1.8rem]">
   {
     items.map((item) => {
       const primaryLabel = item.label || item.content || item.href || "";
 
       return item.href ? (
-        <a href={item.href} target={item.target} rel={item.rel} aria-label={primaryLabel}>
+        <a
+          href={item.href}
+          target={item.target}
+          rel={item.rel}
+          aria-label={primaryLabel}
+          class="contact-icon inline-flex items-center bg-none border-none p-0"
+        >
           <Icon name={item.icon} size={22} aria-hidden="true" />
         </a>
       ) : (
-        <span class="icon-placeholder" role="img" aria-label={primaryLabel}>
+        <span
+          class="contact-icon inline-flex items-center bg-none border-none p-0 cursor-pointer"
+          role="img"
+          aria-label={primaryLabel}
+        >
           <Icon name={item.icon} size={22} aria-hidden="true" />
         </span>
       );
@@ -37,36 +47,19 @@ const { items = [] } = Astro.props;
 </div>
 
 <style>
-  .contact-icons {
-    display: flex;
-    align-items: center;
-    gap: 1.8rem;
-  }
-
-  .contact-icons a,
-  .contact-icons .icon-placeholder {
+  /* Icon color and hover states - kept in CSS */
+  .contact-icon {
     color: var(--theme-icon-color);
     opacity: 0.8;
     transition:
       opacity 0.2s ease,
       color 0.2s ease;
-    display: inline-flex;
-    align-items: center;
-    background: none;
-    border: none;
-    padding: 0;
   }
 
-  .contact-icons a:hover,
-  .contact-icons a:focus,
-  .contact-icons .icon-placeholder:hover,
-  .contact-icons .icon-placeholder:focus {
+  .contact-icon:hover,
+  .contact-icon:focus {
     opacity: 1;
     color: var(--theme-accent);
     outline: none;
-  }
-
-  .contact-icons .icon-placeholder {
-    cursor: pointer;
   }
 </style>
