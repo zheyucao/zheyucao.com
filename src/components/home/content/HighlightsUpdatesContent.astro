@@ -31,28 +31,31 @@ const highlightsToShow = events;
 <div class="section-content scroll-target-content">
   {
     highlightsToShow.length > 0 ? (
-      <ul class="highlights-list-enhanced">
-        {highlightsToShow.map((event) => (
-          <li class="highlight-item-enhanced">
-            <div class="highlight-meta">
+      <ul class="list-none pl-0 mt-0">
+        {highlightsToShow.map((event, index) => (
+          <li class:list={[
+            "mb-10 pb-10 border-b border-divider",
+            "sm:flex sm:gap-6",
+            index === highlightsToShow.length - 1 && "mb-0 pb-0 border-b-0"
+          ]}>
+            <div class="mb-2 sm:mb-0 sm:flex-shrink-0 sm:w-20">
               <time
                 datetime={event.data.endDate ?? event.data.startDate ?? ""}
-                class="highlight-date"
+                class="font-sans text-[0.9rem] leading-relaxed block"
               >
                 {
                   formatDateRange(event.data.startDate, event.data.endDate) ||
                   formatDate(event.data.startDate || event.data.endDate || "")}
               </time>
             </div>
-            <div class="highlight-body">
-              <h4 class="highlight-title">{event.data.title}</h4>
-              {/* Use highlightSummary if available, fallback to description (Content) */}
+            <div class="flex-1">
+              <h4 class="text-[1.2rem] font-normal mb-2 leading-normal">{event.data.title}</h4>
               {event.data.highlightSummary ? (
-                <div class="highlight-summary">
+                <div class="text-base leading-relaxed">
                   <RichText content={event.data.highlightSummary} />
                 </div>
               ) : (
-                <div class="highlight-description">
+                <div class="text-base leading-relaxed">
                   <event.Content />
                 </div>
               )}
@@ -65,80 +68,7 @@ const highlightsToShow = events;
     )
   }
 
-  <div class="button-group">
+  <div class="btn-group">
     <Button class="button" href={cta.href} text={cta.text} wrapperClass="cta-link" />
   </div>
 </div>
-
-<style>
-  .highlights-list-enhanced {
-    list-style: none;
-    padding-left: 0;
-    margin-top: 0;
-  }
-
-  .highlight-item-enhanced {
-    margin-bottom: 2.5rem;
-    padding-bottom: 2.5rem;
-    border-bottom: 1px solid var(--theme-divider-color);
-  }
-
-  .highlight-item-enhanced:last-child {
-    margin-bottom: 0;
-    padding-bottom: 0;
-    border-bottom: none;
-  }
-
-  .highlight-meta {
-    margin-bottom: 0.5rem;
-  }
-
-  .highlight-date {
-    font-family: var(--font-family-sans);
-    font-size: 0.9rem;
-    line-height: 1.6;
-    display: block;
-  }
-
-  .highlight-body p {
-    margin: 0;
-  }
-
-  .highlight-title {
-    font-size: 1.2rem;
-    font-weight: normal;
-    margin: 0 0 0.5rem 0;
-    line-height: 1.5;
-  }
-
-  .highlight-description {
-    margin: 0;
-  }
-  .highlight-description ul {
-    padding-left: 1.2em;
-    margin-top: 0.5em;
-    list-style: disc;
-  }
-  .button-group {
-    display: flex;
-    gap: 1rem;
-    margin-top: 2rem;
-  }
-
-  /* --- Responsive layout for wider screens --- */
-  @media (min-width: 640px) {
-    .highlight-item-enhanced {
-      display: flex;
-      gap: 1.5rem;
-    }
-
-    .highlight-meta {
-      flex: 0 0 80px;
-      margin-bottom: 0;
-    }
-
-    .highlight-body {
-      flex: 1 1 auto;
-    }
-  }
-</style>

@@ -30,26 +30,13 @@ const { title, cta, Content, socialItems } = data;
 
   {
     socialItems?.length ? (
-      <div class="connect-icon-links">
+      <div class="my-8">
         <ContactIcons items={socialItems} />
       </div>
     ) : null
   }
 
-  <div class="button-group">
+  <div class="btn-group">
     <Button class="button" href={cta.href} text={cta.text} wrapperClass="meet-me-cta-button" />
   </div>
 </div>
-
-<style>
-  .connect-icon-links {
-    margin: 2rem 0;
-  }
-
-  .button-group {
-    display: flex;
-    gap: 1rem;
-    margin-top: 2rem;
-  }
-</style>
-

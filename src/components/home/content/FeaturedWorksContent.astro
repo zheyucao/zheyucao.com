@@ -21,14 +21,15 @@ const { data } = Astro.props;
 const { section, projects } = data;
 const { title, cta } = section;
 const featuredProjects = projects;
+const isDoubleColumn = featuredProjects.length % 2 === 0;
 ---
 
 <h2 slot="title" class="section-title scroll-target-title">{title}</h2>
 
 <div
   class:list={[
-    "section-content scroll-target-content featured-works-container",
-    featuredProjects.length % 2 !== 0 ? "single-column" : "double-column",
+    "section-content scroll-target-content grid grid-cols-1 gap-8",
+    isDoubleColumn && "md:grid-cols-2",
   ]}
 >
   {
@@ -38,40 +39,13 @@ const featuredProjects = projects;
           title={project.data.title}
           homepageSummary={project.data.homepageSummary}
           slug={project.slug}
-          isDoubleColumn={featuredProjects.length % 2 === 0}
+          isDoubleColumn={isDoubleColumn}
         />
       );
     })
   }
 
-  <div class="button-group">
+  <div class="btn-group">
     <Button class="button" href={cta.href} text={cta.text} wrapperClass="projects-cta-button" />
   </div>
 </div>
-
-<style>
-  .featured-works-container {
-    display: grid;
-    grid-template-columns: 1fr; /* Default: 1 column */
-    gap: 2rem; /* Spacing between cards (vertical and horizontal in grid) */
-  }
-
-  /* Apply 2-column layout on wider screens */
-  @media (min-width: 696px) {
-    /* Adjust breakpoint as needed (e.g., 992px for larger screens) */
-    .featured-works-container.double-column {
-      width: 100%;
-      grid-template-columns: repeat(2, 1fr);
-    }
-
-    /* Force single column if odd number of items */
-    .featured-works-container.single-column {
-      grid-template-columns: 1fr;
-    }
-  }
-
-  .button-group {
-    display: flex;
-    gap: 1rem;
-  }
-</style>

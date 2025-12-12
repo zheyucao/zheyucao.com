@@ -30,36 +30,13 @@ const { title, cta, Content, socialItems } = data;
 
   {
     socialItems?.length ? (
-      <div class="connect-icon-links">
+      <div class="my-8">
         <ContactIcons items={socialItems} />
       </div>
     ) : null
   }
 
-  {/* Button for full contact page */}
-  <div class="button-group">
+  <div class="btn-group">
     <Button class="button" href={cta.href} text={cta.text} wrapperClass="cta-link" />
   </div>
 </div>
-
-<style>
-  p {
-    margin-bottom: 1.5rem; /* Space below intro text */
-    line-height: 1.7;
-    color: var(--theme-text);
-  }
-
-  .connect-icon-links {
-    margin: 2rem 0;
-  }
-
-  /* Style for the button group containing the CTA button */
-  .button-group {
-    display: flex;
-    gap: 1rem;
-    margin-top: 2rem; /* Adjust spacing above button */
-  }
-
-  /* Remove styles specific to the old .cta-link if they exist */
-  /* .cta-link { ... } */
-</style>
