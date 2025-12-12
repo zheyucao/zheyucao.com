@@ -26,7 +26,7 @@ const { projects, metadata } = await getProjectsViewModel();
         />
       ))
   }
-  <div class="projects-grid">
+  <div class="projects-grid columns-1 gap-x-12 md:columns-2">
     {
       projects.map((project) => (
         <ProjectCard
@@ -114,18 +114,7 @@ const { projects, metadata } = await getProjectsViewModel();
 </script>
 
 <style>
-  .projects-grid {
-    column-count: 1;
-    column-gap: 3rem;
-  }
-
-  @media (min-width: 768px) {
-    .projects-grid {
-      column-count: 2;
-      column-gap: 3rem;
-    }
-  }
-
+  /* Multi-column specific styling */
   .projects-grid > :global(.project-card) {
     break-inside: avoid;
     margin-bottom: 3rem;

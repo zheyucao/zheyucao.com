@@ -6,37 +6,40 @@ import { Icon } from "astro-icon/components";
 interface Props extends HTMLAttributes<"a"> {
   href: string;
   text: string;
-  download?: string | boolean; // Optional: true or suggested filename
-  icon?: string | null; // Optional icon content (plain text or iconify name like "lucide:download")
-  wrapperClass?: string; // Optional class for the wrapper div
-  iconPosition?: "left" | "right"; // Optional icon position, defaults to left
-  noMargin?: boolean; // Optional: remove bottom margin
+  download?: string | boolean;
+  icon?: string | null;
+  wrapperClass?: string;
+  iconPosition?: "left" | "right";
+  noMargin?: boolean;
 }
 
 const {
   href,
   text,
   download,
-  icon = null, // Default to no icon
-  class: className, // User can pass additional classes to the <a> tag
-  wrapperClass, // Class for the div
-  iconPosition = "left", // Default to left
+  icon = null,
+  class: className,
+  wrapperClass,
+  iconPosition = "left",
   noMargin = false,
-  ...rest // Pass other attributes like target, rel
+  ...rest
 } = Astro.props;
 
-// Determine the final download attribute value
 const downloadAttr = download === "" ? true : download;
-
 const iconName = typeof icon === "string" && icon.includes(":") ? icon : undefined;
 const iconText = typeof icon === "string" && !iconName ? icon : null;
 ---
 
-<div class:list={["button-wrapper", wrapperClass, { "no-margin": noMargin }]}>
-  <a href={href} download={downloadAttr} class:list={["button button-link", className]} {...rest}>
+<div class:list={["mb-6 text-left", wrapperClass, { "!mb-0": noMargin }]}>
+  <a
+    href={href}
+    download={downloadAttr}
+    class:list={["button-link inline-flex items-center justify-center px-[1.2em] py-[0.6em] rounded-lg font-sans text-[0.9rem] leading-[1.4]", className]}
+    {...rest}
+  >
     {
       iconPosition === "left" && icon ? (
-        <span aria-hidden="true" class="button-icon icon-left">
+        <span aria-hidden="true" class="inline-flex items-center justify-center mr-[0.5em] leading-none">
           {iconName ? <Icon name={iconName} size={16} /> : iconText}
         </span>
       ) : null
@@ -44,7 +47,7 @@ const iconText = typeof icon === "string" && !iconName ? icon : null;
     {text}
     {
       iconPosition === "right" && icon ? (
-        <span aria-hidden="true" class="button-icon icon-right">
+        <span aria-hidden="true" class="inline-flex items-center justify-center ml-[0.5em] leading-none">
           {iconName ? <Icon name={iconName} size={16} /> : iconText}
         </span>
       ) : null
@@ -53,61 +56,24 @@ const iconText = typeof icon === "string" && !iconName ? icon : null;
 </div>
 
 <style>
-  /* Styles adapted for general button */
-  .button-wrapper {
-    margin-bottom: 1.5rem;
-    text-align: left;
-  }
-  .button-wrapper.no-margin {
-    margin-bottom: 0;
-  }
-
-  /* Animation support */
-  .button-wrapper.page-load-initial-state {
-    animation: pageLoadAnimate 0.8s ease-out 0s forwards;
-  }
-
-  .button.button-link {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    padding: 0.6em 1.2em;
+  /* Visual styling - borders, colors, transitions */
+  .button-link {
     border: 1px solid var(--button-border-color);
     color: var(--text-muted);
     background-color: transparent;
-    border-radius: 8px;
     text-decoration: none;
-    font-family: var(--font-family-sans);
-    font-size: 0.9rem;
     transition: all 0.2s ease;
     cursor: pointer;
-    line-height: 1.4;
   }
 
-  .button.button-link:hover {
+  .button-link:hover {
     border-color: var(--button-border-hover-color);
     background-color: var(--button-hover-bg);
     color: var(--button-hover-text);
   }
 
-  .button-icon {
-    margin: 0;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    vertical-align: middle;
-    line-height: 0;
-  }
-
-  .button-icon.icon-left {
-    margin-right: 0.5em;
-  }
-  .button-icon.icon-right {
-    margin-left: 0.5em;
-  }
-
   @media (max-width: 600px) {
-    .button-wrapper {
+    :global(.mb-6) {
       margin-bottom: 2rem;
     }
   }
