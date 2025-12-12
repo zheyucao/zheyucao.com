@@ -100,23 +100,6 @@ const homepage_sections = defineCollection({
   ]),
 });
 
-const home = defineCollection({
-  type: "content",
-  schema: z.object({
-    title: z.string().optional(),
-    greeting: z.string().optional(), // For Hero
-    name: z.string().optional(), // For Hero
-    description: z.string().optional(), // For Hero
-    cta: z
-      .object({
-        text: z.string(),
-        href: z.string(),
-      })
-      .optional(),
-    fallback: z.string().optional(), // For Highlights
-  }),
-});
-
 // Shared action schema for reuse across collections
 const actionSchema = z.object({
   text: z.string(),
@@ -242,7 +225,6 @@ const footer = defineCollection({
 export const collections = {
   projects,
   timeline,
-  home,
   "homepage-sections": homepage_sections,
   resume,
   contact,

@@ -2,7 +2,6 @@ import { getCollection, type CollectionEntry } from "astro:content";
 import { getPageMetadata, type PageMetadata } from "../lib/viewmodels/baseViewModel";
 import { sortByOrder } from "../lib/utils/sortUtils";
 
-
 export interface ContactItem {
   icon: string;
   content?: string;
@@ -48,10 +47,10 @@ export async function getContactViewModel(): Promise<ContactViewModel> {
   // Pick the first intro by order (if present)
   let intro: ContactIntro | undefined;
   if (introEntries.length > 0) {
-    sortByOrder(introEntries, {
+    const sortedIntroEntries = sortByOrder(introEntries, {
       getOrder: (e) => e.data.order,
     });
-    const introEntry = introEntries[0] as CollectionEntry<"contact">;
+    const introEntry = sortedIntroEntries[0] as CollectionEntry<"contact">;
 
     const { Content } = await introEntry.render();
     intro = {
@@ -74,15 +73,14 @@ export async function getContactViewModel(): Promise<ContactViewModel> {
   );
 
   // Sort sections by order
-  sortByOrder(sections, {
+  const sortedSections = sortByOrder(sections, {
     getOrder: (s) => s.order,
   });
-
 
   return {
     metadata,
     intro,
-    sections,
+    sections: sortedSections,
   };
 }
 
@@ -119,4 +117,3 @@ export async function getContactFooterItems(): Promise<ContactItem[]> {
     getOrder: (i) => i.order,
   });
 }
-
