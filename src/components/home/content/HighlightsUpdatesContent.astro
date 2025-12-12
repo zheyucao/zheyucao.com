@@ -34,14 +34,14 @@ const highlightsToShow = events;
       <ul class="list-none pl-0 mt-0">
         {highlightsToShow.map((event, index) => (
           <li class:list={[
-            "mb-10 pb-10 border-b border-divider",
-            "sm:flex sm:gap-6",
-            index === highlightsToShow.length - 1 && "mb-0 pb-0 border-b-0"
+            "mb-4 pb-4",
+            "sm:flex sm:gap-[1.5rem]",
+            index === highlightsToShow.length - 1 && "!mb-0 !pb-0"
           ]}>
-            <div class="mb-2 sm:mb-0 sm:flex-shrink-0 sm:w-20">
+            <div class="mb-2 sm:mb-0 sm:shrink-0 sm:basis-[80px]">
               <time
                 datetime={event.data.endDate ?? event.data.startDate ?? ""}
-                class="font-sans text-[0.9rem] leading-relaxed block"
+                class="font-sans text-[0.9rem] leading-[1.6] block"
               >
                 {
                   formatDateRange(event.data.startDate, event.data.endDate) ||
@@ -49,13 +49,13 @@ const highlightsToShow = events;
               </time>
             </div>
             <div class="flex-1">
-              <h4 class="text-[1.2rem] font-normal mb-2 leading-normal">{event.data.title}</h4>
+              <h4 class="text-[1.2rem] font-normal m-0 mb-2 leading-[1.5]">{event.data.title}</h4>
               {event.data.highlightSummary ? (
-                <div class="text-base leading-relaxed">
+                <div class="highlight-summary text-[1rem] text-text leading-[1.7] [&_p]:m-0">
                   <RichText content={event.data.highlightSummary} />
                 </div>
               ) : (
-                <div class="text-base leading-relaxed">
+                <div class="highlight-description text-[1rem] text-text leading-[1.7] [&_p]:m-0 [&_ul]:pl-[1.2em] [&_ul]:mt-2 [&_ul]:list-disc">
                   <event.Content />
                 </div>
               )}

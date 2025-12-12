@@ -25,7 +25,7 @@ export default defineConfig({
   },
   // Shortcuts for common patterns
   shortcuts: {
-    "section-title": "text-[clamp(2rem,2rem+2vw,4rem)] font-normal mb-4",
+    "section-title": "text-[clamp(2rem,2rem+2vw,4rem)] font-normal mb-16",
     "section-content": "text-[1.25rem] leading-relaxed max-w-[65ch]",
     "btn-group": "flex gap-4 mt-8",
   },
