@@ -53,64 +53,70 @@ const { projects, metadata } = await getProjectsViewModel();
 
   registerGsapPlugins();
 
-  let scrollTimeoutId: number | null = null;
+  const SCROLL_TO_KEY = "__projectScrollToEventsRegistered__";
+  type ScrollWindow = Window & { [SCROLL_TO_KEY]?: boolean };
+  const scrollWindow = window as ScrollWindow;
 
-  function smoothScrollToTarget() {
-    const params = new URLSearchParams(window.location.search);
-    const targetId = params.get("scrollTo");
+  if (!scrollWindow[SCROLL_TO_KEY]) {
+    scrollWindow[SCROLL_TO_KEY] = true;
 
-    if (targetId) {
-      return window.setTimeout(() => {
-        const targetElement = document.getElementById(targetId);
-        const pageWrapperElement = document.querySelector(".page-wrapper") as HTMLElement | null;
+    let scrollTimeoutId: number | null = null;
 
-        if (targetElement && pageWrapperElement) {
-          const targetOffsetTopInWrapper = targetElement.offsetTop;
-          const finalScrollPosition = targetOffsetTopInWrapper;
+    function smoothScrollToTarget() {
+      const params = new URLSearchParams(window.location.search);
+      const targetId = params.get("scrollTo");
 
-          if (prefersReducedMotion()) {
-            pageWrapperElement.scrollTo({ top: finalScrollPosition, behavior: "auto" });
-            const newUrl = window.location.pathname;
-            window.history.replaceState({}, "", newUrl);
-            return;
-          }
+      if (targetId) {
+        return window.setTimeout(() => {
+          const targetElement = document.getElementById(targetId);
+          const pageWrapperElement = document.querySelector(".page-wrapper") as HTMLElement | null;
 
-          gsap.to(pageWrapperElement, {
-            duration: 1,
-            scrollTo: {
-              y: finalScrollPosition,
-            },
-            ease: "power4.out",
-            onComplete: () => {
+          if (targetElement && pageWrapperElement) {
+            const targetOffsetTopInWrapper = targetElement.offsetTop;
+            const finalScrollPosition = targetOffsetTopInWrapper;
+
+            if (prefersReducedMotion()) {
+              pageWrapperElement.scrollTo({ top: finalScrollPosition, behavior: "auto" });
               const newUrl = window.location.pathname;
               window.history.replaceState({}, "", newUrl);
-            },
-          });
-        }
-      }, 100);
+              return;
+            }
+
+            gsap.to(pageWrapperElement, {
+              duration: 1,
+              scrollTo: {
+                y: finalScrollPosition,
+              },
+              ease: "power4.out",
+              onComplete: () => {
+                const newUrl = window.location.pathname;
+                window.history.replaceState({}, "", newUrl);
+              },
+            });
+          }
+        }, 100);
+      }
+
+      return null;
     }
 
-    return null;
+    const handlePageLoad = () => {
+      if (scrollTimeoutId !== null) {
+        clearTimeout(scrollTimeoutId);
+      }
+      scrollTimeoutId = smoothScrollToTarget();
+    };
+
+    const handleBeforeSwap = () => {
+      if (scrollTimeoutId !== null) {
+        clearTimeout(scrollTimeoutId);
+        scrollTimeoutId = null;
+      }
+    };
+
+    document.addEventListener("astro:page-load", handlePageLoad);
+    document.addEventListener("astro:before-swap", handleBeforeSwap);
   }
-
-  const handlePageLoad = () => {
-    if (scrollTimeoutId !== null) {
-      clearTimeout(scrollTimeoutId);
-    }
-    scrollTimeoutId = smoothScrollToTarget();
-  };
-
-  const handleBeforeSwap = () => {
-    if (scrollTimeoutId !== null) {
-      clearTimeout(scrollTimeoutId);
-      scrollTimeoutId = null;
-    }
-    document.removeEventListener("astro:page-load", handlePageLoad);
-    document.removeEventListener("astro:before-swap", handleBeforeSwap);
-  };
-
-  document.addEventListener("astro:page-load", handlePageLoad);
-  document.addEventListener("astro:before-swap", handleBeforeSwap);
 </script>
 
 <style>
