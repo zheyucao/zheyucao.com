@@ -79,7 +79,7 @@ const homepage_sections = defineCollection({
     }),
     // Collection showcase section (for featured projects, timeline highlights, etc.)
     z.object({
-      type: z.literal("collection-showcase"),
+      type: z.literal("showcase"),
       order: z.number(),
       visible: z.boolean().default(true),
       title: z.string().optional(),

@@ -27,7 +27,7 @@ const { section } = Astro.props;
         }}
       />
     </SectionWrapper>
-  ) : section.type === "collection-showcase" ? (
+  ) : section.type === "showcase" ? (
     <SectionWrapper>
       {section.componentType === "cards" ? (
         <FeaturedWorksContent

@@ -26,7 +26,7 @@ export type TextContentSection = {
 };
 
 export type CollectionShowcaseSection = {
-  type: "collection-showcase";
+  type: "showcase";
   order: number;
   title?: string;
   cta?: {
@@ -35,7 +35,9 @@ export type CollectionShowcaseSection = {
   };
   fallback?: string;
   componentType: "cards" | "list";
-  items: Array<CollectionEntry<"projects"> | (CollectionEntry<"timeline"> & { Content: AstroComponentFactory })>;
+  items: Array<
+    CollectionEntry<"projects"> | (CollectionEntry<"timeline"> & { Content: AstroComponentFactory })
+  >;
 };
 
 export type HomepageSection = HeroSection | TextContentSection | CollectionShowcaseSection;
@@ -82,7 +84,8 @@ export async function getHomepageSectionsViewModel(): Promise<HomepageSection[]>
 
         // Handle supplementary data (e.g., contact icons)
         if (section.data.supplementaryData?.contactIcons) {
-          const { sourceCollection, filter, itemFilter } = section.data.supplementaryData.contactIcons;
+          const { sourceCollection, filter, itemFilter } =
+            section.data.supplementaryData.contactIcons;
 
           if (sourceCollection === "contact") {
             const contactEntries = await getCollection("contact");
@@ -125,7 +128,7 @@ export async function getHomepageSectionsViewModel(): Promise<HomepageSection[]>
         return result;
       }
 
-      if (type === "collection-showcase") {
+      if (type === "showcase") {
         const { sourceCollection, filter, sortBy, sortOrder, limit, componentType } = section.data;
 
         // Dynamically query the specified collection
@@ -183,7 +186,7 @@ export async function getHomepageSectionsViewModel(): Promise<HomepageSection[]>
         }
 
         return {
-          type: "collection-showcase" as const,
+          type: "showcase" as const,
           order: section.data.order,
           title: section.data.title,
           cta: section.data.cta,
