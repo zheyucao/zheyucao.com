@@ -13,7 +13,7 @@ export default defineConfig({
   prefetch: true,
   redirects: {
     // fallback if /_redirects file did not work
-    "/resume.pdf": "https://assets.zheyucao.com/resume.pdf",
-    "/pdf": "https://assets.zheyucao.com/resume.pdf",
+    "/resume.pdf": "https://assets.zheyucao.com/ZheyuCao_Resume_zh-cn.pdf",
+    "/pdf": "https://assets.zheyucao.com/ZheyuCao_Resume_zh-cn.pdf",
   },
 });
