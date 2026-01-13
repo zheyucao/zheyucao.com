@@ -11,4 +11,7 @@ import UnoCSS from "@unocss/astro";
 export default defineConfig({
   integrations: [icon(), mdx(), UnoCSS()],
   prefetch: true,
+  redirects: {
+    "/resume.pdf": "https://assets.zheyucao.com/resume.pdf",
+  },
 });
