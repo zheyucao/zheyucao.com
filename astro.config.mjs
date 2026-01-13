@@ -12,6 +12,8 @@ export default defineConfig({
   integrations: [icon(), mdx(), UnoCSS()],
   prefetch: true,
   redirects: {
+    // fallback if /_redirects file did not work
     "/resume.pdf": "https://assets.zheyucao.com/resume.pdf",
+    "/pdf": "https://assets.zheyucao.com/resume.pdf",
   },
 });
