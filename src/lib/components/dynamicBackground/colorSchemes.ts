@@ -20,7 +20,10 @@ export function pickInitialColors(numBlobs: number): string[] {
   const availableColors = colorScheme[selectedSchemeName] || [];
   const shuffledColors = shuffleArray([...availableColors]);
 
-  return Array.from({ length: numBlobs }, (_, i) => shuffledColors[i % shuffledColors.length] || "#90EE90");
+  return Array.from(
+    { length: numBlobs },
+    (_, i) => shuffledColors[i % shuffledColors.length] || "#90EE90"
+  );
 }
 
 export { colorScheme };

@@ -19,9 +19,18 @@ const safeDescription = sanitizeStrict(description);
 
 <section class="min-h-screen flex justify-start items-center pl-[10%] box-border">
   <div class="max-w-[80%] -translate-y-[5vh]">
-    <div class="hero-greeting font-serif text-[clamp(1.5rem,1.5rem+2vw,4rem)] text-text-muted mb-[10px] leading-none ml-[10px]" set:html={safeGreeting} />
-    <div class="hero-name font-serif text-text text-[clamp(3rem,4rem+4vw,8rem)] font-normal leading-none m-0" set:html={safeName} />
-    <div class="hero-description font-serif text-text text-[clamp(1.5rem,1rem+1vw,2rem)] font-normal leading-[1.4] mt-[2em] ml-[10px] max-w-[90%]" set:html={safeDescription} />
+    <div
+      class="hero-greeting font-serif text-[clamp(1.5rem,1.5rem+2vw,4rem)] text-text-muted mb-[10px] leading-none ml-[10px]"
+      set:html={safeGreeting}
+    />
+    <div
+      class="hero-name font-serif text-text text-[clamp(3rem,4rem+4vw,8rem)] font-normal leading-none m-0"
+      set:html={safeName}
+    />
+    <div
+      class="hero-description font-serif text-text text-[clamp(1.5rem,1rem+1vw,2rem)] font-normal leading-[1.4] mt-[2em] ml-[10px] max-w-[90%]"
+      set:html={safeDescription}
+    />
   </div>
 </section>
 

@@ -3,7 +3,6 @@ import { getPageMetadata } from "../lib/viewmodels/baseViewModel";
 import { sortByOrder } from "../lib/utils/sortUtils";
 import { formatDateRange } from "../lib/utils/dateUtils";
 
-
 /**
  * Projects page view model
  * Fetches and prepares project data for the projects page
@@ -22,7 +21,7 @@ export async function getProjectsViewModel() {
       return {
         ...project,
         Content,
-        formattedDate: formatDateRange(project.data.startDate, project.data.endDate)
+        formattedDate: formatDateRange(project.data.startDate, project.data.endDate),
       };
     })
   );
@@ -34,7 +33,6 @@ export async function getProjectsViewModel() {
     getOrder: (p) => p.data.order,
     getDate: (p) => p.data.endDate ?? p.data.startDate,
   });
-
 
   return {
     metadata,

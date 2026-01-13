@@ -29,8 +29,8 @@
 
   --font-family-serif: "EB Garamond Variable", "EB Garamond", "Garamond", "Times New Roman", serif;
   --font-family-sans:
-    "Inter Variable", "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif,
-    "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+    "Inter Variable", "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica,
+    Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
 }
 
 html.dark {
@@ -280,7 +280,6 @@ html.reduce-motion .page-load-initial-state {
 }
 
 @media (prefers-reduced-motion: reduce) {
-
   .scroll-reveal-animate,
   .scroll-reveal-animate.visible {
     opacity: 1;

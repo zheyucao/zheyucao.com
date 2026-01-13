@@ -34,12 +34,18 @@ const iconText = typeof icon === "string" && !iconName ? icon : null;
   <a
     href={href}
     download={downloadAttr}
-    class:list={["button-link inline-flex items-center justify-center px-[1.2em] py-[0.6em] rounded-lg font-sans text-[0.9rem] leading-[1.4]", className]}
+    class:list={[
+      "button-link inline-flex items-center justify-center px-[1.2em] py-[0.6em] rounded-lg font-sans text-[0.9rem] leading-[1.4]",
+      className,
+    ]}
     {...rest}
   >
     {
       iconPosition === "left" && icon ? (
-        <span aria-hidden="true" class="inline-flex items-center justify-center mr-[0.5em] leading-none">
+        <span
+          aria-hidden="true"
+          class="inline-flex items-center justify-center mr-[0.5em] leading-none"
+        >
           {iconName ? <Icon name={iconName} size={16} /> : iconText}
         </span>
       ) : null
@@ -47,7 +53,10 @@ const iconText = typeof icon === "string" && !iconName ? icon : null;
     {text}
     {
       iconPosition === "right" && icon ? (
-        <span aria-hidden="true" class="inline-flex items-center justify-center ml-[0.5em] leading-none">
+        <span
+          aria-hidden="true"
+          class="inline-flex items-center justify-center ml-[0.5em] leading-none"
+        >
           {iconName ? <Icon name={iconName} size={16} /> : iconText}
         </span>
       ) : null

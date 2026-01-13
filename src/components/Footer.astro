@@ -24,7 +24,9 @@ import { getContactFooterItems } from "../viewmodels/contactViewModel";
 const contactFooterItems = await getContactFooterItems();
 ---
 
-<footer class="site-footer py-16 px-[10%] min-h-[40vh] flex items-center relative z-5 font-sans md:px-[20%]">
+<footer
+  class="site-footer py-16 px-[10%] min-h-[40vh] flex items-center relative z-5 font-sans md:px-[20%]"
+>
   <div class="flex flex-wrap gap-8 w-full md:flex-nowrap md:gap-12">
     <div class="footer-column basis-full md:flex-[4_1_0%]">
       <h4 class="text-[var(--footer-heading)] mb-[1em] font-semibold">{author}</h4>
@@ -37,7 +39,9 @@ const contactFooterItems = await getContactFooterItems();
       </p>
     </div>
     <div class="footer-column flex-1 md:flex-[1_1_0%]">
-      <h4 class="text-[var(--footer-heading)] mb-[1em] font-semibold">{footerStrings.linksHeading}</h4>
+      <h4 class="text-[var(--footer-heading)] mb-[1em] font-semibold">
+        {footerStrings.linksHeading}
+      </h4>
       <ul class="m-0 p-0 list-none text-[0.9rem] leading-[1.6]">
         {
           navigation.items.map((item) => (
@@ -53,7 +57,9 @@ const contactFooterItems = await getContactFooterItems();
     {
       contactFooterItems.length > 0 && (
         <div class="footer-column flex-1 md:flex-[1_1_0%]">
-          <h4 class="text-[var(--footer-heading)] mb-[1em] font-semibold">{footerStrings.connectHeading}</h4>
+          <h4 class="text-[var(--footer-heading)] mb-[1em] font-semibold">
+            {footerStrings.connectHeading}
+          </h4>
           <ul class="m-0 p-0 list-none text-[0.9rem] leading-[1.6]">
             {contactFooterItems.map((item) => (
               <li class="mb-[0.5em]">

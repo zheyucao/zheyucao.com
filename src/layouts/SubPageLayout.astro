@@ -13,14 +13,20 @@ const { title } = Astro.props;
   <main class="subpage-main py-8 px-[10%] pb-16 min-h-[60vh] mt-8">
     <div class="subpage-header mb-12 pb-4">
       <div class="page-actions flex items-center gap-4 mb-6">
-        <div class="back-link-wrapper no-margin page-load-initial-state flex items-center justify-center h-[2.4rem] w-[2.4rem] min-w-[2.4rem] shrink-0 rounded-lg">
+        <div
+          class="back-link-wrapper no-margin page-load-initial-state flex items-center justify-center h-[2.4rem] w-[2.4rem] min-w-[2.4rem] shrink-0 rounded-lg"
+        >
           <a href="/" class="back-link flex items-center justify-center w-full h-full">
             <Icon name="ri:arrow-left-line" class="back-link-icon" size={16} />
           </a>
         </div>
         <slot name="actions" />
       </div>
-      <h1 class="subpage-title page-load-initial-state text-[clamp(2rem,2rem+2vw,4rem)] font-semibold m-0 leading-[1.2]">{title}</h1>
+      <h1
+        class="subpage-title page-load-initial-state text-[clamp(2rem,2rem+2vw,4rem)] font-semibold m-0 leading-[1.2]"
+      >
+        {title}
+      </h1>
     </div>
     <div class="subpage-content page-load-initial-state text-[1.2rem] leading-[1.6]">
       <slot />
@@ -66,6 +72,10 @@ const { title } = Astro.props;
   }
 
   .back-link-wrapper.page-load-initial-state {
+    animation: fadeIn 0.8s ease-out 0s forwards;
+  }
+
+  .page-actions :global(.page-load-initial-state) {
     animation: fadeIn 0.8s ease-out 0s forwards;
   }
 

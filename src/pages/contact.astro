@@ -44,7 +44,10 @@ const { intro, sections, metadata } = await getContactViewModel();
           <ul class="list-none pl-0 m-0 leading-[1.9]">
             {section.items.map((item) => (
               <li class="contact-item mb-[1.2rem] flex items-start text-[1.2rem]">
-                <Icon name={item.icon} class="contact-icon mr-4 text-[1.3em] shrink-0 opacity-90 mt-[0.3em]" />
+                <Icon
+                  name={item.icon}
+                  class="contact-icon mr-4 text-[1.3em] shrink-0 opacity-90 mt-[0.3em]"
+                />
                 {(() => {
                   const value = item.content || "";
                   const description = item.description;
@@ -53,7 +56,12 @@ const { intro, sections, metadata } = await getContactViewModel();
                   if (item.href) {
                     return (
                       <>
-                        <a href={item.href} target={item.target} rel={item.rel} class="contact-link break-all">
+                        <a
+                          href={item.href}
+                          target={item.target}
+                          rel={item.rel}
+                          class="contact-link break-all"
+                        >
                           {value}
                         </a>
                         {description && <span class="text-text-muted">&nbsp;{description}</span>}
@@ -64,9 +72,7 @@ const { intro, sections, metadata } = await getContactViewModel();
                   if (copyValue) {
                     return (
                       <>
-                        <span class:list={["copyable", { clickable: true }]}>
-                          {value}
-                        </span>
+                        <span class:list={["copyable", { clickable: true }]}>{value}</span>
                         {description && <span class="text-text-muted">&nbsp;{description}</span>}
                       </>
                     );

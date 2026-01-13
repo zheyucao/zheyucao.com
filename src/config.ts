@@ -16,8 +16,7 @@ export interface SiteConfig {
 export const siteConfig: SiteConfig = {
   metadata: {
     title: "Zheyu Cao's Personal Website",
-    description:
-      "A website showcasing Zheyu Cao's work, projects, updates and résumé.",
+    description: "A website showcasing Zheyu Cao's work, projects, updates and résumé.",
     author: "Zheyu Cao",
     siteUrl: "https://zheyucao.com", // Update with actual URL if different
   },

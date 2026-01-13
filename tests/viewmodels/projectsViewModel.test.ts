@@ -1,49 +1,49 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { getProjectsViewModel } from '../../src/viewmodels/projectsViewModel';
-import { getCollection } from 'astro:content';
-import { getPageMetadata } from '../../src/lib/viewmodels/baseViewModel';
+import { describe, it, expect, vi, beforeEach } from "vitest";
+import { getProjectsViewModel } from "../../src/viewmodels/projectsViewModel";
+import { getCollection } from "astro:content";
+import { getPageMetadata } from "../../src/lib/viewmodels/baseViewModel";
 
 // Mock astro:content
-vi.mock('astro:content', () => ({
-    getCollection: vi.fn(),
+vi.mock("astro:content", () => ({
+  getCollection: vi.fn(),
 }));
 
 // Mock baseViewModel
-vi.mock('../../src/lib/viewmodels/baseViewModel', () => ({
-    getPageMetadata: vi.fn(),
+vi.mock("../../src/lib/viewmodels/baseViewModel", () => ({
+  getPageMetadata: vi.fn(),
 }));
 
 const mockedGetCollection = vi.mocked(getCollection);
 const mockedGetPageMetadata = vi.mocked(getPageMetadata);
 
-describe('projectsViewModel', () => {
-    beforeEach(() => {
-        vi.clearAllMocks();
-    });
+describe("projectsViewModel", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
 
-    it('should return projects view model correctly', async () => {
-        const mockMetadata = { title: 'Projects', description: 'My Projects' };
-        mockedGetPageMetadata.mockResolvedValue(mockMetadata as never);
+  it("should return projects view model correctly", async () => {
+    const mockMetadata = { title: "Projects", description: "My Projects" };
+    mockedGetPageMetadata.mockResolvedValue(mockMetadata as never);
 
-        const mockProjects = [
-            {
-                data: { title: 'Project 1', order: 2 },
-                render: vi.fn().mockResolvedValue({ Content: 'Project1Content' }),
-            },
-            {
-                data: { title: 'Project 2', order: 1 },
-                render: vi.fn().mockResolvedValue({ Content: 'Project2Content' }),
-            },
-        ];
-        mockedGetCollection.mockResolvedValue(mockProjects as never);
+    const mockProjects = [
+      {
+        data: { title: "Project 1", order: 2 },
+        render: vi.fn().mockResolvedValue({ Content: "Project1Content" }),
+      },
+      {
+        data: { title: "Project 2", order: 1 },
+        render: vi.fn().mockResolvedValue({ Content: "Project2Content" }),
+      },
+    ];
+    mockedGetCollection.mockResolvedValue(mockProjects as never);
 
-        const result = await getProjectsViewModel();
+    const result = await getProjectsViewModel();
 
-        expect(result.metadata).toEqual(mockMetadata);
-        expect(result.projects).toHaveLength(2);
-        // Should be sorted by order
-        expect(result.projects[0].data.title).toBe('Project 2');
-        expect(result.projects[1].data.title).toBe('Project 1');
-        expect(result.projects[0].Content).toBe('Project2Content');
-    });
+    expect(result.metadata).toEqual(mockMetadata);
+    expect(result.projects).toHaveLength(2);
+    // Should be sorted by order
+    expect(result.projects[0].data.title).toBe("Project 2");
+    expect(result.projects[1].data.title).toBe("Project 1");
+    expect(result.projects[0].Content).toBe("Project2Content");
+  });
 });

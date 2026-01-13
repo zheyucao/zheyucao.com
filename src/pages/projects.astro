@@ -30,7 +30,7 @@ const { projects, metadata } = await getProjectsViewModel();
     {
       projects.map((project) => (
         <ProjectCard
-          id={project.slug}
+          id={project.id}
           title={project.data.title}
           imageSrc={project.data.imageSrc}
           imageAlt={project.data.imageAlt}

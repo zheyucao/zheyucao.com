@@ -33,18 +33,19 @@ const highlightsToShow = events;
     highlightsToShow.length > 0 ? (
       <ul class="list-none pl-0 mt-0">
         {highlightsToShow.map((event, index) => (
-          <li class:list={[
-            "mb-4 pb-4",
-            "sm:flex sm:gap-[1.5rem]",
-            index === highlightsToShow.length - 1 && "!mb-0 !pb-0"
-          ]}>
+          <li
+            class:list={[
+              "mb-4 pb-4",
+              "sm:flex sm:gap-[1.5rem]",
+              index === highlightsToShow.length - 1 && "!mb-0 !pb-0",
+            ]}
+          >
             <div class="mb-2 sm:mb-0 sm:shrink-0 sm:basis-[80px]">
               <time
                 datetime={event.data.endDate ?? event.data.startDate ?? ""}
                 class="font-sans text-[0.9rem] leading-[1.6] block"
               >
-                {
-                  formatDateRange(event.data.startDate, event.data.endDate) ||
+                {formatDateRange(event.data.startDate, event.data.endDate) ||
                   formatDate(event.data.startDate || event.data.endDate || "")}
               </time>
             </div>

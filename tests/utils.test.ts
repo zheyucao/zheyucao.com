@@ -1,5 +1,10 @@
 import { describe, it, expect } from "vitest";
-import { parseDate, formatTimelineDate, formatDate, formatDateRange } from "../src/lib/utils/dateUtils";
+import {
+  parseDate,
+  formatTimelineDate,
+  formatDate,
+  formatDateRange,
+} from "../src/lib/utils/dateUtils";
 import { sanitizeStrict, sanitizeRich } from "../src/lib/utils/sanitize";
 
 describe("dateUtils", () => {
