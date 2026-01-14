@@ -9,6 +9,12 @@ export interface HSLColor {
   l: number;
 }
 
+export interface OKLCHColor {
+  l: number; // 0-1 lightness
+  c: number; // 0-0.4+ chroma
+  h: number; // 0-360 hue angle
+}
+
 export interface BlobShape {
   id: number;
   position: Vector;

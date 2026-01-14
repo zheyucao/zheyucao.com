@@ -1,7 +1,8 @@
+import { generateHarmoniousPaletteColors, applyVariation, oklchToHex } from "./oklchColors";
 import { shuffleArray } from "./utils";
 import type { ColorScheme } from "./types";
 
-const colorScheme: ColorScheme = {
+const curatedSchemes: ColorScheme = {
   reds: ["#FF6B6B", "#FFD93D", "#F2bF47", "#F2B707", "#F28706", "#F26430"],
   oranges: ["#FFa700", "#FF9B58", "#F27149", "#F9c443", "#faD93D"],
   yellows: ["#FFD700", "#FFDB58", "#F2E109", "#F9D423", "#caD93D"],
@@ -14,16 +15,56 @@ const colorScheme: ColorScheme = {
   winter: ["#87CEEB", "#64f5ED", "#7De6FF", "#cccccc", "#ffffff"],
 };
 
-export function pickInitialColors(numBlobs: number): string[] {
-  const schemeNames = Object.keys(colorScheme);
-  const selectedSchemeName = schemeNames[Math.floor(Math.random() * schemeNames.length)];
-  const availableColors = colorScheme[selectedSchemeName] || [];
-  const shuffledColors = shuffleArray([...availableColors]);
+export type ColorStrategy = "oklch-automatic" | "manual-curated";
 
-  return Array.from(
-    { length: numBlobs },
-    (_, i) => shuffledColors[i % shuffledColors.length] || "#90EE90"
-  );
+/**
+ * Pick initial colors for blobs, either using OKLCH generation or curated schemes.
+ *
+ * @param numBlobs - Number of blobs to color
+ * @param strategy - "oklch-automatic" (default) or "manual-curated"
+ * @returns Array of hex color strings
+ */
+export function pickInitialColors(
+  numBlobs: number,
+  strategy: ColorStrategy = "oklch-automatic"
+): string[] {
+  if (strategy === "manual-curated") {
+    const schemeNames = Object.keys(curatedSchemes);
+    const selectedSchemeName = schemeNames[Math.floor(Math.random() * schemeNames.length)];
+    const availableColors = curatedSchemes[selectedSchemeName] || [];
+    const shuffledColors = shuffleArray([...availableColors]);
+
+    return Array.from(
+      { length: numBlobs },
+      (_, i) => shuffledColors[i % shuffledColors.length] || "#90EE90"
+    );
+  }
+
+  // Fallback to OKLCH automatic generation
+  // 1. Decide on the number of distinct color families (1 or 2 as per user preference)
+  const familyCount = Math.random() > 0.5 ? 1 : 2;
+
+  // 2. Generate the base colors for these families
+  const baseFamilies = generateHarmoniousPaletteColors(familyCount);
+
+  // 3. Generate individual blob colors
+  // Assign each blob to a family and apply random variation
+  return Array.from({ length: numBlobs }, (_, i) => {
+    // Cycle through families
+    const baseColor = baseFamilies[i % baseFamilies.length];
+
+    // Apply variation:
+    // - Lightness: ±0.06 (subtle brightness shift)
+    // - Chroma: ±0.03 (subtle saturation shift)
+    // - Hue: ±10 degrees (keeps it within the same "color family" but distinct)
+    const variedColor = applyVariation(baseColor, {
+      l: 0.12,
+      c: 0.06,
+      h: 20,
+    });
+
+    return oklchToHex(variedColor);
+  });
 }
 
-export { colorScheme };
+export { curatedSchemes as colorScheme };
