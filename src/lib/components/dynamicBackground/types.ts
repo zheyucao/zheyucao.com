@@ -21,7 +21,8 @@ export interface BlobShape {
   velocity: Vector;
   radius: number;
   color: string;
-  hsl: HSLColor;
+  hsl: HSLColor; // Kept for legacy compatibility if needed
+  oklch: OKLCHColor; // For high-quality color shifting
   points: Vector[];
   path: Path2D;
   angle: number;

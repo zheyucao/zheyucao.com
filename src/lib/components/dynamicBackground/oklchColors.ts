@@ -29,6 +29,21 @@ function oklchToOklab(oklch: OKLCHColor): { L: number; a: number; b: number } {
 }
 
 /**
+ * Convert Oklab to OKLCH
+ */
+function oklabToOklch(oklab: { L: number; a: number; b: number }): OKLCHColor {
+  const hRad = Math.atan2(oklab.b, oklab.a);
+  let hDeg = (hRad * 180) / Math.PI;
+  if (hDeg < 0) hDeg += 360;
+
+  return {
+    l: oklab.L,
+    c: Math.sqrt(oklab.a * oklab.a + oklab.b * oklab.b),
+    h: hDeg,
+  };
+}
+
+/**
  * Convert Oklab to linear sRGB
  * Uses the official Oklab transformation matrix
  */
@@ -58,6 +73,32 @@ function oklabToLinearSrgb(oklab: { L: number; a: number; b: number }): {
 }
 
 /**
+ * Convert Linear sRGB to Oklab
+ */
+function linearSrgbToOklab(linear: { r: number; g: number; b: number }): {
+  L: number;
+  a: number;
+  b: number;
+} {
+  // Linear sRGB to LMS
+  const l = 0.4122214708 * linear.r + 0.5363325363 * linear.g + 0.0514459929 * linear.b;
+  const m = 0.2119034982 * linear.r + 0.6806995451 * linear.g + 0.1073969566 * linear.b;
+  const s = 0.0883024619 * linear.r + 0.2817188376 * linear.g + 0.6299787005 * linear.b;
+
+  // Cuberoot (LMS to LMS')
+  const l_ = Math.cbrt(l);
+  const m_ = Math.cbrt(m);
+  const s_ = Math.cbrt(s);
+
+  // LMS' to Oklab
+  return {
+    L: 0.2104542553 * l_ + 0.793617785 * m_ - 0.0040720468 * s_,
+    a: 1.9779984951 * l_ - 2.428592205 * m_ + 0.4505937099 * s_,
+    b: 0.0259040371 * l_ + 0.7827717662 * m_ - 0.808675766 * s_,
+  };
+}
+
+/**
  * Apply sRGB gamma correction (linear → sRGB)
  */
 function linearToSrgb(c: number): number {
@@ -65,6 +106,16 @@ function linearToSrgb(c: number): number {
     return 12.92 * c;
   }
   return 1.055 * Math.pow(c, 1 / 2.4) - 0.055;
+}
+
+/**
+ * Remove sRGB gamma correction (sRGB → linear)
+ */
+function srgbToLinear(c: number): number {
+  if (c <= 0.04045) {
+    return c / 12.92;
+  }
+  return Math.pow((c + 0.055) / 1.055, 2.4);
 }
 
 /**
@@ -137,6 +188,38 @@ export function oklchToHex(color: OKLCHColor): string {
       .padStart(2, "0");
 
   return `#${toHex(r)}${toHex(g)}${toHex(b)}`.toUpperCase();
+}
+
+/**
+ * Convert hex color string to OKLCH
+ */
+export function hexToOklch(hex: string): OKLCHColor {
+  // Normalize hex
+  hex = hex.replace(/^#/, "");
+  if (hex.length === 3) {
+    hex = hex
+      .split("")
+      .map((c) => c + c)
+      .join("");
+  }
+
+  // Parse sRGB
+  const r = parseInt(hex.slice(0, 2), 16) / 255;
+  const g = parseInt(hex.slice(2, 4), 16) / 255;
+  const b = parseInt(hex.slice(4, 6), 16) / 255;
+
+  // sRGB to Linear
+  const linear = {
+    r: srgbToLinear(r),
+    g: srgbToLinear(g),
+    b: srgbToLinear(b),
+  };
+
+  // Linear to Oklab
+  const oklab = linearSrgbToOklab(linear);
+
+  // Oklab to OKLCH
+  return oklabToOklch(oklab);
 }
 
 // ============================================================================

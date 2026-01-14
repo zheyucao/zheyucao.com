@@ -1,6 +1,7 @@
 import { describe, it, expect } from "vitest";
 import {
   oklchToHex,
+  hexToOklch, // Import updated
   clampToGamut,
   generateHarmoniousPalette,
   type HarmonyScheme,
@@ -48,6 +49,27 @@ describe("oklchColors", () => {
 
       expect(oklchToHex(black)).toBe("#000000");
       expect(oklchToHex(white)).toBe("#FFFFFF");
+    });
+  });
+
+  describe("hexToOklch", () => {
+    it("converts hex to OKLCH correctly", () => {
+      // Red #FF0000 approx OKLCH(0.627, 0.257, 29.23)
+      const color = hexToOklch("#FF0000");
+
+      expect(color.l).toBeCloseTo(0.627, 1);
+      expect(color.c).toBeCloseTo(0.257, 1);
+      expect(color.h).toBeCloseTo(29.23, 1);
+    });
+
+    it("converts white and black", () => {
+      const white = hexToOklch("#FFFFFF");
+      expect(white.l).toBeCloseTo(1, 1);
+      expect(white.c).toBeCloseTo(0, 1);
+
+      const black = hexToOklch("#000000");
+      expect(black.l).toBeCloseTo(0, 1);
+      expect(black.c).toBeCloseTo(0, 1);
     });
   });
 

@@ -3,6 +3,7 @@ import { createConfig } from "./dynamicBackground/config";
 import { pickInitialColors } from "./dynamicBackground/colorSchemes";
 import { buildPathFromPoints, createBlobPoints } from "./dynamicBackground/geometry";
 import { hexToHsl, random } from "./dynamicBackground/utils";
+import { hexToOklch, oklchToHex } from "./dynamicBackground/oklchColors";
 import type { BlobShape, DynamicBackgroundConfig, Vector } from "./dynamicBackground/types";
 
 export class DynamicBackgroundManager {
@@ -63,7 +64,6 @@ export class DynamicBackgroundManager {
       this.initStatic();
       this.setupEventListeners(true);
     } else {
-      this.canvas.classList.add("css-hue-shift-active");
       this.initBlobs();
       this.setupEventListeners();
       this.setupIntersectionObserver();
@@ -208,6 +208,12 @@ export class DynamicBackgroundManager {
   private updateBlob(blob: BlobShape, containerWidth: number, containerHeight: number) {
     blob.deformationTime += 1;
 
+    // Smooth color shifting using OKLCH
+    // Increment hue slightly each frame (approx 0.1 deg/frame ~ 6 deg/sec)
+    blob.oklch.h = (blob.oklch.h + 0.1) % 360;
+    // Update the render color
+    blob.color = oklchToHex(blob.oklch);
+
     blob.position.x += blob.velocity.x;
     blob.position.y += blob.velocity.y;
     blob.angle += blob.angularVelocity;
@@ -341,6 +347,9 @@ export class DynamicBackgroundManager {
     };
 
     const initialHsl = hexToHsl(initialHex);
+    // Initialize OKLCH for consistent color shifting
+    const initialOklch = hexToOklch(initialHex);
+
     const initialGeometry = createBlobPoints(0, 0, radius, 0.3, 0.2, 8);
     const path = buildPathFromPoints(initialGeometry.points);
     const velocity: Vector = {
@@ -357,6 +366,7 @@ export class DynamicBackgroundManager {
       radius,
       color: initialHex,
       hsl: initialHsl || { h: 0, s: 0, l: 50 },
+      oklch: initialOklch,
       points: initialGeometry.points,
       path,
       angle: initialAngle,
