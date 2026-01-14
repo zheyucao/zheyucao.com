@@ -239,29 +239,21 @@ hr {
   }
 }
 
-/* Reduced motion support: disable most transitions and show content without movement */
+/* Reduced motion support: disable animations for specific animation classes */
 @media (prefers-reduced-motion: reduce) {
-  *,
-  *::before,
-  *::after {
-    animation-duration: 0.001ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.001ms !important;
-    scroll-behavior: auto !important;
-  }
-
-  .scroll-reveal-animate {
-    opacity: 1 !important;
-    filter: none !important;
-    transform: none !important;
-    transition: none !important;
-  }
-
-  .page-load-initial-state {
+  /* Target animation classes specifically instead of all elements */
+  .scroll-reveal-animate,
+  .page-load-initial-state,
+  [class*="animate-"] {
     animation: none !important;
+    transition: none !important;
     opacity: 1 !important;
     filter: none !important;
     transform: none !important;
+  }
+
+  html {
+    scroll-behavior: auto !important;
   }
 }
 
@@ -277,22 +269,6 @@ html.reduce-motion .page-load-initial-state {
   opacity: 1 !important;
   filter: none !important;
   transform: none !important;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .scroll-reveal-animate,
-  .scroll-reveal-animate.visible {
-    opacity: 1;
-    filter: none;
-    transform: none;
-    transition: none;
-  }
-
-  .page-load-initial-state {
-    opacity: 1;
-    filter: none;
-    transform: none;
-  }
 }
 
 /* Base link style */

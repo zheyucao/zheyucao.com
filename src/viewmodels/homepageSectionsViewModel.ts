@@ -46,8 +46,14 @@ export type HomepageSection = HeroSection | TextContentSection | CollectionShowc
  * Get all homepage sections, processed and ready for rendering
  */
 export async function getHomepageSectionsViewModel(): Promise<HomepageSection[]> {
-  // Load all sections
-  const allSections = await getCollection("homepage-sections");
+  // Pre-fetch all collections that may be needed (avoids repeated fetches in loop)
+  const [allSections, allContactEntries, allProjectsEntries, allTimelineEntries] =
+    await Promise.all([
+      getCollection("homepage-sections"),
+      getCollection("contact"),
+      getCollection("projects"),
+      getCollection("timeline"),
+    ]);
 
   // Filter visible sections and sort by order
   const visibleSections = sortByOrder(
@@ -88,7 +94,7 @@ export async function getHomepageSectionsViewModel(): Promise<HomepageSection[]>
             section.data.supplementaryData.contactIcons;
 
           if (sourceCollection === "contact") {
-            const contactEntries = await getCollection("contact");
+            const contactEntries = allContactEntries;
 
             // Filter by entry-level filter (e.g., kind: "list")
             let filteredEntries = contactEntries;
@@ -133,7 +139,7 @@ export async function getHomepageSectionsViewModel(): Promise<HomepageSection[]>
 
         // Handle projects collection
         if (sourceCollection === "projects") {
-          let projectItems = await getCollection("projects");
+          let projectItems = [...allProjectsEntries];
 
           // Apply filters
           if (filter) {
@@ -176,7 +182,7 @@ export async function getHomepageSectionsViewModel(): Promise<HomepageSection[]>
 
         // Handle timeline collection
         if (sourceCollection === "timeline") {
-          let timelineItems = await getCollection("timeline");
+          let timelineItems = [...allTimelineEntries];
 
           // Apply filters
           if (filter) {

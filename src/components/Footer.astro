@@ -110,86 +110,48 @@ const contactFooterItems = await getContactFooterItems();
 </style>
 
 <script>
+  import { onPageLifecycle } from "../lib/utils/pageLifecycle";
+  import { querySelector } from "../lib/utils/dom";
   import { setupFooterAnimation } from "../lib/animations/footerAnimation";
 
-  const FOOTER_ANIMATION_KEY = "__footerAnimationEventsRegistered__";
-  type FooterWindow = Window & {
-    [FOOTER_ANIMATION_KEY]?: boolean;
-  };
-  const footerWindow = window as FooterWindow;
+  function updateActiveFooterLink() {
+    const currentPath = window.location.pathname;
+    const normalizedPath = "/" + currentPath.replace(/^\/+|\/+$/g, "");
+    const rootPath = "/";
+    const links = document.querySelectorAll(".footer-column:nth-child(2) ul li a");
 
-  if (!footerWindow[FOOTER_ANIMATION_KEY]) {
-    footerWindow[FOOTER_ANIMATION_KEY] = true;
+    links.forEach((link) => {
+      const linkHref = link.getAttribute("href");
+      const linkParentLi = link.closest("li");
+      if (!linkHref || !linkParentLi) return;
+      const normalizedHref = "/" + linkHref.replace(/^\/+|\/+$/g, "");
 
-    let cleanup: (() => void) | null = null;
+      linkParentLi.classList.remove("active");
 
-    const handlePageLoad = () => {
-      cleanup?.();
+      if (linkHref === rootPath && (currentPath === rootPath || currentPath === "/index.html")) {
+        linkParentLi.classList.add("active");
+      } else if (
+        linkHref !== rootPath &&
+        linkHref.startsWith("/") &&
+        !linkHref.includes("#") &&
+        normalizedHref === normalizedPath
+      ) {
+        linkParentLi.classList.add("active");
+      }
+    });
+  }
 
-      const footer = document.querySelector(".site-footer") as HTMLElement | null;
-      const scroller = document.querySelector(".page-wrapper") as HTMLElement | null;
+  onPageLifecycle("footer", {
+    onLoad: () => {
+      updateActiveFooterLink();
+
+      const footer = querySelector<HTMLElement>(".site-footer");
+      const scroller = querySelector<HTMLElement>(".page-wrapper");
 
       if (footer && scroller) {
-        cleanup = setupFooterAnimation({ footer, scroller });
+        return setupFooterAnimation({ footer, scroller });
       }
-    };
-
-    // Cleanup on navigation, but keep listeners so they can re-run on the next page
-    const handleBeforeSwap = () => {
-      cleanup?.();
-      cleanup = null;
-    };
-
-    document.addEventListener("astro:page-load", handlePageLoad);
-    document.addEventListener("astro:before-swap", handleBeforeSwap);
-  }
+    },
+  });
 </script>
 
-<script>
-  // Client-side script to mark the active footer link
-  const FOOTER_ACTIVE_LINK_KEY = "__footerActiveLinkEventsRegistered__";
-  type FooterLinkWindow = Window & {
-    [FOOTER_ACTIVE_LINK_KEY]?: boolean;
-  };
-  const footerLinkWindow = window as FooterLinkWindow;
-
-  if (!footerLinkWindow[FOOTER_ACTIVE_LINK_KEY]) {
-    footerLinkWindow[FOOTER_ACTIVE_LINK_KEY] = true;
-
-    const updateActiveFooterLink = () => {
-      const currentPath = window.location.pathname;
-      const normalizedPath = "/" + currentPath.replace(/^\/+|\/+$/g, "");
-      const rootPath = "/";
-      const links = document.querySelectorAll(".footer-column:nth-child(2) ul li a");
-
-      links.forEach((link) => {
-        const linkHref = link.getAttribute("href");
-        const linkParentLi = link.closest("li");
-        if (!linkHref || !linkParentLi) return;
-        const normalizedHref = "/" + linkHref.replace(/^\/+|\/+$/g, "");
-
-        linkParentLi.classList.remove("active"); // Remove active from all first
-
-        if (linkHref === rootPath && (currentPath === rootPath || currentPath === "/index.html")) {
-          linkParentLi.classList.add("active");
-        } else if (
-          linkHref !== rootPath &&
-          linkHref.startsWith("/") &&
-          !linkHref.includes("#") &&
-          normalizedHref === normalizedPath
-        ) {
-          linkParentLi.classList.add("active");
-        }
-      });
-    };
-
-    // Run update on initial load and after SPA navigations
-    const handlePageLoad = () => updateActiveFooterLink();
-    const handleBeforeSwap = () => {
-      // Keep listeners alive; just ensure the current run finishes cleanly
-    };
-
-    document.addEventListener("astro:page-load", handlePageLoad);
-    document.addEventListener("astro:before-swap", handleBeforeSwap);
-  }
-</script>

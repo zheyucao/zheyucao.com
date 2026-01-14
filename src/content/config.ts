@@ -20,7 +20,6 @@ const projects = defineCollection({
       techStack: z.array(z.string()).optional(),
       imageSrc: image().optional(),
       imageAlt: z.string().optional(),
-      thumbnailSrc: image().optional(),
       isFeatured: z.boolean().default(false),
       homepageSummary: z.string().optional(),
       order: z.number().optional(), // Manual ordering for projects page

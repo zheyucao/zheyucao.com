@@ -69,82 +69,28 @@ const showScrollIndicator =
         document.documentElement.classList.add("dark");
       }
     </script>
-    <!-- Theme Handling -->
+    <!-- Layout Core Scripts (Theme, Scroll Reveal, GSAP) -->
     <script>
+      import { onPageLifecycle } from "../lib/utils/pageLifecycle";
       import { initTheme } from "../lib/layout/theme";
-      const THEME_EVENTS_KEY = "__themeEventsRegistered__";
-      type LayoutWindow = Window & {
-        [THEME_EVENTS_KEY]?: boolean;
-      };
-      const layoutWindow = window as LayoutWindow;
-
-      if (!layoutWindow[THEME_EVENTS_KEY]) {
-        layoutWindow[THEME_EVENTS_KEY] = true;
-
-        let cleanupTheme: (() => void) | undefined;
-
-        const handlePageLoad = () => {
-          cleanupTheme = initTheme();
-        };
-
-        const handleBeforeSwap = () => {
-          cleanupTheme?.();
-          cleanupTheme = undefined;
-        };
-
-        document.addEventListener("astro:page-load", handlePageLoad);
-        document.addEventListener("astro:before-swap", handleBeforeSwap);
-      }
-    </script>
-
-    <!-- Intersection Observer for Scroll Reveal -->
-    <script>
       import { setupIntersectionObserver } from "../lib/layout/intersectionObserver";
-
-      const INTERSECTION_EVENTS_KEY = "__intersectionObserverEventsRegistered__";
-      type LayoutWindowIntersection = Window & {
-        [INTERSECTION_EVENTS_KEY]?: boolean;
-      };
-      const layoutIntersectionWindow = window as LayoutWindowIntersection;
-
-      if (!layoutIntersectionWindow[INTERSECTION_EVENTS_KEY]) {
-        layoutIntersectionWindow[INTERSECTION_EVENTS_KEY] = true;
-
-        let cleanupObserver: (() => void) | undefined;
-
-        const handlePageLoad = () => {
-          if (cleanupObserver) cleanupObserver();
-          cleanupObserver = setupIntersectionObserver();
-        };
-
-        const handleBeforeSwap = () => {
-          if (cleanupObserver) cleanupObserver();
-          cleanupObserver = undefined;
-        };
-
-        document.addEventListener("astro:page-load", handlePageLoad);
-        document.addEventListener("astro:before-swap", handleBeforeSwap);
-      }
-    </script>
-
-    <!-- GSAP Section Animations -->
-    <script>
       import { setupSectionAnimations, cleanupScrollTriggers } from "../lib/layout/gsapAnimations";
 
-      const GSAP_EVENTS_KEY = "__gsapSectionAnimationEventsRegistered__";
-      type LayoutWindowGsap = Window & {
-        [GSAP_EVENTS_KEY]?: boolean;
-      };
-      const layoutGsapWindow = window as LayoutWindowGsap;
+      onPageLifecycle("layout-core", {
+        onLoad: () => {
+          const cleanupTheme = initTheme();
+          const cleanupObserver = setupIntersectionObserver();
+          requestAnimationFrame(() => setupSectionAnimations());
 
-      if (!layoutGsapWindow[GSAP_EVENTS_KEY]) {
-        layoutGsapWindow[GSAP_EVENTS_KEY] = true;
-
-        const runSectionAnimations = () => requestAnimationFrame(() => setupSectionAnimations());
-
-        document.addEventListener("astro:page-load", runSectionAnimations);
-        document.addEventListener("astro:before-swap", cleanupScrollTriggers);
-      }
+          return () => {
+            cleanupTheme();
+            cleanupObserver();
+          };
+        },
+        onSwap: () => {
+          cleanupScrollTriggers();
+        },
+      });
     </script>
   </head>
   <body>

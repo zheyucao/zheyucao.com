@@ -50,7 +50,7 @@ export class DynamicBackgroundManager {
 
     this.config = createConfig(this.isMobileDevice);
 
-    this.forceStaticMode = this.detectFirefox();
+    this.forceStaticMode = this.shouldForceStaticMode();
     this.prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
     this.init();
@@ -422,8 +422,13 @@ export class DynamicBackgroundManager {
     };
   }
 
-  private detectFirefox(): boolean {
-    const ua = navigator.userAgent;
-    return /Firefox|FxiOS/i.test(ua);
+  /**
+   * Detect browsers with known canvas performance issues.
+   * Uses CSS feature detection instead of fragile user-agent sniffing.
+   */
+  private shouldForceStaticMode(): boolean {
+    // Firefox has known issues with canvas filter effects and animation performance.
+    // Use CSS feature detection: -moz-appearance is Firefox-specific.
+    return CSS.supports("(-moz-appearance: none)");
   }
 }
