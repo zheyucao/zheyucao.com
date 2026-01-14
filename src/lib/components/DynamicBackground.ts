@@ -24,6 +24,7 @@ export class DynamicBackgroundManager {
   private lastTimestamp = 0;
   private lastLogicExecutionTime = 0;
   private observer: IntersectionObserver | null = null;
+  private themeObserver: MutationObserver | null = null;
   private isVisible = true;
   private prefersReducedMotion = false;
   private cleanupListeners: () => void = () => {};
@@ -59,6 +60,7 @@ export class DynamicBackgroundManager {
 
   private init() {
     this.ensureCanvasSize();
+    this.setupThemeObserver();
 
     if (this.prefersReducedMotion || this.forceStaticMode) {
       this.initStatic();
@@ -89,9 +91,35 @@ export class DynamicBackgroundManager {
     if (this.mouseThrottleTimeout) cancelAnimationFrame(this.mouseThrottleTimeout);
     this.cleanupListeners();
     if (this.observer) this.observer.disconnect();
+    if (this.themeObserver) this.themeObserver.disconnect();
     this.blobs = [];
     this.ctx.setTransform(1, 0, 0, 1, 0, 0);
     this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+  }
+
+  private isDarkMode(): boolean {
+    return document.documentElement.classList.contains("dark");
+  }
+
+  private setupThemeObserver() {
+    this.themeObserver = new MutationObserver((mutations) => {
+      mutations.forEach((mutation) => {
+        if (mutation.type === "attributes" && mutation.attributeName === "class") {
+          // Theme changed, regenerate blobs with new colors
+          // We can just call initBlobs() which clears and repopulates this.blobs
+          this.initBlobs();
+          if (this.config.numBlobs === 3) {
+            // If in static mode, redraw immediately
+            this.drawFrame();
+          }
+        }
+      });
+    });
+
+    this.themeObserver.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ["class"],
+    });
   }
 
   private setupIntersectionObserver() {
@@ -304,7 +332,9 @@ export class DynamicBackgroundManager {
     const currentSmallMinSize = this.config.baseSmallMinBlobSize * scaleFactor;
     const currentSmallMaxSize = this.config.baseSmallMaxBlobSize * scaleFactor;
 
-    const initialBlobColorsHex = pickInitialColors(this.config.numBlobs);
+    const colorConfig = this.isDarkMode() ? this.config.colors.dark : this.config.colors.light;
+
+    const initialBlobColorsHex = pickInitialColors(this.config.numBlobs, colorConfig);
 
     const largeBlobCount = Math.ceil(this.config.numBlobs / 2);
     for (let i = 0; i < largeBlobCount; i++) {

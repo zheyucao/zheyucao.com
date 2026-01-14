@@ -34,6 +34,40 @@ export interface BlobShape {
   deformationAmplitude: number;
 }
 
+export interface ColorScheme {
+  [key: string]: string[];
+}
+
+export type HarmonyScheme =
+  | "analogous"
+  | "complementary"
+  | "triadic"
+  | "tetradic"
+  | "split-complementary"
+  | "warm"
+  | "cool";
+
+export type ColorStrategy = "oklch-automatic" | "manual-curated";
+
+export interface ColorModeConfig {
+  strategy: ColorStrategy;
+
+  // For manual strategy:
+  // Option A: allowed keys from curatedSchemes (e.g. "blues", "reds")
+  curatedSchemes?: string[];
+  // Option B: Provide a custom fixed palette of hex codes
+  customPalette?: string[];
+
+  // For automatic strategy:
+  harmonySchemes?: HarmonyScheme[]; // Allowed schemes (e.g. ["analogous", "warm"])
+  baseHue?: number; // Fixed base hue (0-360) for generation
+  preset?: {
+    lightness: number;
+    chroma: number;
+  };
+  forceMonochrome?: boolean; // If true, forces single color family
+}
+
 export interface DynamicBackgroundConfig {
   numBlobs: number;
   baseLargeMinBlobSize: number;
@@ -50,8 +84,9 @@ export interface DynamicBackgroundConfig {
   enableShapeChanging: boolean;
   enableCollisionDetection: boolean;
   enableMouseInteraction: boolean;
-}
-
-export interface ColorScheme {
-  [key: string]: string[];
+  // New color config
+  colors: {
+    light: ColorModeConfig;
+    dark: ColorModeConfig;
+  };
 }

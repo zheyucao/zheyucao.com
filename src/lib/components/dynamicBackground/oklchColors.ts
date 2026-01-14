@@ -10,7 +10,7 @@
  * to generate guaranteed good-looking colors.
  */
 
-import type { OKLCHColor } from "./types";
+import type { OKLCHColor, HarmonyScheme } from "./types";
 
 // ============================================================================
 // OKLCH → Oklab → Linear sRGB → sRGB Pipeline
@@ -226,15 +226,6 @@ export function hexToOklch(hex: string): OKLCHColor {
 // Color Harmony Generation
 // ============================================================================
 
-export type HarmonyScheme =
-  | "analogous"
-  | "complementary"
-  | "triadic"
-  | "tetradic"
-  | "split-complementary"
-  | "warm"
-  | "cool";
-
 /**
  * Get hue offsets for a given harmony scheme
  */
@@ -285,6 +276,14 @@ function getHueOffsets(scheme: HarmonyScheme, count: number): number[] {
 // Default OKLCH parameters for vibrant, balanced colors
 const DEFAULT_LIGHTNESS = 0.78;
 const DEFAULT_CHROMA = 0.14;
+
+export const OKLCH_PRESETS = {
+  // Delicate pastel for white backgrounds
+  LIGHT: { lightness: 0.92, chroma: 0.06 },
+
+  // Deep, rich colors for dark backgrounds (avoids muddy look)
+  DARK: { lightness: 0.3, chroma: 0.14 },
+};
 
 // Available harmony schemes with weights for random selection
 // Higher weights = more likely to be selected
