@@ -100,6 +100,46 @@ const isContactEntry = (
 } => "type" in entry.data && entry.data.type === "contact";
 
 /**
+ * Process standard resume entries (education, experience, projects, awards).
+ * Filters by prefix, renders content, formats dates, and sorts.
+ */
+async function processStandardEntries(
+  allEntries: ResumeCollectionEntry[],
+  prefix: string,
+  options: { includeSubtitle?: boolean } = {}
+): Promise<ResumeEntryItem[]> {
+  const { includeSubtitle = true } = options;
+
+  const filteredEntries = allEntries.filter(
+    (entry): entry is ResumeCollectionEntry & { data: StandardEntryData } =>
+      entry.id.startsWith(`${prefix}/`) && isStandardEntry(entry)
+  );
+
+  const processedEntries = await Promise.all(
+    filteredEntries.map(async (entry) => {
+      const { Content } = await entry.render();
+      const item: ResumeEntryItem = {
+        title: entry.data.title,
+        date: formatDateRange(entry.data.startDate, entry.data.endDate),
+        startDate: entry.data.startDate,
+        endDate: entry.data.endDate,
+        order: getOrder(entry),
+        Content,
+      };
+      if (includeSubtitle && entry.data.subtitle) {
+        item.subtitle = entry.data.subtitle;
+      }
+      return item;
+    })
+  );
+
+  return sortByOrder(processedEntries, {
+    getOrder: (e) => e.order,
+    getDate: (e) => e.endDate ?? e.startDate,
+  });
+}
+
+/**
  * Résumé page view model
  * Aggregates and organizes resume content into main column and sidebar
  */
@@ -119,100 +159,13 @@ export async function getResumeViewModel(): Promise<{
   if (!profileEntry) throw new Error("Profile entry not found");
   const { Content: ProfileContent } = await profileEntry.render();
 
-  // Filter education entries
-  const educationEntries = allResumeContent.filter(
-    (entry): entry is ResumeCollectionEntry & { data: StandardEntryData } =>
-      entry.id.startsWith("education/") && isStandardEntry(entry)
-  );
-  const education: ResumeEntryItem[] = await Promise.all(
-    educationEntries.map(async (entry) => {
-      const { Content } = await entry.render();
-      return {
-        title: entry.data.title,
-        subtitle: entry.data.subtitle,
-        date: formatDateRange(entry.data.startDate, entry.data.endDate),
-        startDate: entry.data.startDate,
-        endDate: entry.data.endDate,
-        order: getOrder(entry),
-        Content,
-      };
-    })
-  );
-  const sortedEducation = sortByOrder(education, {
-    getOrder: (e) => e.order,
-    getDate: (e) => e.endDate ?? e.startDate,
-  });
-
-  // Filter experience entries
-  const experienceEntries = allResumeContent.filter(
-    (entry): entry is ResumeCollectionEntry & { data: StandardEntryData } =>
-      entry.id.startsWith("experience/") && isStandardEntry(entry)
-  );
-  const experience: ResumeEntryItem[] = await Promise.all(
-    experienceEntries.map(async (entry) => {
-      const { Content } = await entry.render();
-      return {
-        title: entry.data.title,
-        subtitle: entry.data.subtitle,
-        date: formatDateRange(entry.data.startDate, entry.data.endDate),
-        startDate: entry.data.startDate,
-        endDate: entry.data.endDate,
-        order: getOrder(entry),
-        Content,
-      };
-    })
-  );
-  const sortedExperience = sortByOrder(experience, {
-    getOrder: (e) => e.order,
-    getDate: (e) => e.endDate ?? e.startDate,
-  });
-
-  // Filter project entries
-  const projectEntries = allResumeContent.filter(
-    (entry): entry is ResumeCollectionEntry & { data: StandardEntryData } =>
-      entry.id.startsWith("projects/") && isStandardEntry(entry)
-  );
-  const projects: ResumeEntryItem[] = await Promise.all(
-    projectEntries.map(async (entry) => {
-      const { Content } = await entry.render();
-      return {
-        title: entry.data.title,
-        date: formatDateRange(entry.data.startDate, entry.data.endDate),
-        startDate: entry.data.startDate,
-        endDate: entry.data.endDate,
-        order: getOrder(entry),
-        Content,
-      };
-    })
-  );
-  const sortedProjects = sortByOrder(projects, {
-    getOrder: (e) => e.order,
-    getDate: (e) => e.endDate ?? e.startDate,
-  });
-
-  // Filter awards entries
-  const awardsEntries = allResumeContent.filter(
-    (entry): entry is ResumeCollectionEntry & { data: StandardEntryData } =>
-      entry.id.startsWith("awards/") && isStandardEntry(entry)
-  );
-  const awards: ResumeEntryItem[] = await Promise.all(
-    awardsEntries.map(async (entry) => {
-      const { Content } = await entry.render();
-      return {
-        title: entry.data.title,
-        subtitle: entry.data.subtitle,
-        date: formatDateRange(entry.data.startDate, entry.data.endDate),
-        startDate: entry.data.startDate,
-        endDate: entry.data.endDate,
-        order: getOrder(entry),
-        Content,
-      };
-    })
-  );
-  const sortedAwards = sortByOrder(awards, {
-    getOrder: (e) => e.order,
-    getDate: (e) => e.endDate ?? e.startDate,
-  });
+  // Process entry sections using helper
+  const [sortedEducation, sortedExperience, sortedProjects, sortedAwards] = await Promise.all([
+    processStandardEntries(allResumeContent, "education"),
+    processStandardEntries(allResumeContent, "experience"),
+    processStandardEntries(allResumeContent, "projects", { includeSubtitle: false }),
+    processStandardEntries(allResumeContent, "awards"),
+  ]);
 
   // Fetch skills data
   const skillsEntry = allResumeContent.find(
