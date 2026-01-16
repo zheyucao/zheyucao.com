@@ -278,8 +278,8 @@ const DEFAULT_LIGHTNESS = 0.78;
 const DEFAULT_CHROMA = 0.14;
 
 export const OKLCH_PRESETS = {
-  // Delicate pastel for white backgrounds
-  LIGHT: { lightness: 0.92, chroma: 0.06 },
+  // Delicate pastel for white backgrounds - tuned for vibrancy
+  LIGHT: { lightness: 0.85, chroma: 0.14 },
 
   // Deep, rich colors for dark backgrounds (avoids muddy look)
   DARK: { lightness: 0.3, chroma: 0.14 },

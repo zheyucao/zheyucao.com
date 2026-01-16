@@ -58,7 +58,7 @@ describe("colorSchemes", () => {
         const r = parseInt(hex.slice(1, 3), 16);
         const g = parseInt(hex.slice(3, 5), 16);
         const b = parseInt(hex.slice(5, 7), 16);
-        return (r + g + b) / 3 > 180; // > ~70% brightness
+        return (r + g + b) / 3 > 140; // > ~55% brightness (accommodates vibrant colors)
       });
 
       expect(isLight).toBe(true);
