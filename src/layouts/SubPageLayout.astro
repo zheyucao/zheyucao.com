@@ -10,7 +10,7 @@ const { title } = Astro.props;
 ---
 
 <Layout title={title} showIndicatorOverride={false}>
-  <main class="subpage-main py-8 px-[10%] pb-16 min-h-[60vh] mt-8">
+  <section class="subpage-main py-8 px-[10%] pb-16 min-h-[60vh] mt-8">
     <div class="subpage-header mb-12 pb-4">
       <div class="page-actions flex items-center gap-4 mb-6">
         <div
@@ -31,7 +31,7 @@ const { title } = Astro.props;
     <div class="subpage-content page-load-initial-state text-[1.2rem] leading-[1.6]">
       <slot />
     </div>
-  </main>
+  </section>
 </Layout>
 
 <style>

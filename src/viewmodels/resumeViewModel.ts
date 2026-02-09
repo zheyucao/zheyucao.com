@@ -78,6 +78,9 @@ export type ResumeSection =
 
 import { sortByOrder } from "../lib/utils/sortUtils";
 
+const matchesSingleEntryId = (entryId: string, baseName: string): boolean =>
+  entryId === baseName || entryId === `${baseName}.mdx` || entryId === `${baseName}.md`;
+
 const getOrder = (entry: ResumeCollectionEntry): number | undefined =>
   "order" in entry.data ? entry.data.order : undefined;
 
@@ -170,7 +173,7 @@ export async function getResumeViewModel(): Promise<{
   // Fetch skills data
   const skillsEntry = allResumeContent.find(
     (entry): entry is ResumeCollectionEntry & { data: SkillsEntryData } =>
-      entry.id === "skills.mdx" && isSkillsEntry(entry)
+      matchesSingleEntryId(entry.id, "skills") && isSkillsEntry(entry)
   );
   if (!skillsEntry) {
     throw new Error("Skills entry not found or invalid");
@@ -179,7 +182,7 @@ export async function getResumeViewModel(): Promise<{
   // Fetch contact data
   const contactEntry = allResumeContent.find(
     (entry): entry is ResumeCollectionEntry & { data: ContactEntryData } =>
-      entry.id === "contact.mdx" && isContactEntry(entry)
+      matchesSingleEntryId(entry.id, "contact") && isContactEntry(entry)
   );
   if (!contactEntry) {
     throw new Error("Contact entry not found or invalid");

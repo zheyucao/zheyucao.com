@@ -29,12 +29,14 @@ describe("timelineViewModel", () => {
 
     const mockEvents = [
       {
-        data: { date: "2023-01-01", title: "Event 1", category: "Cat1" },
+        data: { startDate: "2023-01", title: "Event 1", category: "Cat1" },
         body: "Description 1",
+        render: vi.fn().mockResolvedValue({ Content: "Event1Content" }),
       },
       {
-        data: { date: "2022-01-01", title: "Event 2", category: "Cat2" },
+        data: { startDate: "2022-01", title: "Event 2", category: "Cat2" },
         body: "Description 2",
+        render: vi.fn().mockResolvedValue({ Content: "Event2Content" }),
       },
     ];
     mockedGetCollection.mockResolvedValue(mockEvents as never);
@@ -55,6 +57,7 @@ describe("timelineViewModel", () => {
     expect(result.metadata).toEqual(mockMetadata);
     expect(result.events).toHaveLength(2);
     expect(result.events[0].description).toBe("Description 1");
+    expect(result.events[0].Content).toBe("Event1Content");
     expect(result.categories).toEqual(["Cat1", "Cat2"]);
     expect(result.initialEvents).toHaveLength(2);
     // Sorted by date descending (newest first)

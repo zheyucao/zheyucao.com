@@ -75,4 +75,25 @@
   line-height: 1.7;
 }
 
-/* Removed global p selector as set:html applies directly */
+.timeline-description p {
+  margin: 0 0 0.8rem;
+}
+
+.timeline-description p:last-child {
+  margin-bottom: 0;
+}
+
+.timeline-description p:only-child {
+  display: inline;
+  margin: 0;
+}
+
+.timeline-description ul,
+.timeline-description ol {
+  margin: 0.4rem 0 0.8rem;
+  padding-left: 1.2rem;
+}
+
+.timeline-description li {
+  margin-bottom: 0.4rem;
+}

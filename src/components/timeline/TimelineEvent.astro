@@ -1,17 +1,19 @@
 ---
+import RichText from "../common/RichText.astro";
+import type { AstroComponentFactory } from "astro/runtime/server/index.js";
+
 // src/components/timeline/TimelineEvent.astro
 interface Props {
   date: string; // Represents end date if range exists
-  dateRange?: string; // <<< Add dateRange prop
+  dateRange?: string;
   title: string;
-  description?: string; // <<< Make description optional
+  description?: string;
+  Content?: AstroComponentFactory;
   category?: string;
   isLast?: boolean; // To prevent line extending past the last item
 }
 
-import RichText from "../common/RichText.astro";
-
-const { date, dateRange, title, description, category, isLast = false } = Astro.props;
+const { date, dateRange, title, description, Content, category, isLast = false } = Astro.props;
 ---
 
 <li class:list={["timeline-event", { "is-last": isLast }]} data-category={category}>
@@ -22,12 +24,14 @@ const { date, dateRange, title, description, category, isLast = false } = Astro.
       <h3 class="timeline-title">{title}</h3>
       <!-- {category && <span class="timeline-category">{category}</span>} -->
     </div>
-    {
-      description && (
-        <div class="timeline-description">
-          <RichText content={description} />
-        </div>
-      )
-    }
+    {Content ? (
+      <div class="timeline-description">
+        <Content />
+      </div>
+    ) : description ? (
+      <div class="timeline-description">
+        <RichText content={description} />
+      </div>
+    ) : null}
   </div>
 </li>

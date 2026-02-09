@@ -7,9 +7,9 @@ const sections = await getHomepageSectionsViewModel();
 ---
 
 <Layout title="Homepage">
-  <main class="homepage-content">
+  <div class="homepage-content">
     {sections.map((section) => <SectionRenderer section={section} />)}
-  </main>
+  </div>
 </Layout>
 
 <style>
@@ -18,8 +18,6 @@ const sections = await getHomepageSectionsViewModel();
     /* Ensures sections flow vertically */
     display: flex;
     flex-direction: column;
-  }
-  main {
     position: relative;
     width: 100%;
   }

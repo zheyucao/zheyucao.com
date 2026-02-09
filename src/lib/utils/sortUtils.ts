@@ -17,7 +17,7 @@ export interface SortOptions<T> {
  * Sort items by order field
  * 1. Items with positive order come first, sorted by value (ascending)
  * 2. Items without order are sorted by date (descending/newest first) if getDate is provided
- * 3. Items with negative order come last, sorted by absolute value (ascending, so -1 is last)
+ * 3. Items with negative order come last, sorted by value descending (so -1 comes first among negatives)
  * 4. Items with equal order/date preserve their original relative order (stable sort)
  */
 export function sortByOrder<T>(items: T[], options: SortOptions<T> = {}): T[] {

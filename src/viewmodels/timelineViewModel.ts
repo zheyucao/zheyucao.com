@@ -18,12 +18,19 @@ export async function getTimelineViewModel() {
   const rawEvents = await getCollection("timeline");
 
   // Process events for client-side rendering
-  const allEvents = rawEvents.map((event) => ({
-    ...event.data,
-    description: event.body,
-    date: formatDateRange(event.data.startDate, event.data.endDate),
-    dateRange: formatDateRange(event.data.startDate, event.data.endDate),
-  }));
+  const allEvents = await Promise.all(
+    rawEvents.map(async (event) => {
+      const { Content } = await event.render();
+      const dateRange = formatDateRange(event.data.startDate, event.data.endDate);
+      return {
+        ...event.data,
+        description: event.body,
+        date: dateRange,
+        dateRange,
+        Content,
+      };
+    })
+  );
 
   // Calculate unique categories
   const categories = [...new Set(allEvents.map((event) => event.category).filter(Boolean))].sort();

@@ -156,10 +156,11 @@ export async function getHomepageSectionsViewModel(): Promise<HomepageSection[]>
               getOrder: (item) => item.data.order,
             });
           } else if (sortBy === "date") {
+            // sortByOrder defaults to newest-first for dates
             projectItems = sortByOrder(projectItems, {
               getDate: (item) => item.data.endDate ?? item.data.startDate,
             });
-            if (sortOrder === "desc") {
+            if (sortOrder === "asc") {
               projectItems = projectItems.reverse();
             }
           }
@@ -199,10 +200,11 @@ export async function getHomepageSectionsViewModel(): Promise<HomepageSection[]>
               getOrder: (item) => (item.data as { order?: number }).order,
             });
           } else if (sortBy === "date") {
+            // sortByOrder defaults to newest-first for dates
             timelineItems = sortByOrder(timelineItems, {
               getDate: (item) => item.data.endDate ?? item.data.startDate,
             });
-            if (sortOrder === "desc") {
+            if (sortOrder === "asc") {
               timelineItems = timelineItems.reverse();
             }
           }
