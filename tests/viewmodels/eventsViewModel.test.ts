@@ -1,12 +1,12 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { getEventsViewModel } from "../../src/viewmodels/eventsViewModel";
-import { getCollection, getEntry } from "astro:content";
+import { getCollection } from "astro:content";
 import { getPageMetadata } from "../../src/lib/viewmodels/baseViewModel";
+import { getUiStrings } from "../../src/lib/i18n/uiStrings";
 
 // Mock astro:content
 vi.mock("astro:content", () => ({
   getCollection: vi.fn(),
-  getEntry: vi.fn(),
 }));
 
 // Mock baseViewModel
@@ -14,9 +14,13 @@ vi.mock("../../src/lib/viewmodels/baseViewModel", () => ({
   getPageMetadata: vi.fn(),
 }));
 
+vi.mock("../../src/lib/i18n/uiStrings", () => ({
+  getUiStrings: vi.fn(),
+}));
+
 const mockedGetCollection = vi.mocked(getCollection);
-const mockedGetEntry = vi.mocked(getEntry);
 const mockedGetPageMetadata = vi.mocked(getPageMetadata);
+const mockedGetUiStrings = vi.mocked(getUiStrings);
 
 describe("eventsViewModel", () => {
   beforeEach(() => {
@@ -42,15 +46,13 @@ describe("eventsViewModel", () => {
     mockedGetCollection.mockResolvedValue(mockEvents as never);
 
     const mockUiStrings = {
-      data: {
-        pages: {
-          timeline: {
-            filterAll: "All Events",
-          },
+      pages: {
+        timeline: {
+          filterAll: "All Events",
         },
       },
     };
-    mockedGetEntry.mockResolvedValue(mockUiStrings as never);
+    mockedGetUiStrings.mockResolvedValue(mockUiStrings as never);
 
     const result = await getEventsViewModel();
 
@@ -67,8 +69,12 @@ describe("eventsViewModel", () => {
 
   it("should throw error if UI strings are missing", async () => {
     mockedGetCollection.mockResolvedValue([] as never);
-    mockedGetEntry.mockResolvedValue(undefined as never);
+    mockedGetUiStrings.mockRejectedValue(
+      new Error("Could not find UI strings for locale 'en' or fallback 'en'")
+    );
 
-    await expect(getEventsViewModel()).rejects.toThrow("Could not find UI strings for 'en'");
+    await expect(getEventsViewModel()).rejects.toThrow(
+      "Could not find UI strings for locale 'en' or fallback 'en'"
+    );
   });
 });

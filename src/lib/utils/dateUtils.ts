@@ -3,25 +3,37 @@
  * Uses Date.UTC to avoid timezone issues and ensure consistent sorting.
  * Returns 0 if the date is invalid.
  */
+const YEAR_PATTERN = /^\d{4}$/;
+const YEAR_MONTH_PATTERN = /^\d{4}-(0[1-9]|1[0-2])$/;
+const PRESENT_PATTERN = /^present$/i;
+
+function parseYearMonth(dateStr: string): { year: number; month: number } | null {
+  if (YEAR_MONTH_PATTERN.test(dateStr)) {
+    const [yearToken, monthToken] = dateStr.split("-");
+    return { year: Number(yearToken), month: Number(monthToken) };
+  }
+
+  if (YEAR_PATTERN.test(dateStr)) {
+    return { year: Number(dateStr), month: 1 };
+  }
+
+  return null;
+}
+
 export function parseDate(dateStr: string): number {
   if (!dateStr) return 0;
 
   // Handle "Present" case
-  if (dateStr.toLowerCase() === "present") {
+  if (PRESENT_PATTERN.test(dateStr)) {
     return Date.now();
   }
 
-  const parts = dateStr.split("-");
-  const year = Number(parts[0]);
-  // Default to 1 (Jan) if no month part exists
-  const month = parts[1] ? Number(parts[1]) : 1;
-
-  if (isNaN(year) || isNaN(month)) {
+  const parsed = parseYearMonth(dateStr);
+  if (!parsed) {
     return 0;
   }
 
-  // Month is 0-indexed in Date.UTC
-  return Date.UTC(year, month - 1);
+  return Date.UTC(parsed.year, parsed.month - 1);
 }
 
 /**
@@ -32,20 +44,15 @@ export function formatDate(dateStr: string): string {
   if (!dateStr) return "";
 
   // Handle "Present" case
-  if (dateStr.toLowerCase() === "present") {
+  if (PRESENT_PATTERN.test(dateStr)) {
     return "Present";
   }
 
-  const parts = dateStr.split("-");
-  const year = Number(parts[0]);
-  const month = parts[1] ? Number(parts[1]) : 1;
+  const parsed = parseYearMonth(dateStr);
+  if (!parsed) return dateStr;
 
-  if (isNaN(year) || isNaN(month)) return dateStr;
-
-  // Create date object for formatting
-  const dateObj = new Date(year, month - 1);
-
-  return dateObj.toLocaleString("en-US", { month: "long", year: "numeric" });
+  const dateObj = new Date(Date.UTC(parsed.year, parsed.month - 1));
+  return dateObj.toLocaleString("en-US", { month: "long", year: "numeric", timeZone: "UTC" });
 }
 
 /**

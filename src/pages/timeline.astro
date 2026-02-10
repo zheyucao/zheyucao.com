@@ -4,8 +4,10 @@ import EventEntry from "../components/events/EventEntry.astro";
 import { getEventsViewModel } from "../viewmodels/eventsViewModel";
 import "../styles/events.css";
 import PageActions from "../components/common/PageActions.astro";
+import { resolveLocaleFromPath } from "../lib/i18n/locale";
 
-const viewModel = await getEventsViewModel();
+const locale = resolveLocaleFromPath(Astro.url.pathname);
+const viewModel = await getEventsViewModel(locale);
 const { categories, initialEvents: initialFilteredEvents, metadata, filterAll } = viewModel;
 ---
 

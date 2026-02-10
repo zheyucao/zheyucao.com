@@ -1,20 +1,24 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { getEventsViewModel } from "../../src/viewmodels/eventsViewModel";
-import { getCollection, getEntry } from "astro:content";
+import { getCollection } from "astro:content";
 import { getPageMetadata } from "../../src/lib/viewmodels/baseViewModel";
+import { getUiStrings } from "../../src/lib/i18n/uiStrings";
 
 vi.mock("astro:content", () => ({
   getCollection: vi.fn(),
-  getEntry: vi.fn(),
 }));
 
 vi.mock("../../src/lib/viewmodels/baseViewModel", () => ({
   getPageMetadata: vi.fn(),
 }));
 
+vi.mock("../../src/lib/i18n/uiStrings", () => ({
+  getUiStrings: vi.fn(),
+}));
+
 const mockedGetCollection = vi.mocked(getCollection);
-const mockedGetEntry = vi.mocked(getEntry);
 const mockedGetPageMetadata = vi.mocked(getPageMetadata);
+const mockedGetUiStrings = vi.mocked(getUiStrings);
 
 const createTimelineEvent = (
   title: string,
@@ -44,13 +48,11 @@ describe("eventsViewModel combinations", () => {
 
   it("sorts categories alphabetically and de-duplicates", async () => {
     mockedGetPageMetadata.mockResolvedValue({ title: "Timeline" } as never);
-    mockedGetEntry.mockResolvedValue(
+    mockedGetUiStrings.mockResolvedValue(
       {
-        data: {
-          pages: {
-            timeline: {
-              filterAll: "Everything",
-            },
+        pages: {
+          timeline: {
+            filterAll: "Everything",
           },
         },
       } as never
@@ -71,13 +73,11 @@ describe("eventsViewModel combinations", () => {
 
   it("sorts initial events by endDate first, then startDate when endDate is missing", async () => {
     mockedGetPageMetadata.mockResolvedValue({ title: "Timeline" } as never);
-    mockedGetEntry.mockResolvedValue(
+    mockedGetUiStrings.mockResolvedValue(
       {
-        data: {
-          pages: {
-            timeline: {
-              filterAll: "All",
-            },
+        pages: {
+          timeline: {
+            filterAll: "All",
           },
         },
       } as never
@@ -112,13 +112,11 @@ describe("eventsViewModel combinations", () => {
 
   it("maps rendered Content, description and formatted date range for each event", async () => {
     mockedGetPageMetadata.mockResolvedValue({ title: "Timeline" } as never);
-    mockedGetEntry.mockResolvedValue(
+    mockedGetUiStrings.mockResolvedValue(
       {
-        data: {
-          pages: {
-            timeline: {
-              filterAll: "All",
-            },
+        pages: {
+          timeline: {
+            filterAll: "All",
           },
         },
       } as never
@@ -146,8 +144,12 @@ describe("eventsViewModel combinations", () => {
   it("throws if UI strings entry is missing", async () => {
     mockedGetPageMetadata.mockResolvedValue({ title: "Timeline" } as never);
     mockedGetCollection.mockResolvedValue([] as never);
-    mockedGetEntry.mockResolvedValue(undefined as never);
+    mockedGetUiStrings.mockRejectedValue(
+      new Error("Could not find UI strings for locale 'en' or fallback 'en'")
+    );
 
-    await expect(getEventsViewModel()).rejects.toThrow("Could not find UI strings for 'en'");
+    await expect(getEventsViewModel()).rejects.toThrow(
+      "Could not find UI strings for locale 'en' or fallback 'en'"
+    );
   });
 });

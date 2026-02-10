@@ -1,13 +1,15 @@
-import { getCollection, getEntry } from "astro:content";
+import { getCollection } from "astro:content";
 import { getPageMetadata } from "../lib/viewmodels/baseViewModel";
 import { sortByOrder } from "../lib/utils/sortUtils";
 import { formatDateRange } from "../lib/utils/dateUtils";
+import { DEFAULT_LOCALE } from "../lib/i18n/locale";
+import { getUiStrings } from "../lib/i18n/uiStrings";
 
 /**
  * Events page view model
  * Fetches and prepares events for the events page
  */
-export async function getEventsViewModel() {
+export async function getEventsViewModel(locale: string = DEFAULT_LOCALE) {
   // Fetch timeline events
   const rawEvents = await getCollection("timeline");
 
@@ -35,15 +37,8 @@ export async function getEventsViewModel() {
   });
 
   // Fetch metadata and UI strings in parallel
-  const [metadata, uiStrings] = await Promise.all([
-    getPageMetadata("timeline"),
-    getEntry("ui-strings", "en"),
-  ]);
-
-  if (!uiStrings) {
-    throw new Error("Could not find UI strings for 'en'");
-  }
-  const { filterAll } = uiStrings.data.pages.timeline;
+  const [metadata, uiStrings] = await Promise.all([getPageMetadata("timeline"), getUiStrings(locale)]);
+  const { filterAll } = uiStrings.pages.timeline;
 
   return {
     events: allEvents,

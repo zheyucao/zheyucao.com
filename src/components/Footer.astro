@@ -2,15 +2,14 @@
 // Component: src/components/Footer.astro
 import { siteConfig } from "../config";
 import { getEntry } from "astro:content";
+import { resolveLocaleFromPath } from "../lib/i18n/locale";
+import { getUiStrings } from "../lib/i18n/uiStrings";
 
 const currentYear = new Date().getFullYear();
 const { navigation } = siteConfig;
-
-const uiStrings = await getEntry("ui-strings", "en");
-if (!uiStrings) {
-  throw new Error("Could not find UI strings for 'en'");
-}
-const { footer: footerStrings } = uiStrings.data;
+const locale = resolveLocaleFromPath(Astro.url.pathname);
+const uiStrings = await getUiStrings(locale);
+const { footer: footerStrings } = uiStrings;
 
 const footerData = await getEntry("footer", "info");
 if (!footerData) {
@@ -42,7 +41,7 @@ const contactFooterItems = await getContactFooterItems();
       <h4 class="text-[var(--footer-heading)] mb-[1em] font-semibold">
         {footerStrings.linksHeading}
       </h4>
-      <ul class="m-0 p-0 list-none text-[0.9rem] leading-[1.6]">
+      <ul class="footer-nav m-0 p-0 list-none text-[0.9rem] leading-[1.6]">
         {
           navigation.items.map((item) => (
             <li class="mb-[0.5em]">
@@ -104,7 +103,7 @@ const contactFooterItems = await getContactFooterItems();
   }
 
   /* Hide active footer link */
-  .footer-column:nth-child(2) ul li.active {
+  .footer-nav li.active {
     display: none;
   }
 </style>
@@ -113,12 +112,13 @@ const contactFooterItems = await getContactFooterItems();
   import { onPageLifecycle } from "../lib/utils/pageLifecycle";
   import { querySelector } from "../lib/utils/dom";
   import { setupFooterAnimation } from "../lib/animations/footerAnimation";
+  import { stripLocalePrefix } from "../lib/i18n/locale";
 
   function updateActiveFooterLink() {
-    const currentPath = window.location.pathname;
+    const currentPath = stripLocalePrefix(window.location.pathname);
     const normalizedPath = "/" + currentPath.replace(/^\/+|\/+$/g, "");
     const rootPath = "/";
-    const links = document.querySelectorAll(".footer-column:nth-child(2) ul li a");
+    const links = document.querySelectorAll(".footer-nav li a");
 
     links.forEach((link) => {
       const linkHref = link.getAttribute("href");
@@ -154,4 +154,3 @@ const contactFooterItems = await getContactFooterItems();
     },
   });
 </script>
-

@@ -1,0 +1,8 @@
+footer:
+  linksHeading: "链接"
+  connectHeading: "联系"
+  copyrightText: "保留所有权利"
+
+pages:
+  timeline:
+    filterAll: "全部"

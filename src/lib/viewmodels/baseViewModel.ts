@@ -1,5 +1,15 @@
 import { getEntry } from "astro:content";
 
+const toHumanizedLabel = (value: string): string => {
+  const normalized = value
+    .split(/[-_]/g)
+    .filter(Boolean)
+    .map((token) => token.charAt(0).toUpperCase() + token.slice(1))
+    .join(" ");
+
+  return normalized || value;
+};
+
 /**
  * Page action button configuration
  */
@@ -46,9 +56,9 @@ export async function getPageMetadata(pageId: string): Promise<PageMetadata> {
 
   if (!entry) {
     console.warn(`No metadata found for page: ${pageId}`);
-    // Fallback to capitalized page ID as title
+    // Fallback to a humanized page ID as title
     return {
-      title: pageId.charAt(0).toUpperCase() + pageId.slice(1),
+      title: toHumanizedLabel(pageId),
     };
   }
 

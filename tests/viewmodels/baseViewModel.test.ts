@@ -80,7 +80,7 @@ describe("baseViewModel", () => {
 
     const result = await getPageMetadata("blog-posts");
 
-    expect(result.title).toBe("Blog-posts");
+    expect(result.title).toBe("Blog Posts");
     warnSpy.mockRestore();
   });
 });

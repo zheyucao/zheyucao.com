@@ -40,17 +40,11 @@ describe("dateUtils matrix coverage", () => {
       });
     });
 
-    const permissiveCases = [
-      ["----", -2208988800000],
-      ["2024-", 1704067200000],
-      ["-01", -2208988800000],
-      ["2024-13-01", 1735689600000],
-      ["01-2024", 3142540800000],
-    ] as const;
+    const strictInvalidCases = ["----", "2024-", "-01", "2024-13-01", "01-2024", "2024-13"] as const;
 
-    permissiveCases.forEach(([input, expected]) => {
-      it(`reflects current permissive parsing for "${input}"`, () => {
-        expect(parseDate(input)).toBe(expected);
+    strictInvalidCases.forEach((input) => {
+      it(`returns 0 for strict-invalid input "${input}"`, () => {
+        expect(parseDate(input)).toBe(0);
       });
     });
 

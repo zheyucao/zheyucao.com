@@ -1,12 +1,30 @@
 import { defineCollection, z } from "astro:content";
 
+const YEAR_PATTERN = /^\d{4}$/;
+const YEAR_MONTH_PATTERN = /^\d{4}-(0[1-9]|1[0-2])$/;
+const PRESENT_PATTERN = /^present$/i;
+
+const yearOrYearMonthDate = z.string().refine(
+  (value) => YEAR_PATTERN.test(value) || YEAR_MONTH_PATTERN.test(value),
+  {
+    message: "Date must be in YYYY or YYYY-MM format",
+  }
+);
+
+const yearOrYearMonthOrPresentDate = z.string().refine(
+  (value) => PRESENT_PATTERN.test(value) || YEAR_PATTERN.test(value) || YEAR_MONTH_PATTERN.test(value),
+  {
+    message: 'Date must be in YYYY, YYYY-MM, or "present" format',
+  }
+);
+
 const projects = defineCollection({
   type: "content",
   schema: ({ image }) =>
     z.object({
       title: z.string(),
-      startDate: z.string().optional(), // YYYY-MM format
-      endDate: z.string().optional(), // YYYY-MM or "present"
+      startDate: yearOrYearMonthDate.optional(), // YYYY or YYYY-MM format
+      endDate: yearOrYearMonthOrPresentDate.optional(), // YYYY, YYYY-MM, or "present"
       githubUrl: z.string().url().optional(),
       githubRepos: z
         .array(
@@ -29,8 +47,8 @@ const projects = defineCollection({
 const timeline = defineCollection({
   type: "content",
   schema: z.object({
-    startDate: z.string(), // YYYY-MM format
-    endDate: z.string().optional(), // YYYY-MM or "present"
+    startDate: yearOrYearMonthDate, // YYYY or YYYY-MM format
+    endDate: yearOrYearMonthOrPresentDate.optional(), // YYYY, YYYY-MM, or "present"
     title: z.string(),
     category: z.enum(["Experiences", "Honors"]),
     isHighlight: z.boolean().default(false),
@@ -145,8 +163,8 @@ const resume = defineCollection({
     z.object({
       title: z.string(),
       subtitle: z.string().optional(),
-      startDate: z.string().optional(), // YYYY-MM format
-      endDate: z.string().optional(), // YYYY-MM or "present"
+      startDate: yearOrYearMonthDate.optional(), // YYYY or YYYY-MM format
+      endDate: yearOrYearMonthOrPresentDate.optional(), // YYYY, YYYY-MM, or "present"
       order: z.number().optional(), // Manual ordering
       actions: z.array(actionSchema).optional(),
     }),

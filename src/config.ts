@@ -11,6 +11,10 @@ export interface SiteConfig {
   theme: {
     defaultTheme: "light" | "dark" | "system";
   };
+  i18n: {
+    defaultLocale: string;
+    locales: string[];
+  };
 }
 
 export const siteConfig: SiteConfig = {
@@ -31,5 +35,9 @@ export const siteConfig: SiteConfig = {
   },
   theme: {
     defaultTheme: "system",
+  },
+  i18n: {
+    defaultLocale: "en",
+    locales: ["en", "zh"],
   },
 };

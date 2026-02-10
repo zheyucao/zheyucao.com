@@ -5,6 +5,7 @@ import ScrollIndicator from "../components/ScrollIndicator.astro";
 import Footer from "../components/Footer.astro";
 import { siteConfig } from "../config";
 import type { SEOMetadata } from "../lib/viewmodels/baseViewModel";
+import { resolveLocaleFromPath } from "../lib/i18n/locale";
 import "../styles/global.css";
 
 // Fontsource Variable Imports
@@ -28,6 +29,7 @@ const pageDescription = description || siteConfig.metadata.description;
 const canonicalUrl = new URL(Astro.url.pathname, siteConfig.metadata.siteUrl).toString();
 const seoMetadata = seo || {};
 const defaultTheme = siteConfig.theme.defaultTheme;
+const locale = resolveLocaleFromPath(Astro.url.pathname);
 
 // Determine if the scroll indicator should be shown
 const currentPath = Astro.url.pathname;
@@ -38,7 +40,7 @@ const showScrollIndicator =
 ---
 
 <!doctype html>
-<html lang="en" data-default-theme={defaultTheme}>
+<html lang={locale} data-default-theme={defaultTheme}>
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width" />
