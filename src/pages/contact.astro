@@ -8,7 +8,7 @@ const { intro, sections, metadata } = await getContactViewModel();
 ---
 
 <SubPageLayout title={metadata.title} description={metadata.description} seo={metadata.seo}>
-  <PageActions actions={metadata.actions} />
+  <PageActions slot="actions" actions={metadata.actions} />
   <div class="max-w-[600px]">
     {
       intro && (

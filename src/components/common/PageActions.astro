@@ -12,7 +12,6 @@ const { actions = [] } = Astro.props;
 {
   actions.map((action) => (
     <Button
-      slot="actions"
       href={action.href}
       text={action.text}
       variant={action.variant}

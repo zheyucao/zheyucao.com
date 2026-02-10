@@ -8,7 +8,7 @@ const { projects, metadata } = await getMasonryViewModel();
 ---
 
 <SubPageLayout title={metadata.title} description={metadata.description} seo={metadata.seo}>
-  <PageActions actions={metadata.actions} />
+  <PageActions slot="actions" actions={metadata.actions} />
   <div class="projects-grid columns-1 gap-x-12 md:columns-2">
     {
       projects.map((project) => (

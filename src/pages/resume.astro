@@ -9,7 +9,7 @@ const { title, actions } = metadata;
 ---
 
 <SubPageLayout title={title} description={metadata.description} seo={metadata.seo}>
-  <PageActions actions={actions} />
+  <PageActions slot="actions" actions={actions} />
 
   <div class="resume-container">
     <div class="main-column">

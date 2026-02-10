@@ -10,7 +10,7 @@ const { categories, initialEvents: initialFilteredEvents, metadata, filterAll } 
 ---
 
 <SubPageLayout title={metadata.title} description={metadata.description} seo={metadata.seo}>
-  <PageActions actions={metadata.actions} />
+  <PageActions slot="actions" actions={metadata.actions} />
   <div class="timeline-controls">
     <div class="control-group category-tabs">
       <button type="button" class="category-tab" data-category="all" aria-pressed="true"
