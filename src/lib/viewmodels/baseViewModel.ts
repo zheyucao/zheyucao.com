@@ -7,7 +7,6 @@ export interface PageAction {
   text: string;
   href: string;
   variant?: "default" | "primary" | "subtle";
-  style?: string; // Deprecated alias for variant; kept for backward compatibility.
   download?: string | boolean;
   icon?: string;
   iconPosition?: "left" | "right";

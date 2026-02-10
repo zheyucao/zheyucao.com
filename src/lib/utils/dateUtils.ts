@@ -75,11 +75,3 @@ export function formatDateRange(startDate?: string, endDate?: string): string {
 
   return `${formattedStart} – ${formattedEnd}`;
 }
-
-/**
- * @deprecated Use formatDate instead
- * Formats a date string (YYYY-MM) into "Month Year" (e.g., "January 2024").
- */
-export function formatTimelineDate(dateStr: string): string {
-  return formatDate(dateStr);
-}

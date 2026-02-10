@@ -2,22 +2,11 @@
 import Button from "./Button.astro";
 import type { PageAction } from "../../lib/viewmodels/baseViewModel";
 
-type ButtonVariant = "default" | "primary" | "subtle";
-
 interface Props {
   actions?: PageAction[];
 }
 
 const { actions = [] } = Astro.props;
-
-const allowedVariants = new Set<ButtonVariant>(["default", "primary", "subtle"]);
-
-function normalizeVariant(
-  value: PageAction["variant"] | PageAction["style"]
-): ButtonVariant | undefined {
-  if (!value) return undefined;
-  return allowedVariants.has(value as ButtonVariant) ? (value as ButtonVariant) : undefined;
-}
 ---
 
 {
@@ -26,7 +15,7 @@ function normalizeVariant(
       slot="actions"
       href={action.href}
       text={action.text}
-      variant={normalizeVariant(action.variant ?? action.style)}
+      variant={action.variant}
       download={action.download}
       icon={action.icon}
       iconPosition={action.iconPosition}

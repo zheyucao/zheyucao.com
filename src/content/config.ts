@@ -106,7 +106,6 @@ const actionSchema = z.object({
   text: z.string(),
   href: z.string(),
   variant: z.enum(["default", "primary", "subtle"]).optional(),
-  style: z.string().optional(), // Deprecated alias for variant.
   download: z.string().optional(),
   icon: z.string().optional(),
   iconPosition: z.enum(["left", "right"]).optional(),

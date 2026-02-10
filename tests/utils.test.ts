@@ -1,7 +1,6 @@
 import { describe, it, expect } from "vitest";
 import {
   parseDate,
-  formatTimelineDate,
   formatDate,
   formatDateRange,
 } from "../src/lib/utils/dateUtils";
@@ -78,19 +77,6 @@ describe("dateUtils", () => {
     });
   });
 
-  describe("formatTimelineDate (deprecated)", () => {
-    it("should format YYYY-MM to Month Year", () => {
-      expect(formatTimelineDate("2024-01")).toBe("January 2024");
-    });
-
-    it("should format YYYY to Month Year", () => {
-      expect(formatTimelineDate("2024")).toBe("January 2024");
-    });
-
-    it("should return original string for invalid formats", () => {
-      expect(formatTimelineDate("invalid")).toBe("invalid");
-    });
-  });
 });
 
 describe("sanitize", () => {
