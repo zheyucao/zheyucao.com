@@ -127,10 +127,9 @@ const showScrollIndicator =
   <body>
     <div class="page-wrapper">
       <DynamicBackground />
-      <main class="main-content">
+      <main class="main-content pb-32">
         <slot />
       </main>
-      <div class="some-empty-space" style="height: 20vh;"></div>
       <Footer />
       {/* Conditionally render ScrollIndicator */}
       {showScrollIndicator && <ScrollIndicator />}

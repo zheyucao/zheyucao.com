@@ -20,7 +20,6 @@ export class DynamicBackgroundManager {
   private needsRectUpdate = true;
   private isMobileDevice: boolean;
   private config: DynamicBackgroundConfig;
-  private fpsHistory: number[] = [];
   private lastTimestamp = 0;
   private lastLogicExecutionTime = 0;
   private observer: IntersectionObserver | null = null;
@@ -187,11 +186,7 @@ export class DynamicBackgroundManager {
     this.lastTimestamp = timestamp;
 
     if (!this.isMobileDevice && deltaTime > 0) {
-      const currentFps = 1000 / deltaTime;
-      this.fpsHistory.push(currentFps);
-      if (this.fpsHistory.length > FPS.HISTORY_LENGTH) {
-        this.fpsHistory.shift();
-      }
+      // Logic for non-mobile devices if needed
     }
 
     try {
