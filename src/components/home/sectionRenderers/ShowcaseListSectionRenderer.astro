@@ -1,0 +1,20 @@
+---
+import SectionWrapper from "../SectionWrapper.astro";
+import ShowcaseListContent from "../content/ShowcaseListContent.astro";
+import type { TimelineShowcaseSection } from "../../../lib/homepageSections/registry";
+
+interface Props {
+  section: TimelineShowcaseSection;
+}
+
+const { section } = Astro.props;
+---
+
+<SectionWrapper>
+  <ShowcaseListContent
+    title={section.title || ""}
+    cta={section.cta}
+    fallback={section.fallback || "No items available."}
+    events={section.items}
+  />
+</SectionWrapper>

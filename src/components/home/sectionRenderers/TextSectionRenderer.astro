@@ -1,0 +1,15 @@
+---
+import SectionWrapper from "../SectionWrapper.astro";
+import TextContentSection from "../content/TextContentSection.astro";
+import type { TextSection } from "../../../lib/homepageSections/registry";
+
+interface Props {
+  section: TextSection;
+}
+
+const { section } = Astro.props;
+---
+
+<SectionWrapper>
+  <TextContentSection title={section.title || ""} cta={section.cta} Content={section.Content} />
+</SectionWrapper>

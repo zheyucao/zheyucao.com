@@ -1,0 +1,15 @@
+---
+import SectionWrapper from "../SectionWrapper.astro";
+import ShowcaseCardsContent from "../content/ShowcaseCardsContent.astro";
+import type { ProjectShowcaseSection } from "../../../lib/homepageSections/registry";
+
+interface Props {
+  section: ProjectShowcaseSection;
+}
+
+const { section } = Astro.props;
+---
+
+<SectionWrapper>
+  <ShowcaseCardsContent title={section.title || ""} cta={section.cta} projects={section.items} />
+</SectionWrapper>

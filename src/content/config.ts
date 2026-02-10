@@ -1,4 +1,5 @@
 import { defineCollection, z } from "astro:content";
+import { buildHomepageSectionsSchemaUnion } from "../lib/homepageSections/registry";
 
 const YEAR_PATTERN = /^\d{4}$/;
 const YEAR_MONTH_PATTERN = /^\d{4}-(0[1-9]|1[0-2])$/;
@@ -59,63 +60,7 @@ const timeline = defineCollection({
 // Homepage sections collection - dynamic section system
 const homepage_sections = defineCollection({
   type: "content",
-  schema: z.discriminatedUnion("type", [
-    // Hero section
-    z.object({
-      type: z.literal("hero"),
-      order: z.number(),
-      visible: z.boolean().default(true),
-      greeting: z.string().optional(),
-      name: z.string(),
-      description: z.string().optional(),
-    }),
-    // Text section (vanilla text content with optional CTA)
-    z.object({
-      type: z.literal("text"),
-      order: z.number(),
-      visible: z.boolean().default(true),
-      title: z.string().optional(),
-      cta: z
-        .object({
-          text: z.string(),
-          href: z.string(),
-        })
-        .optional(),
-    }),
-    // Contact section (text content with auto-loaded contact icons)
-    z.object({
-      type: z.literal("contact"),
-      order: z.number(),
-      visible: z.boolean().default(true),
-      title: z.string().optional(),
-      cta: z
-        .object({
-          text: z.string(),
-          href: z.string(),
-        })
-        .optional(),
-    }),
-    // Collection showcase section (for featured projects, timeline highlights, etc.)
-    z.object({
-      type: z.literal("showcase"),
-      order: z.number(),
-      visible: z.boolean().default(true),
-      title: z.string().optional(),
-      cta: z
-        .object({
-          text: z.string(),
-          href: z.string(),
-        })
-        .optional(),
-      fallback: z.string().optional(), // Fallback text when no items
-      sourceCollection: z.enum(["projects", "timeline"]),
-      filter: z.record(z.union([z.string(), z.number(), z.boolean(), z.null()])).optional(),
-      sortBy: z.enum(["order", "date"]).optional(),
-      sortOrder: z.enum(["asc", "desc"]).optional(),
-      limit: z.number().optional(),
-      componentType: z.enum(["cards", "list"]), // "cards" for projects, "list" for timeline
-    }),
-  ]),
+  schema: buildHomepageSectionsSchemaUnion(z) as ReturnType<typeof z.discriminatedUnion>,
 });
 
 // Shared action schema for reuse across collections

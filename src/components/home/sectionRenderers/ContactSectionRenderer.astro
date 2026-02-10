@@ -1,0 +1,20 @@
+---
+import SectionWrapper from "../SectionWrapper.astro";
+import TextContentSection from "../content/TextContentSection.astro";
+import type { ContactSection } from "../../../lib/homepageSections/registry";
+
+interface Props {
+  section: ContactSection;
+}
+
+const { section } = Astro.props;
+---
+
+<SectionWrapper>
+  <TextContentSection
+    title={section.title || ""}
+    cta={section.cta}
+    Content={section.Content}
+    socialItems={section.contactIcons}
+  />
+</SectionWrapper>

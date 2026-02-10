@@ -1,54 +1,24 @@
 ---
-import Hero from "./Hero.astro";
-import TextContentSection from "./content/TextContentSection.astro";
-import ShowcaseCardsContent from "./content/ShowcaseCardsContent.astro";
-import ShowcaseListContent from "./content/ShowcaseListContent.astro";
-import SectionWrapper from "./SectionWrapper.astro";
-import type { HomepageSection } from "../../viewmodels/homepageSectionsViewModel";
+import type { AstroComponentFactory } from "astro/runtime/server/index.js";
+import type { HomepageSection } from "../../lib/homepageSections/registry";
+import { resolveHomepageSectionRenderer } from "../../lib/homepageSections/registry";
 
 interface Props {
   section: HomepageSection;
 }
 
 const { section } = Astro.props;
+
+const rendererKey = resolveHomepageSectionRenderer(section);
+const rendererPath = `./sectionRenderers/${rendererKey}.astro`;
+const rendererModules = import.meta.glob("./sectionRenderers/*.astro", { eager: true });
+const rendererModule = rendererModules[rendererPath];
+
+if (!rendererModule) {
+  throw new Error(`Missing renderer component for key: ${rendererKey}`);
+}
+
+const Renderer = (rendererModule as { default: AstroComponentFactory }).default;
 ---
 
-{
-  section.type === "hero" ? (
-    <Hero data={section} />
-  ) : section.type === "text" ? (
-    <SectionWrapper>
-      <TextContentSection
-        title={section.title || ""}
-        cta={section.cta}
-        Content={section.Content}
-      />
-    </SectionWrapper>
-  ) : section.type === "contact" ? (
-    <SectionWrapper>
-      <TextContentSection
-        title={section.title || ""}
-        cta={section.cta}
-        Content={section.Content}
-        socialItems={section.contactIcons}
-      />
-    </SectionWrapper>
-  ) : section.type === "showcase" ? (
-    <SectionWrapper>
-      {section.componentType === "cards" ? (
-        <ShowcaseCardsContent
-          title={section.title || ""}
-          cta={section.cta}
-          projects={section.items}
-        />
-      ) : (
-        <ShowcaseListContent
-          title={section.title || ""}
-          cta={section.cta}
-          fallback={section.fallback || "No items available."}
-          events={section.items}
-        />
-      )}
-    </SectionWrapper>
-  ) : null
-}
+<Renderer section={section} />
