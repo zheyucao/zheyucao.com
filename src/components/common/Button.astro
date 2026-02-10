@@ -88,13 +88,18 @@ const variantClass = `button-link--${variant}`;
   }
 
   .button-link--primary {
-    border-color: var(--button-border-hover-color);
-    background-color: var(--button-hover-bg);
-    color: var(--button-hover-text);
+    border-color: var(--theme-accent);
+    background-color: var(--theme-accent);
+    color: var(--bg-color);
   }
 
   .button-link--primary:hover {
-    filter: brightness(0.98);
+    border-color: var(--theme-accent);
+    background-color: var(--theme-accent);
+    color: var(--bg-color);
+    filter: brightness(1.15);
+    transform: translateY(-1px);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
   }
 
   .button-link--subtle {
