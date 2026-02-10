@@ -4,10 +4,10 @@ import { sortByOrder } from "../lib/utils/sortUtils";
 import { formatDateRange } from "../lib/utils/dateUtils";
 
 /**
- * Projects page view model
- * Fetches and prepares project data for the projects page
+ * Masonry page view model
+ * Fetches and prepares card data for the masonry page
  */
-export async function getProjectsViewModel() {
+export async function getMasonryViewModel() {
   // Fetch metadata and projects in parallel
   const [metadata, allProjects] = await Promise.all([
     getPageMetadata("projects"),

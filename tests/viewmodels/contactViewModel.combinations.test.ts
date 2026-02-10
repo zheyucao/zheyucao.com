@@ -16,7 +16,7 @@ const mockedGetPageMetadata = vi.mocked(getPageMetadata);
 
 const createTextEntry = (order: number | undefined, content: string) => ({
   id: `text-${order ?? "none"}-${content}`,
-  data: { kind: "text", order },
+  data: { type: "text", order },
   render: vi.fn().mockResolvedValue({ Content: content }),
 });
 
@@ -26,7 +26,7 @@ const createListEntry = (
   items: Array<Record<string, unknown>>
 ) => ({
   id: `list-${order ?? "none"}-${content}`,
-  data: { kind: "list", order, items },
+  data: { type: "list", order, items },
   render: vi.fn().mockResolvedValue({ Content: content }),
 });
 

@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { getProjectsViewModel } from "../../src/viewmodels/projectsViewModel";
+import { getMasonryViewModel } from "../../src/viewmodels/masonryViewModel";
 import { getCollection } from "astro:content";
 import { getPageMetadata } from "../../src/lib/viewmodels/baseViewModel";
 
@@ -16,7 +16,7 @@ vi.mock("../../src/lib/viewmodels/baseViewModel", () => ({
 const mockedGetCollection = vi.mocked(getCollection);
 const mockedGetPageMetadata = vi.mocked(getPageMetadata);
 
-describe("projectsViewModel", () => {
+describe("masonryViewModel", () => {
   beforeEach(() => {
     vi.clearAllMocks();
   });
@@ -37,7 +37,7 @@ describe("projectsViewModel", () => {
     ];
     mockedGetCollection.mockResolvedValue(mockProjects as never);
 
-    const result = await getProjectsViewModel();
+    const result = await getMasonryViewModel();
 
     expect(result.metadata).toEqual(mockMetadata);
     expect(result.projects).toHaveLength(2);

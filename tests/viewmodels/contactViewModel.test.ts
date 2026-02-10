@@ -28,11 +28,11 @@ describe("contactViewModel", () => {
 
       const mockContactEntries = [
         {
-          data: { kind: "text", order: 1 },
+          data: { type: "text", order: 1 },
           render: vi.fn().mockResolvedValue({ Content: "IntroContent" }),
         },
         {
-          data: { kind: "list", order: 2, items: [{ icon: "mail", href: "mailto:test@test.com" }] },
+          data: { type: "list", order: 2, items: [{ icon: "mail", href: "mailto:test@test.com" }] },
           render: vi.fn().mockResolvedValue({ Content: "SectionContent" }),
         },
       ];
@@ -66,7 +66,7 @@ describe("contactViewModel", () => {
       const mockContactEntries = [
         {
           data: {
-            kind: "list",
+            type: "list",
             order: 1,
             items: [
               { icon: "github", href: "https://github.com", showOnFooter: true },
@@ -77,7 +77,7 @@ describe("contactViewModel", () => {
         },
         {
           data: {
-            kind: "list",
+            type: "list",
             order: 2,
             items: [{ icon: "linkedin", href: "https://linkedin.com" }],
           },

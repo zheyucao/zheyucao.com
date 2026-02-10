@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { getResumeViewModel, type ResumeSection } from "../../src/viewmodels/resumeViewModel";
+import { getDocumentViewModel, type DocumentSection } from "../../src/viewmodels/documentViewModel";
 import { getCollection, getEntry } from "astro:content";
 import { getPageMetadata } from "../../src/lib/viewmodels/baseViewModel";
 
@@ -50,7 +50,7 @@ const createContact = (id: string, title = "Contact") => ({
   },
 });
 
-type EntrySection = Extract<ResumeSection, { type: "entries" }>;
+type EntrySection = Extract<DocumentSection, { type: "entries" }>;
 
 function setup(params: {
   sections: Array<Record<string, unknown>>;
@@ -61,7 +61,7 @@ function setup(params: {
   mockedGetCollection.mockResolvedValue(params.entries as never);
 }
 
-describe("resumeViewModel matrix scenarios", () => {
+describe("documentViewModel matrix scenarios", () => {
   beforeEach(() => {
     vi.clearAllMocks();
   });
@@ -93,7 +93,7 @@ describe("resumeViewModel matrix scenarios", () => {
           ],
         });
 
-        const result = await getResumeViewModel();
+        const result = await getDocumentViewModel();
         const section = result.mainColumn[0] as EntrySection;
         expect(section.variant).toBe(variant);
         if (includeSubtitle) {
@@ -127,7 +127,7 @@ describe("resumeViewModel matrix scenarios", () => {
         entries: [createStd(`${sourcePrefix}/item.mdx`, { title: "Item", startDate: "2024-01" })],
       });
 
-      const result = await getResumeViewModel();
+      const result = await getDocumentViewModel();
       expect(result.mainColumn[0].title).toBe(expectedTitle);
     });
   });
@@ -155,7 +155,7 @@ describe("resumeViewModel matrix scenarios", () => {
       ],
     });
 
-    const result = await getResumeViewModel();
+    const result = await getDocumentViewModel();
     expect(result.mainColumn.map((section) => section.id)).toEqual(["contact-1", "skills-1"]);
     expect(result.sidebar.map((section) => section.id)).toEqual(["profile-1", "experience-1"]);
   });
@@ -172,8 +172,8 @@ describe("resumeViewModel matrix scenarios", () => {
         sections: [{ id: "profile", type: "text", column: "main", source, visible: true }],
         entries: [createStd(storedId, { title: "Profile" }, "ProfileContent")],
       });
-      const result = await getResumeViewModel();
-      const section = result.mainColumn[0] as Extract<ResumeSection, { type: "text" }>;
+      const result = await getDocumentViewModel();
+      const section = result.mainColumn[0] as Extract<DocumentSection, { type: "text" }>;
       expect(section.Content).toBe("ProfileContent");
     });
   });

@@ -119,10 +119,30 @@ describe("homepageSectionsViewModel matrix scenarios", () => {
           }),
         ],
         projects: [
-          createProject("a", { title: "Project A", order: 1, startDate: "2023-01", isFeatured: true }),
-          createProject("b", { title: "Project B", order: 2, startDate: "2024-01", isFeatured: true }),
-          createProject("c", { title: "Project C", order: 3, startDate: "2025-01", isFeatured: true }),
-          createProject("x", { title: "Project X", order: 0, startDate: "2022-01", isFeatured: false }),
+          createProject("a", {
+            title: "Project A",
+            order: 1,
+            startDate: "2023-01",
+            isFeatured: true,
+          }),
+          createProject("b", {
+            title: "Project B",
+            order: 2,
+            startDate: "2024-01",
+            isFeatured: true,
+          }),
+          createProject("c", {
+            title: "Project C",
+            order: 3,
+            startDate: "2025-01",
+            isFeatured: true,
+          }),
+          createProject("x", {
+            title: "Project X",
+            order: 0,
+            startDate: "2022-01",
+            isFeatured: false,
+          }),
         ],
       });
 
@@ -215,53 +235,43 @@ describe("homepageSectionsViewModel matrix scenarios", () => {
     });
   });
 
-  it("contact icon matrix supports string/number/boolean/null filters", async () => {
+  it("contact section auto-loads showOnHome items from list entries", async () => {
     setup({
       sections: [
         createSection("connect", {
-          type: "text-content",
+          type: "contact",
           order: 1,
-          supplementaryData: {
-            contactIcons: {
-              sourceCollection: "contact",
-              filter: { kind: "list", enabled: true, sectionId: 7, note: null },
-              itemFilter: { showOnHome: true, group: "primary" },
-            },
-          },
         }),
       ],
       contact: [
         {
           id: "list-a",
           data: {
-            kind: "list",
-            enabled: true,
-            sectionId: 7,
-            note: null,
+            type: "list",
             items: [
-              { icon: "ri:mail-line", showOnHome: true, group: "primary" },
-              { icon: "ri:github-line", showOnHome: true, group: "secondary" },
+              { icon: "ri:mail-line", showOnHome: true },
+              { icon: "ri:github-line", showOnHome: false },
             ],
           },
         },
         {
           id: "list-b",
           data: {
-            kind: "list",
-            enabled: false,
-            sectionId: 7,
-            note: null,
-            items: [{ icon: "ri:twitter-line", showOnHome: true, group: "primary" }],
+            type: "list",
+            items: [{ icon: "ri:twitter-line", showOnHome: true }],
           },
         },
       ],
     });
 
     const [result] = await getHomepageSectionsViewModel();
-    expect(result.type).toBe("text-content");
-    if (result.type !== "text-content") {
+    expect(result.type).toBe("contact");
+    if (result.type !== "contact") {
       throw new Error("Unexpected section type");
     }
-    expect(result.contactIcons?.map((item) => item.icon)).toEqual(["ri:mail-line"]);
+    expect(result.contactIcons?.map((item) => item.icon)).toEqual([
+      "ri:mail-line",
+      "ri:twitter-line",
+    ]);
   });
 });

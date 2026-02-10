@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { getResumeViewModel, type ResumeSection } from "../../src/viewmodels/resumeViewModel";
+import { getDocumentViewModel, type DocumentSection } from "../../src/viewmodels/documentViewModel";
 import { getCollection, getEntry } from "astro:content";
 import { getPageMetadata } from "../../src/lib/viewmodels/baseViewModel";
 
@@ -16,9 +16,9 @@ const mockedGetCollection = vi.mocked(getCollection);
 const mockedGetEntry = vi.mocked(getEntry);
 const mockedGetPageMetadata = vi.mocked(getPageMetadata);
 
-type EntrySection = Extract<ResumeSection, { type: "entries" }>;
-type ContactSection = Extract<ResumeSection, { type: "contact" }>;
-type SkillsSection = Extract<ResumeSection, { type: "skills" }>;
+type EntrySection = Extract<DocumentSection, { type: "entries" }>;
+type ContactSection = Extract<DocumentSection, { type: "contact" }>;
+type SkillsSection = Extract<DocumentSection, { type: "skills" }>;
 
 const createStandardEntry = (
   id: string,
@@ -78,7 +78,7 @@ function mockData(params: {
   );
 }
 
-describe("resumeViewModel combinations", () => {
+describe("documentViewModel combinations", () => {
   beforeEach(() => {
     vi.clearAllMocks();
   });
@@ -97,7 +97,7 @@ describe("resumeViewModel combinations", () => {
       ],
     });
 
-    const result = await getResumeViewModel();
+    const result = await getDocumentViewModel();
 
     expect(result.mainColumn.map((section) => section.id)).toEqual([
       "profile",
@@ -135,7 +135,7 @@ describe("resumeViewModel combinations", () => {
       ],
     });
 
-    const result = await getResumeViewModel();
+    const result = await getDocumentViewModel();
 
     expect(result.mainColumn).toHaveLength(1);
     expect(result.sidebar).toHaveLength(1);
@@ -165,7 +165,7 @@ describe("resumeViewModel combinations", () => {
       ],
     });
 
-    const result = await getResumeViewModel();
+    const result = await getDocumentViewModel();
     const projects = result.mainColumn[0] as EntrySection;
 
     expect(projects.content[0].subtitle).toBeUndefined();
@@ -192,7 +192,7 @@ describe("resumeViewModel combinations", () => {
       ],
     });
 
-    const result = await getResumeViewModel();
+    const result = await getDocumentViewModel();
     const projects = result.mainColumn[0] as EntrySection;
 
     expect(projects.content[0].subtitle).toBe("Should be included");
@@ -218,7 +218,7 @@ describe("resumeViewModel combinations", () => {
       ],
     });
 
-    const result = await getResumeViewModel();
+    const result = await getDocumentViewModel();
 
     expect(result.mainColumn[0].title).toBe("Open Source Projects");
   });
@@ -257,7 +257,7 @@ describe("resumeViewModel combinations", () => {
       ],
     });
 
-    const result = await getResumeViewModel();
+    const result = await getDocumentViewModel();
     const experience = result.mainColumn[0] as EntrySection;
 
     expect(experience.content.map((item) => item.title)).toEqual([
@@ -288,7 +288,7 @@ describe("resumeViewModel combinations", () => {
       ],
     });
 
-    const result = await getResumeViewModel();
+    const result = await getDocumentViewModel();
     const contact = result.sidebar[0] as ContactSection;
 
     expect(contact.content.map((item) => item.label)).toEqual(["Email", "GitHub Desc", "ri:wechat-line"]);
@@ -326,8 +326,8 @@ describe("resumeViewModel combinations", () => {
       ],
     });
 
-    const result = await getResumeViewModel();
-    const textSection = result.mainColumn[0] as Extract<ResumeSection, { type: "text" }>;
+    const result = await getDocumentViewModel();
+    const textSection = result.mainColumn[0] as Extract<DocumentSection, { type: "text" }>;
     const skillsSection = result.sidebar[0] as SkillsSection;
 
     expect(textSection.Content).toBe("ProfileMdContent");
@@ -349,7 +349,7 @@ describe("resumeViewModel combinations", () => {
       resumeEntries: [],
     });
 
-    await expect(getResumeViewModel()).rejects.toThrow(
+    await expect(getDocumentViewModel()).rejects.toThrow(
       "Resume skills entry not found or invalid: skills"
     );
   });
@@ -368,7 +368,7 @@ describe("resumeViewModel combinations", () => {
       resumeEntries: [],
     });
 
-    await expect(getResumeViewModel()).rejects.toThrow(
+    await expect(getDocumentViewModel()).rejects.toThrow(
       "Resume contact entry not found or invalid: contact"
     );
   });
@@ -387,7 +387,7 @@ describe("resumeViewModel combinations", () => {
       resumeEntries: [],
     });
 
-    await expect(getResumeViewModel()).rejects.toThrow(
+    await expect(getDocumentViewModel()).rejects.toThrow(
       "Resume text entry not found: profile/not-found"
     );
   });

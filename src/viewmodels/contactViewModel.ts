@@ -41,8 +41,8 @@ export async function getContactViewModel(): Promise<ContactViewModel> {
     getCollection("contact"),
   ]);
 
-  const introEntries = contactEntries.filter((entry) => entry.data.kind === "text");
-  const sectionEntries = contactEntries.filter((entry) => entry.data.kind === "list");
+  const introEntries = contactEntries.filter((entry) => entry.data.type === "text");
+  const sectionEntries = contactEntries.filter((entry) => entry.data.type === "list");
 
   // Pick the first intro by order (if present)
   let intro: ContactIntro | undefined;
@@ -91,9 +91,9 @@ export async function getContactViewModel(): Promise<ContactViewModel> {
 export async function getContactFooterItems(): Promise<ContactItem[]> {
   const contactEntries = await getCollection("contact");
 
-  type ContactListEntry = CollectionEntry<"contact"> & { data: { kind: "list" } };
+  type ContactListEntry = CollectionEntry<"contact"> & { data: { type: "list" } };
   const isListEntry = (entry: CollectionEntry<"contact">): entry is ContactListEntry => {
-    return entry.data.kind === "list";
+    return entry.data.type === "list";
   };
 
   const listEntries = contactEntries.filter(isListEntry);

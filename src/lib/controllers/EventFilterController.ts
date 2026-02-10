@@ -1,4 +1,4 @@
-export class TimelineController {
+export class EventFilterController {
   private container: HTMLElement;
   private currentFilter: string = "all";
   private categoryTabs: NodeListOf<HTMLElement>;
@@ -7,7 +7,7 @@ export class TimelineController {
 
   constructor(containerId: string, categoryTabsSelector: string) {
     const container = document.querySelector(containerId);
-    if (!container) throw new Error(`Timeline container not found: ${containerId}`);
+    if (!container) throw new Error(`Event container not found: ${containerId}`);
     this.container = container as HTMLElement;
     this.categoryTabs = document.querySelectorAll(categoryTabsSelector);
     this.boundCategoryClick = (e: Event) => this.handleCategoryClick(e);

@@ -51,9 +51,9 @@ const homepage_sections = defineCollection({
       name: z.string(),
       description: z.string().optional(),
     }),
-    // Text content section (for Meet Me, Connect, custom content)
+    // Text section (vanilla text content with optional CTA)
     z.object({
-      type: z.literal("text-content"),
+      type: z.literal("text"),
       order: z.number(),
       visible: z.boolean().default(true),
       title: z.string().optional(),
@@ -63,18 +63,17 @@ const homepage_sections = defineCollection({
           href: z.string(),
         })
         .optional(),
-      // Supplementary data sources (e.g., contact icons)
-      supplementaryData: z
+    }),
+    // Contact section (text content with auto-loaded contact icons)
+    z.object({
+      type: z.literal("contact"),
+      order: z.number(),
+      visible: z.boolean().default(true),
+      title: z.string().optional(),
+      cta: z
         .object({
-          contactIcons: z
-            .object({
-              sourceCollection: z.literal("contact"),
-              filter: z.record(z.union([z.string(), z.number(), z.boolean(), z.null()])).optional(),
-              itemFilter: z
-                .record(z.union([z.string(), z.number(), z.boolean(), z.null()]))
-                .optional(),
-            })
-            .optional(),
+          text: z.string(),
+          href: z.string(),
         })
         .optional(),
     }),
@@ -156,13 +155,13 @@ const resume = defineCollection({
 
 const contact = defineCollection({
   type: "content",
-  schema: z.discriminatedUnion("kind", [
+  schema: z.discriminatedUnion("type", [
     z.object({
-      kind: z.literal("text"),
+      type: z.literal("text"),
       order: z.number().optional(),
     }),
     z.object({
-      kind: z.literal("list"),
+      type: z.literal("list"),
       order: z.number().optional(),
       items: z.array(
         z.object({
@@ -276,5 +275,5 @@ export const collections = {
   "ui-strings": ui_strings,
   "page-metadata": page_metadata,
   footer,
-  "resume-layout": resume_layout,
+  "document-layout": resume_layout,
 };

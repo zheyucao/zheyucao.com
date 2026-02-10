@@ -1,8 +1,8 @@
 ---
 import Hero from "./Hero.astro";
 import TextContentSection from "./content/TextContentSection.astro";
-import FeaturedWorksContent from "./content/FeaturedWorksContent.astro";
-import HighlightsUpdatesContent from "./content/HighlightsUpdatesContent.astro";
+import ShowcaseCardsContent from "./content/ShowcaseCardsContent.astro";
+import ShowcaseListContent from "./content/ShowcaseListContent.astro";
 import SectionWrapper from "./SectionWrapper.astro";
 import type { HomepageSection } from "../../viewmodels/homepageSectionsViewModel";
 
@@ -16,7 +16,17 @@ const { section } = Astro.props;
 {
   section.type === "hero" ? (
     <Hero data={section} />
-  ) : section.type === "text-content" ? (
+  ) : section.type === "text" ? (
+    <SectionWrapper>
+      <TextContentSection
+        data={{
+          title: section.title || "",
+          cta: section.cta,
+          Content: section.Content,
+        }}
+      />
+    </SectionWrapper>
+  ) : section.type === "contact" ? (
     <SectionWrapper>
       <TextContentSection
         data={{
@@ -30,7 +40,7 @@ const { section } = Astro.props;
   ) : section.type === "showcase" ? (
     <SectionWrapper>
       {section.componentType === "cards" ? (
-        <FeaturedWorksContent
+        <ShowcaseCardsContent
           data={{
             section: {
               title: section.title || "",
@@ -40,7 +50,7 @@ const { section } = Astro.props;
           }}
         />
       ) : (
-        <HighlightsUpdatesContent
+        <ShowcaseListContent
           data={{
             section: {
               title: section.title || "",

@@ -14,7 +14,11 @@ type MockEntry = {
   render?: () => Promise<{ Content: string }>;
 };
 
-const createSectionEntry = (id: string, data: Record<string, unknown>, content = "SectionContent") => ({
+const createSectionEntry = (
+  id: string,
+  data: Record<string, unknown>,
+  content = "SectionContent"
+) => ({
   id,
   data,
   render: vi.fn().mockResolvedValue({ Content: content }),
@@ -99,7 +103,7 @@ describe("homepageSectionsViewModel", () => {
     const section = createSectionEntry(
       "text-1",
       {
-        type: "text-content",
+        type: "text",
         order: 1,
         title: "About",
       },
@@ -110,8 +114,8 @@ describe("homepageSectionsViewModel", () => {
 
     const [result] = await getHomepageSectionsViewModel();
 
-    expect(result.type).toBe("text-content");
-    if (result.type !== "text-content") {
+    expect(result.type).toBe("text");
+    if (result.type !== "text") {
       throw new Error("Unexpected section type");
     }
     expect(result.title).toBe("About");
@@ -119,31 +123,24 @@ describe("homepageSectionsViewModel", () => {
     expect(result.Content).toBe("TextContentComponent");
   });
 
-  it("extracts contact icons using entry-level and item-level filters", async () => {
+  it("auto-loads contact icons for contact section type", async () => {
     mockCollections({
       sections: [
         createSectionEntry("connect", {
-          type: "text-content",
+          type: "contact",
           order: 1,
           title: "Connect",
-          supplementaryData: {
-            contactIcons: {
-              sourceCollection: "contact",
-              filter: { kind: "list" },
-              itemFilter: { showOnHome: true },
-            },
-          },
         }),
       ],
       contact: [
         {
           id: "intro",
-          data: { kind: "text", order: 0 },
+          data: { type: "text", order: 0 },
         },
         {
           id: "primary",
           data: {
-            kind: "list",
+            type: "list",
             order: 1,
             items: [
               { icon: "ri:mail-line", href: "mailto:hi@example.com", showOnHome: true },
@@ -154,7 +151,7 @@ describe("homepageSectionsViewModel", () => {
         {
           id: "secondary",
           data: {
-            kind: "list",
+            type: "list",
             order: 2,
             items: [{ icon: "ri:twitter-line", href: "https://x.com/example", showOnHome: true }],
           },
@@ -164,8 +161,8 @@ describe("homepageSectionsViewModel", () => {
 
     const [result] = await getHomepageSectionsViewModel();
 
-    expect(result.type).toBe("text-content");
-    if (result.type !== "text-content") {
+    expect(result.type).toBe("contact");
+    if (result.type !== "contact") {
       throw new Error("Unexpected section type");
     }
     expect(result.contactIcons).toHaveLength(2);
@@ -175,28 +172,22 @@ describe("homepageSectionsViewModel", () => {
     ]);
   });
 
-  it("collects all list items when supplementary itemFilter is omitted", async () => {
+  it("contact section includes all showOnHome items from all list entries", async () => {
     mockCollections({
       sections: [
         createSectionEntry("connect", {
-          type: "text-content",
+          type: "contact",
           order: 1,
-          supplementaryData: {
-            contactIcons: {
-              sourceCollection: "contact",
-              filter: { kind: "list" },
-            },
-          },
         }),
       ],
       contact: [
         {
           id: "primary",
           data: {
-            kind: "list",
+            type: "list",
             items: [
-              { icon: "ri:mail-line", href: "mailto:hi@example.com" },
-              { icon: "ri:github-line", href: "https://github.com/example" },
+              { icon: "ri:mail-line", href: "mailto:hi@example.com", showOnHome: true },
+              { icon: "ri:github-line", href: "https://github.com/example", showOnHome: true },
             ],
           },
         },
@@ -205,8 +196,8 @@ describe("homepageSectionsViewModel", () => {
 
     const [result] = await getHomepageSectionsViewModel();
 
-    expect(result.type).toBe("text-content");
-    if (result.type !== "text-content") {
+    expect(result.type).toBe("contact");
+    if (result.type !== "contact") {
       throw new Error("Unexpected section type");
     }
     expect(result.contactIcons).toHaveLength(2);
@@ -229,7 +220,11 @@ describe("homepageSectionsViewModel", () => {
       projects: [
         createProjectEntry("project-b", { title: "Project B", isFeatured: true, order: 2 }),
         createProjectEntry("project-a", { title: "Project A", isFeatured: true, order: 1 }),
-        createProjectEntry("project-hidden", { title: "Project Hidden", isFeatured: false, order: 0 }),
+        createProjectEntry("project-hidden", {
+          title: "Project Hidden",
+          isFeatured: false,
+          order: 0,
+        }),
       ],
     });
 

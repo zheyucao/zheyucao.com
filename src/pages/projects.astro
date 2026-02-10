@@ -1,10 +1,10 @@
 ---
 import SubPageLayout from "../layouts/SubPageLayout.astro";
-import ProjectCard from "../components/projects/ProjectCard.astro";
-import { getProjectsViewModel } from "../viewmodels/projectsViewModel";
+import MasonryCard from "../components/masonry/MasonryCard.astro";
+import { getMasonryViewModel } from "../viewmodels/masonryViewModel";
 import PageActions from "../components/common/PageActions.astro";
 
-const { projects, metadata } = await getProjectsViewModel();
+const { projects, metadata } = await getMasonryViewModel();
 ---
 
 <SubPageLayout title={metadata.title} description={metadata.description} seo={metadata.seo}>
@@ -12,7 +12,7 @@ const { projects, metadata } = await getProjectsViewModel();
   <div class="projects-grid columns-1 gap-x-12 md:columns-2">
     {
       projects.map((project) => (
-        <ProjectCard
+        <MasonryCard
           id={project.id}
           title={project.data.title}
           imageSrc={project.data.imageSrc}
@@ -24,7 +24,7 @@ const { projects, metadata } = await getProjectsViewModel();
           techStack={project.data.techStack}
         >
           <project.Content />
-        </ProjectCard>
+        </MasonryCard>
       ))
     }
   </div>

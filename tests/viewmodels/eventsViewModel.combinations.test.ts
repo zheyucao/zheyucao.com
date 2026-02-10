@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { getTimelineViewModel } from "../../src/viewmodels/timelineViewModel";
+import { getEventsViewModel } from "../../src/viewmodels/eventsViewModel";
 import { getCollection, getEntry } from "astro:content";
 import { getPageMetadata } from "../../src/lib/viewmodels/baseViewModel";
 
@@ -37,7 +37,7 @@ const createTimelineEvent = (
   render: vi.fn().mockResolvedValue({ Content: content }),
 });
 
-describe("timelineViewModel combinations", () => {
+describe("eventsViewModel combinations", () => {
   beforeEach(() => {
     vi.clearAllMocks();
   });
@@ -63,7 +63,7 @@ describe("timelineViewModel combinations", () => {
       ] as never
     );
 
-    const result = await getTimelineViewModel();
+    const result = await getEventsViewModel();
 
     expect(result.categories).toEqual(["Experiences", "Honors"]);
     expect(result.filterAll).toBe("Everything");
@@ -101,7 +101,7 @@ describe("timelineViewModel combinations", () => {
       ] as never
     );
 
-    const result = await getTimelineViewModel();
+    const result = await getEventsViewModel();
 
     expect(result.initialEvents.map((event) => event.title)).toEqual([
       "Current Role",
@@ -134,7 +134,7 @@ describe("timelineViewModel combinations", () => {
       ] as never
     );
 
-    const result = await getTimelineViewModel();
+    const result = await getEventsViewModel();
     const event = result.events[0];
 
     expect(event.Content).toBe("InternshipContent");
@@ -148,6 +148,6 @@ describe("timelineViewModel combinations", () => {
     mockedGetCollection.mockResolvedValue([] as never);
     mockedGetEntry.mockResolvedValue(undefined as never);
 
-    await expect(getTimelineViewModel()).rejects.toThrow("Could not find UI strings for 'en'");
+    await expect(getEventsViewModel()).rejects.toThrow("Could not find UI strings for 'en'");
   });
 });

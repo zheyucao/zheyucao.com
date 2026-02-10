@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { getProjectsViewModel } from "../../src/viewmodels/projectsViewModel";
+import { getMasonryViewModel } from "../../src/viewmodels/masonryViewModel";
 import { getCollection } from "astro:content";
 import { getPageMetadata } from "../../src/lib/viewmodels/baseViewModel";
 
@@ -31,7 +31,7 @@ const createProject = (
   render: vi.fn().mockResolvedValue({ Content: content }),
 });
 
-describe("projectsViewModel combinations", () => {
+describe("masonryViewModel combinations", () => {
   beforeEach(() => {
     vi.clearAllMocks();
   });
@@ -49,7 +49,7 @@ describe("projectsViewModel combinations", () => {
       ] as never
     );
 
-    const result = await getProjectsViewModel();
+    const result = await getMasonryViewModel();
 
     expect(result.projects.map((project) => project.data.title)).toEqual([
       "Ordered 1",
@@ -67,7 +67,7 @@ describe("projectsViewModel combinations", () => {
       [createProject("Date Range Project", { startDate: "2024-01", endDate: "2024-03" })] as never
     );
 
-    const result = await getProjectsViewModel();
+    const result = await getMasonryViewModel();
 
     expect(result.projects[0].formattedDate).toBe("January 2024 – March 2024");
   });
@@ -81,7 +81,7 @@ describe("projectsViewModel combinations", () => {
       ] as never
     );
 
-    const result = await getProjectsViewModel();
+    const result = await getMasonryViewModel();
 
     expect(result.projects[0].Content).toBe("FirstContent");
     expect(result.projects[1].Content).toBe("SecondContent");

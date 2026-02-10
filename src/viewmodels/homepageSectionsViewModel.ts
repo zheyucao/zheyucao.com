@@ -13,8 +13,8 @@ export type HeroSection = {
   description?: string;
 };
 
-export type TextContentSection = {
-  type: "text-content";
+export type TextSection = {
+  type: "text";
   order: number;
   title?: string;
   cta?: {
@@ -22,7 +22,18 @@ export type TextContentSection = {
     href: string;
   };
   Content: AstroComponentFactory;
-  contactIcons?: ContactItem[];
+};
+
+export type ContactSection = {
+  type: "contact";
+  order: number;
+  title?: string;
+  cta?: {
+    text: string;
+    href: string;
+  };
+  Content: AstroComponentFactory;
+  contactIcons: ContactItem[];
 };
 
 type BaseShowcaseSection = {
@@ -48,9 +59,58 @@ export type TimelineShowcaseSection = BaseShowcaseSection & {
 
 export type HomepageSection =
   | HeroSection
-  | TextContentSection
+  | TextSection
+  | ContactSection
   | ProjectShowcaseSection
   | TimelineShowcaseSection;
+
+/**
+ * Apply filters, sorting, and limit to a collection of items.
+ * Shared utility for showcase sections.
+ */
+function applyCollectionQuery<T>(
+  items: T[],
+  options: {
+    filter?: Record<string, unknown>;
+    sortBy?: "order" | "date";
+    sortOrder?: "asc" | "desc";
+    limit?: number;
+    getOrder?: (item: T) => number | undefined;
+    getDate?: (item: T) => string | undefined;
+  }
+): T[] {
+  let result = [...items];
+
+  // Apply filters
+  if (options.filter) {
+    result = result.filter((item) => {
+      return Object.entries(options.filter!).every(([key, value]) => {
+        return (
+          (item as Record<string, unknown>)[key] === value ||
+          ((item as { data?: Record<string, unknown> }).data as Record<string, unknown>)?.[key] ===
+            value
+        );
+      });
+    });
+  }
+
+  // Apply sorting
+  if (options.sortBy === "order" && options.getOrder) {
+    result = sortByOrder(result, { getOrder: options.getOrder });
+  } else if (options.sortBy === "date" && options.getDate) {
+    result = sortByOrder(result, { getDate: options.getDate });
+    if (options.sortOrder === "asc") {
+      result = result.reverse();
+    }
+  }
+
+  // Apply limit
+  if (options.limit) {
+    result = result.slice(0, options.limit);
+  }
+
+  return result;
+}
 
 /**
  * Get all homepage sections, processed and ready for rendering
@@ -88,102 +148,64 @@ export async function getHomepageSectionsViewModel(): Promise<HomepageSection[]>
         };
       }
 
-      if (type === "text-content") {
+      if (type === "text") {
         const rendered = await section.render();
-        const result: TextContentSection = {
-          type: "text-content" as const,
+        const result: TextSection = {
+          type: "text" as const,
           order: section.data.order,
           title: section.data.title,
           cta: section.data.cta,
           Content: rendered.Content,
         };
+        return result;
+      }
 
-        // Handle supplementary data (e.g., contact icons)
-        if (section.data.supplementaryData?.contactIcons) {
-          const { sourceCollection, filter, itemFilter } =
-            section.data.supplementaryData.contactIcons;
+      if (type === "contact") {
+        const rendered = await section.render();
 
-          if (sourceCollection === "contact") {
-            const contactEntries = allContactEntries;
-
-            // Filter by entry-level filter (e.g., kind: "list")
-            let filteredEntries = contactEntries;
-            if (filter) {
-              filteredEntries = contactEntries.filter((entry) => {
-                return Object.entries(filter).every(([key, value]) => {
-                  return (entry.data as Record<string, unknown>)[key] === value;
-                });
-              });
-            }
-
-            // Extract items and apply item-level filter
-            const items: ContactItem[] = [];
-            for (const entry of filteredEntries) {
-              if (entry.data.kind === "list") {
-                const entryItems = entry.data.items;
-                for (const item of entryItems) {
-                  // Apply item filter (e.g., showOnHome: true)
-                  if (itemFilter) {
-                    const matches = Object.entries(itemFilter).every(([key, value]) => {
-                      return (item as Record<string, unknown>)[key] === value;
-                    });
-                    if (matches) {
-                      items.push(item);
-                    }
-                  } else {
-                    items.push(item);
-                  }
-                }
+        // Auto-load contact icons with showOnHome: true
+        const contactIcons: ContactItem[] = [];
+        for (const entry of allContactEntries) {
+          if (entry.data.type === "list") {
+            const entryItems = entry.data.items;
+            for (const item of entryItems) {
+              if (item.showOnHome === true) {
+                contactIcons.push(item);
               }
             }
-
-            result.contactIcons = items;
           }
         }
 
+        const result: ContactSection = {
+          type: "contact" as const,
+          order: section.data.order,
+          title: section.data.title,
+          cta: section.data.cta,
+          Content: rendered.Content,
+          contactIcons,
+        };
         return result;
       }
 
       if (type === "showcase") {
-          const { sourceCollection, filter, sortBy, sortOrder, limit, componentType } = section.data;
+        const { sourceCollection, filter, sortBy, sortOrder, limit, componentType } = section.data;
 
         // Handle projects collection
         if (sourceCollection === "projects") {
-          let projectItems = [...allProjectsEntries];
-
-          // Apply filters
-          if (filter) {
-            projectItems = projectItems.filter((item) => {
-              return Object.entries(filter).every(([key, value]) => {
-                return (item.data as Record<string, unknown>)[key] === value;
-              });
-            });
-          }
-
           if (componentType !== "cards") {
             throw new Error(
               `Invalid homepage section config '${section.id}': projects sourceCollection requires componentType: "cards"`
             );
           }
 
-          if (sortBy === "order") {
-            projectItems = sortByOrder(projectItems, {
-              getOrder: (item) => item.data.order,
-            });
-          } else if (sortBy === "date") {
-            // sortByOrder defaults to newest-first for dates
-            projectItems = sortByOrder(projectItems, {
-              getDate: (item) => item.data.endDate ?? item.data.startDate,
-            });
-            if (sortOrder === "asc") {
-              projectItems = projectItems.reverse();
-            }
-          }
-
-          // Apply limit
-          if (limit) {
-            projectItems = projectItems.slice(0, limit);
-          }
+          const projectItems = applyCollectionQuery(allProjectsEntries, {
+            filter,
+            sortBy,
+            sortOrder,
+            limit,
+            getOrder: (item) => item.data.order,
+            getDate: (item) => item.data.endDate ?? item.data.startDate,
+          });
 
           const result: ProjectShowcaseSection = {
             type: "showcase" as const,
@@ -199,42 +221,20 @@ export async function getHomepageSectionsViewModel(): Promise<HomepageSection[]>
 
         // Handle timeline collection
         if (sourceCollection === "timeline") {
-          let timelineItems = [...allTimelineEntries];
-
           if (componentType !== "list") {
             throw new Error(
               `Invalid homepage section config '${section.id}': timeline sourceCollection requires componentType: "list"`
             );
           }
 
-          // Apply filters
-          if (filter) {
-            timelineItems = timelineItems.filter((item) => {
-              return Object.entries(filter).every(([key, value]) => {
-                return (item.data as Record<string, unknown>)[key] === value;
-              });
-            });
-          }
-
-          // Apply sorting
-          if (sortBy === "order") {
-            timelineItems = sortByOrder(timelineItems, {
-              getOrder: (item) => (item.data as { order?: number }).order,
-            });
-          } else if (sortBy === "date") {
-            // sortByOrder defaults to newest-first for dates
-            timelineItems = sortByOrder(timelineItems, {
-              getDate: (item) => item.data.endDate ?? item.data.startDate,
-            });
-            if (sortOrder === "asc") {
-              timelineItems = timelineItems.reverse();
-            }
-          }
-
-          // Apply limit
-          if (limit) {
-            timelineItems = timelineItems.slice(0, limit);
-          }
+          const timelineItems = applyCollectionQuery(allTimelineEntries, {
+            filter,
+            sortBy,
+            sortOrder,
+            limit,
+            getOrder: (item) => (item.data as { order?: number }).order,
+            getDate: (item) => item.data.endDate ?? item.data.startDate,
+          });
 
           // Render content for timeline items
           const renderedItems = await Promise.all(

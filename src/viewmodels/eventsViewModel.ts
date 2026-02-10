@@ -10,10 +10,10 @@ import { formatDateRange } from "../lib/utils/dateUtils";
 // Local parseDate removed in favor of shared utility from ../lib/utils/dateUtils
 
 /**
- * Timeline page view model
- * Fetches and prepares timeline events for the timeline page
+ * Events page view model
+ * Fetches and prepares events for the events page
  */
-export async function getTimelineViewModel() {
+export async function getEventsViewModel() {
   // Fetch timeline events
   const rawEvents = await getCollection("timeline");
 

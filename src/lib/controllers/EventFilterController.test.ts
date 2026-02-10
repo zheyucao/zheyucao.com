@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach } from "vitest";
-import { TimelineController } from "./TimelineController";
+import { EventFilterController } from "./EventFilterController";
 
-describe("TimelineController", () => {
+describe("EventFilterController", () => {
   let categoryTab1: HTMLElement;
   let categoryTabAll: HTMLElement;
 
@@ -30,7 +30,7 @@ describe("TimelineController", () => {
   });
 
   it("should initialize and show all events by default", () => {
-    new TimelineController("#timeline-container", ".category-tab");
+    new EventFilterController("#timeline-container", ".category-tab");
 
     const event1 = document.getElementById("event1")!;
     const event2 = document.getElementById("event2")!;
@@ -42,7 +42,7 @@ describe("TimelineController", () => {
   });
 
   it("should filter events when category tab is clicked", () => {
-    new TimelineController("#timeline-container", ".category-tab");
+    new EventFilterController("#timeline-container", ".category-tab");
 
     // Click Cat1
     categoryTab1.click();
@@ -60,7 +60,7 @@ describe("TimelineController", () => {
   });
 
   it("should show all events when 'All' tab is clicked after filtering", () => {
-    new TimelineController("#timeline-container", ".category-tab");
+    new EventFilterController("#timeline-container", ".category-tab");
 
     // Click Cat1 first
     categoryTab1.click();

@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { getResumeViewModel, type ResumeSection } from "../../src/viewmodels/resumeViewModel";
+import { getDocumentViewModel, type DocumentSection } from "../../src/viewmodels/documentViewModel";
 import { getCollection, getEntry } from "astro:content";
 import { getPageMetadata } from "../../src/lib/viewmodels/baseViewModel";
 
@@ -18,11 +18,11 @@ const mockedGetCollection = vi.mocked(getCollection);
 const mockedGetEntry = vi.mocked(getEntry);
 const mockedGetPageMetadata = vi.mocked(getPageMetadata);
 
-type EntrySection = Extract<ResumeSection, { type: "entries" }>;
-type SkillsSection = Extract<ResumeSection, { type: "skills" }>;
-type ContactSection = Extract<ResumeSection, { type: "contact" }>;
+type EntrySection = Extract<DocumentSection, { type: "entries" }>;
+type SkillsSection = Extract<DocumentSection, { type: "skills" }>;
+type ContactSection = Extract<DocumentSection, { type: "contact" }>;
 
-describe("resumeViewModel", () => {
+describe("documentViewModel", () => {
   beforeEach(() => {
     vi.clearAllMocks();
   });
@@ -145,14 +145,14 @@ describe("resumeViewModel", () => {
       } as never
     );
 
-    const result = await getResumeViewModel();
+    const result = await getDocumentViewModel();
 
     expect(result.metadata).toEqual(mockMetadata);
 
     // Check main column
     expect(result.mainColumn).toHaveLength(5);
     expect(result.mainColumn[0].id).toBe("profile");
-    expect((result.mainColumn[0] as Extract<ResumeSection, { type: "text" }>).Content).toBe(
+    expect((result.mainColumn[0] as Extract<DocumentSection, { type: "text" }>).Content).toBe(
       "ProfileContent"
     );
 
@@ -200,6 +200,6 @@ describe("resumeViewModel", () => {
         },
       } as never
     );
-    await expect(getResumeViewModel()).rejects.toThrow("Resume text entry not found: profile/me.md");
+    await expect(getDocumentViewModel()).rejects.toThrow("Resume text entry not found: profile/me.md");
   });
 });

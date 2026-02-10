@@ -1,10 +1,10 @@
 ---
 import SubPageLayout from "../layouts/SubPageLayout.astro";
-import ResumeSectionRenderer from "../components/resume/ResumeSectionRenderer.astro";
+import DocumentSectionRenderer from "../components/document/DocumentSectionRenderer.astro";
 import PageActions from "../components/common/PageActions.astro";
-import { getResumeViewModel } from "../viewmodels/resumeViewModel";
+import { getDocumentViewModel } from "../viewmodels/documentViewModel";
 
-const { mainColumn, sidebar, metadata } = await getResumeViewModel();
+const { mainColumn, sidebar, metadata } = await getDocumentViewModel();
 const { title, actions } = metadata;
 ---
 
@@ -13,11 +13,11 @@ const { title, actions } = metadata;
 
   <div class="resume-container">
     <div class="main-column">
-      {mainColumn.map((section) => <ResumeSectionRenderer section={section} />)}
+      {mainColumn.map((section) => <DocumentSectionRenderer section={section} />)}
     </div>
 
     <aside class="sidebar">
-      {sidebar.map((section) => <ResumeSectionRenderer section={section} />)}
+      {sidebar.map((section) => <DocumentSectionRenderer section={section} />)}
     </aside>
   </div>
 </SubPageLayout>

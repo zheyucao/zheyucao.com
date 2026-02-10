@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { getTimelineViewModel } from "../../src/viewmodels/timelineViewModel";
+import { getEventsViewModel } from "../../src/viewmodels/eventsViewModel";
 import { getCollection, getEntry } from "astro:content";
 import { getPageMetadata } from "../../src/lib/viewmodels/baseViewModel";
 
@@ -18,7 +18,7 @@ const mockedGetCollection = vi.mocked(getCollection);
 const mockedGetEntry = vi.mocked(getEntry);
 const mockedGetPageMetadata = vi.mocked(getPageMetadata);
 
-describe("timelineViewModel", () => {
+describe("eventsViewModel", () => {
   beforeEach(() => {
     vi.clearAllMocks();
   });
@@ -52,7 +52,7 @@ describe("timelineViewModel", () => {
     };
     mockedGetEntry.mockResolvedValue(mockUiStrings as never);
 
-    const result = await getTimelineViewModel();
+    const result = await getEventsViewModel();
 
     expect(result.metadata).toEqual(mockMetadata);
     expect(result.events).toHaveLength(2);
@@ -69,6 +69,6 @@ describe("timelineViewModel", () => {
     mockedGetCollection.mockResolvedValue([] as never);
     mockedGetEntry.mockResolvedValue(undefined as never);
 
-    await expect(getTimelineViewModel()).rejects.toThrow("Could not find UI strings for 'en'");
+    await expect(getEventsViewModel()).rejects.toThrow("Could not find UI strings for 'en'");
   });
 });

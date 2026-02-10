@@ -1,6 +1,6 @@
 ---
-// Content for the "Featured Works" section
-import FeaturedProjectCard from "../FeaturedProjectCard.astro";
+// Content for the "Featured Works" showcase section
+import ShowcaseCard from "../ShowcaseCard.astro";
 import Button from "../../common/Button.astro";
 import type { CollectionEntry } from "astro:content";
 
@@ -35,7 +35,7 @@ const isDoubleColumn = featuredProjects.length % 2 === 0;
   {
     featuredProjects.map((project) => {
       return (
-        <FeaturedProjectCard
+        <ShowcaseCard
           title={project.data.title}
           homepageSummary={project.data.homepageSummary}
           slug={project.slug}

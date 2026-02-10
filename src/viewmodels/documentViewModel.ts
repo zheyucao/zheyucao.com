@@ -10,7 +10,7 @@ export type GridSkillCategory = {
   items: string[];
 };
 
-export type ResumeContactItem = {
+export type DocumentContactItem = {
   icon: string;
   label: string;
   href?: string;
@@ -26,7 +26,7 @@ type StandardEntryData = Exclude<ResumeCollectionData, TypedResumeData>;
 type SkillsEntryData = Extract<ResumeCollectionData, { type: "skills" }>;
 type ContactEntryData = Extract<ResumeCollectionData, { type: "contact" }>;
 
-export type ResumeEntryItem = {
+export type DocumentEntryItem = {
   title: string;
   subtitle?: string;
   date?: string;
@@ -51,7 +51,7 @@ type EntryResumeSection = {
   title: string;
   type: "entries";
   variant?: "default" | "education" | "experience" | "awards" | "projects";
-  content: ResumeEntryItem[];
+  content: DocumentEntryItem[];
   visible?: boolean;
 };
 
@@ -67,17 +67,17 @@ type ContactResumeSection = {
   id: string;
   title: string;
   type: "contact";
-  content: ResumeContactItem[];
+  content: DocumentContactItem[];
   visible?: boolean;
 };
 
-export type ResumeSection =
+export type DocumentSection =
   | TextResumeSection
   | EntryResumeSection
   | SkillsResumeSection
   | ContactResumeSection;
 
-type ResumeLayoutSection =
+type DocumentLayoutSection =
   | {
       id: string;
       type: "text";
@@ -137,7 +137,7 @@ const isContactEntry = (
   data: ContactEntryData;
 } => "type" in entry.data && entry.data.type === "contact";
 
-const DEFAULT_RESUME_LAYOUT: ResumeLayoutSection[] = [
+const DEFAULT_DOCUMENT_LAYOUT: DocumentLayoutSection[] = [
   {
     id: "profile",
     type: "text",
@@ -216,7 +216,7 @@ async function processStandardEntries(
   allEntries: ResumeCollectionEntry[],
   prefix: string,
   options: { includeSubtitle?: boolean } = {}
-): Promise<ResumeEntryItem[]> {
+): Promise<DocumentEntryItem[]> {
   const { includeSubtitle = true } = options;
 
   const filteredEntries = allEntries.filter(
@@ -227,7 +227,7 @@ async function processStandardEntries(
   const processedEntries = await Promise.all(
     filteredEntries.map(async (entry) => {
       const { Content } = await entry.render();
-      const item: ResumeEntryItem = {
+      const item: DocumentEntryItem = {
         title: entry.data.title,
         date: formatDateRange(entry.data.startDate, entry.data.endDate),
         startDate: entry.data.startDate,
@@ -249,9 +249,9 @@ async function processStandardEntries(
 }
 
 async function buildSectionFromLayout(
-  sectionConfig: ResumeLayoutSection,
+  sectionConfig: DocumentLayoutSection,
   allResumeContent: ResumeCollectionEntry[]
-): Promise<ResumeSection> {
+): Promise<DocumentSection> {
   if (sectionConfig.type === "text") {
     const textEntry = allResumeContent.find(
       (entry): entry is ResumeCollectionEntry & { data: StandardEntryData } =>
@@ -321,7 +321,7 @@ async function buildSectionFromLayout(
     title: sectionConfig.title ?? contactEntry.data.title,
     type: "contact",
     content: contactEntry.data.content.map(
-      (item): ResumeContactItem => ({
+      (item): DocumentContactItem => ({
         icon: item.icon,
         label: item.label ?? item.description ?? item.icon,
         href: item.href,
@@ -334,28 +334,28 @@ async function buildSectionFromLayout(
 }
 
 /**
- * Résumé page view model
- * Aggregates and organizes resume content into main column and sidebar
+ * Document page view model
+ * Aggregates and organizes content into main column and sidebar
  */
-export async function getResumeViewModel(): Promise<{
-  mainColumn: ResumeSection[];
-  sidebar: ResumeSection[];
+export async function getDocumentViewModel(): Promise<{
+  mainColumn: DocumentSection[];
+  sidebar: DocumentSection[];
   metadata: PageMetadata;
 }> {
   const allResumeContent = await getCollection("resume");
 
   const [layoutEntry, metadata] = await Promise.all([
-    getEntry("resume-layout", "default"),
+    getEntry("document-layout", "default"),
     getPageMetadata("resume"),
   ]);
-  const layoutSections = layoutEntry?.data.sections ?? DEFAULT_RESUME_LAYOUT;
+  const layoutSections = layoutEntry?.data.sections ?? DEFAULT_DOCUMENT_LAYOUT;
 
   const resolvedSections = await Promise.all(
     layoutSections.map((section) => buildSectionFromLayout(section, allResumeContent))
   );
 
-  const mainColumn: ResumeSection[] = [];
-  const sidebar: ResumeSection[] = [];
+  const mainColumn: DocumentSection[] = [];
+  const sidebar: DocumentSection[] = [];
 
   layoutSections.forEach((sectionConfig, index) => {
     const section = resolvedSections[index];
