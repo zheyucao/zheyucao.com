@@ -11,6 +11,7 @@
  */
 
 import type { OKLCHColor, HarmonyScheme } from "./types";
+export type { HarmonyScheme } from "./types";
 
 // ============================================================================
 // OKLCH → Oklab → Linear sRGB → sRGB Pipeline

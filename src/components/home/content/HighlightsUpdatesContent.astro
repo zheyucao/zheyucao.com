@@ -10,7 +10,7 @@ interface Props {
   data: {
     section: {
       title: string;
-      cta: {
+      cta?: {
         text: string;
         href: string;
       };
@@ -69,7 +69,11 @@ const highlightsToShow = events;
     )
   }
 
-  <div class="btn-group">
-    <Button class="button" href={cta.href} text={cta.text} wrapperClass="cta-link" />
-  </div>
+  {
+    cta?.href && cta?.text ? (
+      <div class="btn-group">
+        <Button class="button" href={cta.href} text={cta.text} wrapperClass="cta-link" />
+      </div>
+    ) : null
+  }
 </div>

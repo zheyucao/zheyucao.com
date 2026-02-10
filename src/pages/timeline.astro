@@ -3,31 +3,14 @@ import SubPageLayout from "../layouts/SubPageLayout.astro";
 import TimelineEvent from "../components/timeline/TimelineEvent.astro";
 import { getTimelineViewModel } from "../viewmodels/timelineViewModel";
 import "../styles/timeline.css";
-import Button from "../components/common/Button.astro";
+import PageActions from "../components/common/PageActions.astro";
 
 const viewModel = await getTimelineViewModel();
 const { categories, initialEvents: initialFilteredEvents, metadata, filterAll } = viewModel;
 ---
 
-<SubPageLayout title={metadata.title}>
-  {
-    metadata.actions &&
-      metadata.actions.map((action) => (
-        <Button
-          slot="actions"
-          href={action.href}
-          text={action.text}
-          style={action.style}
-          download={action.download}
-          icon={action.icon}
-          iconPosition={action.iconPosition}
-          target={action.target}
-          rel={action.rel}
-          noMargin={true}
-          wrapperClass="page-load-initial-state"
-        />
-      ))
-  }
+<SubPageLayout title={metadata.title} description={metadata.description} seo={metadata.seo}>
+  <PageActions actions={metadata.actions} />
   <div class="timeline-controls">
     <div class="control-group category-tabs">
       <button type="button" class="category-tab" data-category="all" aria-pressed="true"

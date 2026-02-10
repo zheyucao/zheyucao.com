@@ -11,8 +11,8 @@
 - **src/viewmodels/**: 视图模型，从内容集合读取并整理页面需要的数据。
 - **src/config.ts**: 全站元数据与导航配置。
 - **src/styles/**: 全局与特定样式文件。
+- **src/content/resume-layout/default.json**: 控制简历分区顺序、主/侧栏位置、数据源映射。
 - **public/**: 静态资源（图片、favicon）。
-- **utils/**: 工具脚本。
 
 ## 功能
 
@@ -29,6 +29,15 @@
 - **内容集合**: 位于 `src/content/`（schema 定义在 `src/content/config.ts`），MDX 正文写文案，frontmatter 存放结构化字段（如链接、技术栈、排序、标记）。
 - **视图模型**: `src/viewmodels/` 负责读取集合并为页面产出所需的 props。
 - 更新文案或数据时，直接修改相应的内容文件即可，通常无需改动组件。
+
+### 模板自定义建议
+
+- **首页分区**: 在 `src/content/homepage-sections/` 中新增或编辑分区文件，通过 frontmatter 控制顺序与显隐。
+- **项目/时间线/联系/简历内容**: 直接编辑 `src/content/` 对应集合目录。
+- **简历布局**: 在 `src/content/resume-layout/default.json` 中调整分区顺序、主侧栏归属与数据来源。
+- **页面元信息与按钮**: 编辑 `src/content/page-metadata/*.mdx`（`actions[].variant` 支持 `default`、`primary`、`subtle`）。
+- **导航与站点信息**: 在 `src/config.ts` 修改。
+- **新增页面**: 新建 `src/pages/<slug>.astro`，并在 `src/config.ts` 中加入导航，按需新增 `src/content/page-metadata/<slug>.mdx`。
 
 ## 开发
 
@@ -54,6 +63,7 @@ pnpm install
 | `pnpm astro -- --help` | 获取 Astro CLI 使用帮助                        |
 | `pnpm lint`            | 运行 ESLint 检查代码问题                       |
 | `pnpm lint:fix`        | 自动修复 ESLint 问题                           |
+| `pnpm check`           | 运行 Astro 类型与内容检查                      |
 | `pnpm format`          | 使用 Prettier 格式化代码                       |
 | `pnpm format:check`    | 检查代码格式而不进行更改                       |
 
@@ -65,7 +75,7 @@ pnpm install
 
 ## 使用指南
 
-- **替换个人信息**: 您 **必须** 替换在内容文件（例如 `src/pages/`, `src/components/`, `src/data/` 等）中的所有个人信息。这包括但不限于：
+- **替换个人信息**: 您 **必须** 替换内容配置中的所有个人信息（例如 `src/content/`, `src/config.ts`, `src/content/footer/info.json` 等）。这包括但不限于：
   - 姓名
   - 个人简介或"关于我"部分
   - 联系信息（电子邮件、社交媒体链接）

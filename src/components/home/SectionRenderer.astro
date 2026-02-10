@@ -1,6 +1,6 @@
 ---
 import Hero from "./Hero.astro";
-import MeetMeContent from "./content/MeetMeContent.astro";
+import TextContentSection from "./content/TextContentSection.astro";
 import FeaturedWorksContent from "./content/FeaturedWorksContent.astro";
 import HighlightsUpdatesContent from "./content/HighlightsUpdatesContent.astro";
 import SectionWrapper from "./SectionWrapper.astro";
@@ -18,10 +18,10 @@ const { section } = Astro.props;
     <Hero data={section} />
   ) : section.type === "text-content" ? (
     <SectionWrapper>
-      <MeetMeContent
+      <TextContentSection
         data={{
           title: section.title || "",
-          cta: section.cta || { text: "", href: "" },
+          cta: section.cta,
           Content: section.Content,
           socialItems: section.contactIcons,
         }}
@@ -34,7 +34,7 @@ const { section } = Astro.props;
           data={{
             section: {
               title: section.title || "",
-              cta: section.cta || { text: "", href: "" },
+              cta: section.cta,
             },
             projects: section.items,
           }}
@@ -44,7 +44,7 @@ const { section } = Astro.props;
           data={{
             section: {
               title: section.title || "",
-              cta: section.cta || { text: "", href: "" },
+              cta: section.cta,
               fallback: section.fallback || "No items available.",
             },
             events: section.items,

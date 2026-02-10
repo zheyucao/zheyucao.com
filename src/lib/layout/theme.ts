@@ -1,4 +1,16 @@
-export function initTheme() {
+type ThemeMode = "light" | "dark" | "system";
+
+export function initTheme(defaultTheme: ThemeMode = "system") {
+  if (defaultTheme === "dark") {
+    document.documentElement.classList.add("dark");
+    return () => {};
+  }
+
+  if (defaultTheme === "light") {
+    document.documentElement.classList.remove("dark");
+    return () => {};
+  }
+
   const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
 
   const checkAndApplyTheme = () => {

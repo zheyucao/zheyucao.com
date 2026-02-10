@@ -2,30 +2,13 @@
 import SubPageLayout from "../layouts/SubPageLayout.astro";
 import ProjectCard from "../components/projects/ProjectCard.astro";
 import { getProjectsViewModel } from "../viewmodels/projectsViewModel";
-import Button from "../components/common/Button.astro";
+import PageActions from "../components/common/PageActions.astro";
 
 const { projects, metadata } = await getProjectsViewModel();
 ---
 
-<SubPageLayout title={metadata.title}>
-  {
-    metadata.actions &&
-      metadata.actions.map((action) => (
-        <Button
-          slot="actions"
-          href={action.href}
-          text={action.text}
-          style={action.style}
-          download={action.download}
-          icon={action.icon}
-          iconPosition={action.iconPosition}
-          target={action.target}
-          rel={action.rel}
-          noMargin={true}
-          wrapperClass="page-load-initial-state"
-        />
-      ))
-  }
+<SubPageLayout title={metadata.title} description={metadata.description} seo={metadata.seo}>
+  <PageActions actions={metadata.actions} />
   <div class="projects-grid columns-1 gap-x-12 md:columns-2">
     {
       projects.map((project) => (

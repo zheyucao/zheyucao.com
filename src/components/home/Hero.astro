@@ -3,18 +3,18 @@ import { sanitizeStrict } from "../../lib/utils/sanitize";
 
 interface Props {
   data: {
-    greeting: string;
+    greeting?: string;
     name: string;
-    description: string;
+    description?: string;
   };
 }
 
 const { data } = Astro.props;
 const { greeting, name, description } = data;
 
-const safeGreeting = sanitizeStrict(greeting);
+const safeGreeting = sanitizeStrict(greeting || "");
 const safeName = sanitizeStrict(name);
-const safeDescription = sanitizeStrict(description);
+const safeDescription = sanitizeStrict(description || "");
 ---
 
 <section class="min-h-screen flex justify-start items-center pl-[10%] box-border">

@@ -53,7 +53,8 @@ describe("pageLifecycle", () => {
       onPageLifecycle("load-test", { onLoad: onLoadMock });
 
       const pageLoadHandler = addEventListenerSpy.mock.calls.find(
-        (call) => call[0] === "astro:page-load"
+        (call: [string, EventListenerOrEventListenerObject, ...unknown[]]) =>
+          call[0] === "astro:page-load"
       )?.[1] as EventListener;
 
       pageLoadHandler?.(new Event("astro:page-load"));
@@ -68,10 +69,12 @@ describe("pageLifecycle", () => {
       onPageLifecycle("cleanup-test", { onLoad: onLoadMock });
 
       const pageLoadHandler = addEventListenerSpy.mock.calls.find(
-        (call) => call[0] === "astro:page-load"
+        (call: [string, EventListenerOrEventListenerObject, ...unknown[]]) =>
+          call[0] === "astro:page-load"
       )?.[1] as EventListener;
       const beforeSwapHandler = addEventListenerSpy.mock.calls.find(
-        (call) => call[0] === "astro:before-swap"
+        (call: [string, EventListenerOrEventListenerObject, ...unknown[]]) =>
+          call[0] === "astro:before-swap"
       )?.[1] as EventListener;
 
       pageLoadHandler?.(new Event("astro:page-load"));
@@ -87,7 +90,8 @@ describe("pageLifecycle", () => {
       onPageLifecycle("swap-test", { onSwap: onSwapMock });
 
       const beforeSwapHandler = addEventListenerSpy.mock.calls.find(
-        (call) => call[0] === "astro:before-swap"
+        (call: [string, EventListenerOrEventListenerObject, ...unknown[]]) =>
+          call[0] === "astro:before-swap"
       )?.[1] as EventListener;
 
       beforeSwapHandler?.(new Event("astro:before-swap"));

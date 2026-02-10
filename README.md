@@ -11,8 +11,8 @@ Source code for zheyucao.com, built with Astro. Content lives in collections (MD
 - **src/viewmodels/**: Load content collections and shape props for pages.
 - **src/config.ts**: Site metadata and navigation.
 - **src/styles/**: Global and feature styles.
+- **src/content/resume-layout/default.json**: Controls résumé section order, placement (main/sidebar), and source mapping.
 - **public/**: Static assets (images, favicon).
-- **utils/**: Utility scripts.
 
 ## Features
 
@@ -32,6 +32,15 @@ Content is managed through Astro content collections:
 - **View models** (`src/viewmodels/`): load and map content into the shapes pages need.
 
 To update copy or data, edit the relevant entry in `src/content/`.
+
+### Template Customization
+
+- **Homepage sections**: Edit/add files in `src/content/homepage-sections/` and control order/visibility via frontmatter.
+- **Projects/Timeline/Contact/Resume content**: Add or edit entries under each collection folder in `src/content/`.
+- **Résumé layout**: Reorder sections, move between main/sidebar, or remap sources in `src/content/resume-layout/default.json`.
+- **Page metadata & actions**: Edit `src/content/page-metadata/*.mdx` (`actions[].variant` supports `default`, `primary`, `subtle`).
+- **Navigation**: Edit `src/config.ts` for menu items/site metadata.
+- **Adding a new page**: Create `src/pages/<slug>.astro`, then add navigation and optionally a `src/content/page-metadata/<slug>.mdx` entry.
 
 ## Development
 
@@ -57,6 +66,7 @@ pnpm install
 | `pnpm astro -- --help` | Get help using the Astro CLI                     |
 | `pnpm lint`            | Run ESLint to check for code issues              |
 | `pnpm lint:fix`        | Fix ESLint issues automatically                  |
+| `pnpm check`           | Run Astro type/content checks                    |
 | `pnpm format`          | Format code using Prettier                       |
 | `pnpm format:check`    | Check code formatting without making changes     |
 

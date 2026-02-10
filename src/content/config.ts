@@ -68,9 +68,11 @@ const homepage_sections = defineCollection({
         .object({
           contactIcons: z
             .object({
-              sourceCollection: z.string(),
-              filter: z.record(z.any()).optional(),
-              itemFilter: z.record(z.any()).optional(),
+              sourceCollection: z.literal("contact"),
+              filter: z.record(z.union([z.string(), z.number(), z.boolean(), z.null()])).optional(),
+              itemFilter: z
+                .record(z.union([z.string(), z.number(), z.boolean(), z.null()]))
+                .optional(),
             })
             .optional(),
         })
@@ -89,9 +91,9 @@ const homepage_sections = defineCollection({
         })
         .optional(),
       fallback: z.string().optional(), // Fallback text when no items
-      sourceCollection: z.string(), // e.g., "projects", "timeline"
-      filter: z.record(z.any()).optional(), // e.g., { isFeatured: true }
-      sortBy: z.string().optional(), // e.g., "order", "date"
+      sourceCollection: z.enum(["projects", "timeline"]),
+      filter: z.record(z.union([z.string(), z.number(), z.boolean(), z.null()])).optional(),
+      sortBy: z.enum(["order", "date"]).optional(),
       sortOrder: z.enum(["asc", "desc"]).optional(),
       limit: z.number().optional(),
       componentType: z.enum(["cards", "list"]), // "cards" for projects, "list" for timeline
@@ -103,7 +105,8 @@ const homepage_sections = defineCollection({
 const actionSchema = z.object({
   text: z.string(),
   href: z.string(),
-  style: z.string().optional(),
+  variant: z.enum(["default", "primary", "subtle"]).optional(),
+  style: z.string().optional(), // Deprecated alias for variant.
   download: z.string().optional(),
   icon: z.string().optional(),
   iconPosition: z.enum(["left", "right"]).optional(),
@@ -221,6 +224,50 @@ const footer = defineCollection({
   }),
 });
 
+const resume_layout = defineCollection({
+  type: "data",
+  schema: z.object({
+    sections: z.array(
+      z.discriminatedUnion("type", [
+        z.object({
+          id: z.string(),
+          type: z.literal("text"),
+          column: z.enum(["main", "sidebar"]),
+          source: z.string(),
+          title: z.string().optional(),
+          visible: z.boolean().default(true),
+        }),
+        z.object({
+          id: z.string(),
+          type: z.literal("entries"),
+          column: z.enum(["main", "sidebar"]),
+          sourcePrefix: z.string(),
+          title: z.string().optional(),
+          variant: z.enum(["default", "education", "experience", "awards", "projects"]).optional(),
+          includeSubtitle: z.boolean().default(true),
+          visible: z.boolean().default(true),
+        }),
+        z.object({
+          id: z.string(),
+          type: z.literal("skills"),
+          column: z.enum(["main", "sidebar"]),
+          source: z.string(),
+          title: z.string().optional(),
+          visible: z.boolean().default(true),
+        }),
+        z.object({
+          id: z.string(),
+          type: z.literal("contact"),
+          column: z.enum(["main", "sidebar"]),
+          source: z.string(),
+          title: z.string().optional(),
+          visible: z.boolean().default(true),
+        }),
+      ])
+    ),
+  }),
+});
+
 export const collections = {
   projects,
   timeline,
@@ -230,4 +277,5 @@ export const collections = {
   "ui-strings": ui_strings,
   "page-metadata": page_metadata,
   footer,
+  "resume-layout": resume_layout,
 };

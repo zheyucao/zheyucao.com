@@ -4,6 +4,7 @@ import DynamicBackground from "../components/DynamicBackground.astro";
 import ScrollIndicator from "../components/ScrollIndicator.astro";
 import Footer from "../components/Footer.astro";
 import { siteConfig } from "../config";
+import type { SEOMetadata } from "../lib/viewmodels/baseViewModel";
 import "../styles/global.css";
 
 // Fontsource Variable Imports
@@ -16,11 +17,17 @@ import "@fontsource-variable/eb-garamond/wght-italic.css";
 interface Props {
   title?: string; // Optional title prop
   showIndicatorOverride?: boolean; // Add override prop
+  description?: string;
+  seo?: SEOMetadata;
 }
-const { title, showIndicatorOverride } = Astro.props;
+const { title, showIndicatorOverride, description, seo } = Astro.props;
 
 // Set a default title if none is provided
 const pageTitle = `${title || siteConfig.metadata.title} | ${siteConfig.metadata.author}`;
+const pageDescription = description || siteConfig.metadata.description;
+const canonicalUrl = new URL(Astro.url.pathname, siteConfig.metadata.siteUrl).toString();
+const seoMetadata = seo || {};
+const defaultTheme = siteConfig.theme.defaultTheme;
 
 // Determine if the scroll indicator should be shown
 const currentPath = Astro.url.pathname;
@@ -31,15 +38,28 @@ const showScrollIndicator =
 ---
 
 <!doctype html>
-<html lang="en">
+<html lang="en" data-default-theme={defaultTheme}>
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width" />
     <link rel="icon" type="image/png" href="/favicon.png" />
     <meta name="generator" content={Astro.generator} />
     <title>{pageTitle}</title>
-    <meta name="description" content={siteConfig.metadata.description} />
+    <meta name="description" content={pageDescription} />
     <meta name="author" content={siteConfig.metadata.author} />
+    <link rel="canonical" href={canonicalUrl} />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content={canonicalUrl} />
+    <meta property="og:title" content={seoMetadata.ogTitle ?? pageTitle} />
+    <meta property="og:description" content={seoMetadata.ogDescription ?? pageDescription} />
+    {seoMetadata.ogImage && <meta property="og:image" content={seoMetadata.ogImage} />}
+    <meta
+      name="twitter:card"
+      content={seoMetadata.twitterCard ?? (seoMetadata.ogImage ? "summary_large_image" : "summary")}
+    />
+    <meta name="twitter:title" content={seoMetadata.ogTitle ?? pageTitle} />
+    <meta name="twitter:description" content={seoMetadata.ogDescription ?? pageDescription} />
+    {seoMetadata.ogImage && <meta name="twitter:image" content={seoMetadata.ogImage} />}
     <script is:inline>
       // Safari view transitions can flicker; force fallback swap there.
       const ua = navigator.userAgent;
@@ -63,9 +83,14 @@ const showScrollIndicator =
       motionQuery.addEventListener("change", updateMotionClass);
     </script>
     <!-- START Insert Theme Detection Script Here -->
-    <script is:inline>
+    <script is:inline define:vars={{ defaultTheme }}>
       // Immediate theme application to prevent flash
-      if (window.matchMedia("(prefers-color-scheme: dark)").matches) {
+      if (defaultTheme === "dark") {
+        document.documentElement.classList.add("dark");
+      } else if (
+        defaultTheme === "system" &&
+        window.matchMedia("(prefers-color-scheme: dark)").matches
+      ) {
         document.documentElement.classList.add("dark");
       }
     </script>
@@ -76,9 +101,13 @@ const showScrollIndicator =
       import { setupIntersectionObserver } from "../lib/layout/intersectionObserver";
       import { setupSectionAnimations, cleanupScrollTriggers } from "../lib/layout/gsapAnimations";
 
+      const defaultTheme = (
+        document.documentElement.dataset.defaultTheme || "system"
+      ) as "light" | "dark" | "system";
+
       onPageLifecycle("layout-core", {
         onLoad: () => {
-          const cleanupTheme = initTheme();
+          const cleanupTheme = initTheme(defaultTheme);
           const cleanupObserver = setupIntersectionObserver();
           requestAnimationFrame(() => setupSectionAnimations());
 

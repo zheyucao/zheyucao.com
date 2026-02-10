@@ -13,12 +13,13 @@ export interface EntryItem {
 interface Props {
   title: string;
   entries: EntryItem[];
+  variant?: "default" | "education" | "experience" | "awards" | "projects";
 }
 
-const { title, entries } = Astro.props;
+const { title, entries, variant = "default" } = Astro.props;
 ---
 
-<section class="resume-section scroll-reveal-animate mb-12">
+<section class="resume-section scroll-reveal-animate mb-12" data-variant={variant}>
   <h2 class="section-heading">{title}</h2>
   {
     entries.map((entry, index) => (

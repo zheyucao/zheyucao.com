@@ -8,7 +8,7 @@ interface Props {
   data: {
     section: {
       title: string;
-      cta: {
+      cta?: {
         text: string;
         href: string;
       };
@@ -45,7 +45,11 @@ const isDoubleColumn = featuredProjects.length % 2 === 0;
     })
   }
 
-  <div class="btn-group">
-    <Button class="button" href={cta.href} text={cta.text} wrapperClass="projects-cta-button" />
-  </div>
+  {
+    cta?.href && cta?.text ? (
+      <div class="btn-group">
+        <Button class="button" href={cta.href} text={cta.text} wrapperClass="projects-cta-button" />
+      </div>
+    ) : null
+  }
 </div>

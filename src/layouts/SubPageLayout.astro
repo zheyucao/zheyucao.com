@@ -1,15 +1,18 @@
 ---
 import Layout from "./Layout.astro";
 import { Icon } from "astro-icon/components";
+import type { SEOMetadata } from "../lib/viewmodels/baseViewModel";
 
 interface Props {
   title: string;
+  description?: string;
+  seo?: SEOMetadata;
 }
 
-const { title } = Astro.props;
+const { title, description, seo } = Astro.props;
 ---
 
-<Layout title={title} showIndicatorOverride={false}>
+<Layout title={title} description={description} seo={seo} showIndicatorOverride={false}>
   <section class="subpage-main py-8 px-[10%] pb-16 min-h-[60vh] mt-8">
     <div class="subpage-header mb-12 pb-4">
       <div class="page-actions flex items-center gap-4 mb-6">

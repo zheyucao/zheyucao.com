@@ -2,30 +2,13 @@
 import SubPageLayout from "../layouts/SubPageLayout.astro";
 import { getContactViewModel } from "../viewmodels/contactViewModel";
 import { Icon } from "astro-icon/components";
-import Button from "../components/common/Button.astro";
+import PageActions from "../components/common/PageActions.astro";
 
 const { intro, sections, metadata } = await getContactViewModel();
 ---
 
-<SubPageLayout title={metadata.title}>
-  {
-    metadata.actions &&
-      metadata.actions.map((action) => (
-        <Button
-          slot="actions"
-          href={action.href}
-          text={action.text}
-          style={action.style}
-          download={action.download}
-          icon={action.icon}
-          iconPosition={action.iconPosition}
-          target={action.target}
-          rel={action.rel}
-          noMargin={true}
-          wrapperClass="page-load-initial-state"
-        />
-      ))
-  }
+<SubPageLayout title={metadata.title} description={metadata.description} seo={metadata.seo}>
+  <PageActions actions={metadata.actions} />
   <div class="max-w-[600px]">
     {
       intro && (
@@ -51,7 +34,6 @@ const { intro, sections, metadata } = await getContactViewModel();
                 {(() => {
                   const value = item.content || "";
                   const description = item.description;
-                  const copyValue = undefined;
 
                   if (item.href) {
                     return (
@@ -64,15 +46,6 @@ const { intro, sections, metadata } = await getContactViewModel();
                         >
                           {value}
                         </a>
-                        {description && <span class="text-text-muted">&nbsp;{description}</span>}
-                      </>
-                    );
-                  }
-
-                  if (copyValue) {
-                    return (
-                      <>
-                        <span class:list={["copyable", { clickable: true }]}>{value}</span>
                         {description && <span class="text-text-muted">&nbsp;{description}</span>}
                       </>
                     );

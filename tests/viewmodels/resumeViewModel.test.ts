@@ -1,11 +1,12 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { getResumeViewModel, type ResumeSection } from "../../src/viewmodels/resumeViewModel";
-import { getCollection } from "astro:content";
+import { getCollection, getEntry } from "astro:content";
 import { getPageMetadata } from "../../src/lib/viewmodels/baseViewModel";
 
 // Mock astro:content
 vi.mock("astro:content", () => ({
   getCollection: vi.fn(),
+  getEntry: vi.fn(),
 }));
 
 // Mock baseViewModel
@@ -14,6 +15,7 @@ vi.mock("../../src/lib/viewmodels/baseViewModel", () => ({
 }));
 
 const mockedGetCollection = vi.mocked(getCollection);
+const mockedGetEntry = vi.mocked(getEntry);
 const mockedGetPageMetadata = vi.mocked(getPageMetadata);
 
 type EntrySection = Extract<ResumeSection, { type: "entries" }>;
@@ -73,6 +75,75 @@ describe("resumeViewModel", () => {
       },
     ];
     mockedGetCollection.mockResolvedValue(mockEntries as never);
+    mockedGetEntry.mockResolvedValue(
+      {
+        data: {
+          sections: [
+            {
+              id: "profile",
+              type: "text",
+              column: "main",
+              source: "profile/me.md",
+              visible: true,
+            },
+            {
+              id: "education",
+              type: "entries",
+              column: "main",
+              sourcePrefix: "education",
+              title: "Education",
+              variant: "education",
+              includeSubtitle: true,
+              visible: true,
+            },
+            {
+              id: "awards",
+              type: "entries",
+              column: "main",
+              sourcePrefix: "awards",
+              title: "Honors & Awards",
+              variant: "awards",
+              includeSubtitle: true,
+              visible: true,
+            },
+            {
+              id: "experience",
+              type: "entries",
+              column: "main",
+              sourcePrefix: "experience",
+              title: "Experience",
+              variant: "experience",
+              includeSubtitle: true,
+              visible: true,
+            },
+            {
+              id: "projects",
+              type: "entries",
+              column: "main",
+              sourcePrefix: "projects",
+              title: "Projects",
+              variant: "projects",
+              includeSubtitle: false,
+              visible: true,
+            },
+            {
+              id: "skills",
+              type: "skills",
+              column: "sidebar",
+              source: "skills.mdx",
+              visible: true,
+            },
+            {
+              id: "contact",
+              type: "contact",
+              column: "sidebar",
+              source: "contact.mdx",
+              visible: true,
+            },
+          ],
+        },
+      } as never
+    );
 
     const result = await getResumeViewModel();
 
@@ -114,6 +185,21 @@ describe("resumeViewModel", () => {
 
   it("should throw error if profile is missing", async () => {
     mockedGetCollection.mockResolvedValue([] as never);
-    await expect(getResumeViewModel()).rejects.toThrow("Profile entry not found");
+    mockedGetEntry.mockResolvedValue(
+      {
+        data: {
+          sections: [
+            {
+              id: "profile",
+              type: "text",
+              column: "main",
+              source: "profile/me.md",
+              visible: true,
+            },
+          ],
+        },
+      } as never
+    );
+    await expect(getResumeViewModel()).rejects.toThrow("Resume text entry not found: profile/me.md");
   });
 });

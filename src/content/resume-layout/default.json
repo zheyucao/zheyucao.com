@@ -1,0 +1,62 @@
+{
+  "sections": [
+    {
+      "id": "profile",
+      "type": "text",
+      "column": "main",
+      "source": "profile/profile",
+      "visible": true
+    },
+    {
+      "id": "education",
+      "type": "entries",
+      "column": "main",
+      "sourcePrefix": "education",
+      "title": "Education",
+      "variant": "education",
+      "visible": true
+    },
+    {
+      "id": "awards",
+      "type": "entries",
+      "column": "main",
+      "sourcePrefix": "awards",
+      "title": "Honors & Awards",
+      "variant": "awards",
+      "visible": true
+    },
+    {
+      "id": "experience",
+      "type": "entries",
+      "column": "main",
+      "sourcePrefix": "experience",
+      "title": "Experience",
+      "variant": "experience",
+      "visible": true
+    },
+    {
+      "id": "projects",
+      "type": "entries",
+      "column": "main",
+      "sourcePrefix": "projects",
+      "title": "Projects",
+      "variant": "projects",
+      "includeSubtitle": false,
+      "visible": true
+    },
+    {
+      "id": "skills",
+      "type": "skills",
+      "column": "sidebar",
+      "source": "skills",
+      "visible": true
+    },
+    {
+      "id": "contact",
+      "type": "contact",
+      "column": "sidebar",
+      "source": "contact",
+      "visible": true
+    }
+  ]
+}

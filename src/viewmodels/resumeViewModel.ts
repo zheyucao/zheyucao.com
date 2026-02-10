@@ -1,7 +1,8 @@
-import { getCollection, type CollectionEntry } from "astro:content";
+import { getCollection, getEntry, type CollectionEntry } from "astro:content";
 import type { AstroComponentFactory } from "astro/runtime/server/index.js";
 import { getPageMetadata, type PageMetadata } from "../lib/viewmodels/baseViewModel";
 import { formatDateRange } from "../lib/utils/dateUtils";
+import { sortByOrder } from "../lib/utils/sortUtils";
 
 // Define types inline (can't import from .astro files)
 export type GridSkillCategory = {
@@ -76,7 +77,41 @@ export type ResumeSection =
   | SkillsResumeSection
   | ContactResumeSection;
 
-import { sortByOrder } from "../lib/utils/sortUtils";
+type ResumeLayoutSection =
+  | {
+      id: string;
+      type: "text";
+      column: "main" | "sidebar";
+      source: string;
+      title?: string;
+      visible: boolean;
+    }
+  | {
+      id: string;
+      type: "entries";
+      column: "main" | "sidebar";
+      sourcePrefix: string;
+      title?: string;
+      variant?: "default" | "education" | "experience" | "awards" | "projects";
+      includeSubtitle: boolean;
+      visible: boolean;
+    }
+  | {
+      id: string;
+      type: "skills";
+      column: "main" | "sidebar";
+      source: string;
+      title?: string;
+      visible: boolean;
+    }
+  | {
+      id: string;
+      type: "contact";
+      column: "main" | "sidebar";
+      source: string;
+      title?: string;
+      visible: boolean;
+    };
 
 const matchesSingleEntryId = (entryId: string, baseName: string): boolean =>
   entryId === baseName || entryId === `${baseName}.mdx` || entryId === `${baseName}.md`;
@@ -101,6 +136,77 @@ const isContactEntry = (
 ): entry is ResumeCollectionEntry & {
   data: ContactEntryData;
 } => "type" in entry.data && entry.data.type === "contact";
+
+const DEFAULT_RESUME_LAYOUT: ResumeLayoutSection[] = [
+  {
+    id: "profile",
+    type: "text",
+    column: "main",
+    source: "profile/profile",
+    visible: true,
+  },
+  {
+    id: "education",
+    type: "entries",
+    column: "main",
+    sourcePrefix: "education",
+    title: "Education",
+    variant: "education",
+    includeSubtitle: true,
+    visible: true,
+  },
+  {
+    id: "awards",
+    type: "entries",
+    column: "main",
+    sourcePrefix: "awards",
+    title: "Honors & Awards",
+    variant: "awards",
+    includeSubtitle: true,
+    visible: true,
+  },
+  {
+    id: "experience",
+    type: "entries",
+    column: "main",
+    sourcePrefix: "experience",
+    title: "Experience",
+    variant: "experience",
+    includeSubtitle: true,
+    visible: true,
+  },
+  {
+    id: "projects",
+    type: "entries",
+    column: "main",
+    sourcePrefix: "projects",
+    title: "Projects",
+    variant: "projects",
+    includeSubtitle: false,
+    visible: true,
+  },
+  {
+    id: "skills",
+    type: "skills",
+    column: "sidebar",
+    source: "skills",
+    visible: true,
+  },
+  {
+    id: "contact",
+    type: "contact",
+    column: "sidebar",
+    source: "contact",
+    visible: true,
+  },
+];
+
+const toDefaultSectionTitle = (value: string): string =>
+  value
+    .split(/[-_/]/g)
+    .filter(Boolean)
+    .map((token) => token.charAt(0).toUpperCase() + token.slice(1))
+    .join(" ");
 
 /**
  * Process standard resume entries (education, experience, projects, awards).
@@ -142,6 +248,91 @@ async function processStandardEntries(
   });
 }
 
+async function buildSectionFromLayout(
+  sectionConfig: ResumeLayoutSection,
+  allResumeContent: ResumeCollectionEntry[]
+): Promise<ResumeSection> {
+  if (sectionConfig.type === "text") {
+    const textEntry = allResumeContent.find(
+      (entry): entry is ResumeCollectionEntry & { data: StandardEntryData } =>
+        matchesSingleEntryId(entry.id, sectionConfig.source) && isStandardEntry(entry)
+    );
+    if (!textEntry) {
+      throw new Error(`Resume text entry not found: ${sectionConfig.source}`);
+    }
+    const { Content } = await textEntry.render();
+    return {
+      id: sectionConfig.id,
+      title: sectionConfig.title ?? textEntry.data.title,
+      type: "text",
+      Content,
+      visible: sectionConfig.visible,
+    };
+  }
+
+  if (sectionConfig.type === "entries") {
+    const content = await processStandardEntries(allResumeContent, sectionConfig.sourcePrefix, {
+      includeSubtitle: sectionConfig.includeSubtitle,
+    });
+
+    return {
+      id: sectionConfig.id,
+      title: sectionConfig.title ?? toDefaultSectionTitle(sectionConfig.sourcePrefix),
+      type: "entries",
+      variant: sectionConfig.variant,
+      content,
+      visible: sectionConfig.visible,
+    };
+  }
+
+  if (sectionConfig.type === "skills") {
+    const skillsEntry = allResumeContent.find(
+      (entry): entry is ResumeCollectionEntry & { data: SkillsEntryData } =>
+        matchesSingleEntryId(entry.id, sectionConfig.source) && isSkillsEntry(entry)
+    );
+    if (!skillsEntry) {
+      throw new Error(`Resume skills entry not found or invalid: ${sectionConfig.source}`);
+    }
+
+    return {
+      id: sectionConfig.id,
+      title: sectionConfig.title ?? skillsEntry.data.title,
+      type: "skills",
+      content: skillsEntry.data.content.map(
+        (category): GridSkillCategory => ({
+          name: category.category,
+          items: category.items,
+        })
+      ),
+      visible: sectionConfig.visible,
+    };
+  }
+
+  const contactEntry = allResumeContent.find(
+    (entry): entry is ResumeCollectionEntry & { data: ContactEntryData } =>
+      matchesSingleEntryId(entry.id, sectionConfig.source) && isContactEntry(entry)
+  );
+  if (!contactEntry) {
+    throw new Error(`Resume contact entry not found or invalid: ${sectionConfig.source}`);
+  }
+
+  return {
+    id: sectionConfig.id,
+    title: sectionConfig.title ?? contactEntry.data.title,
+    type: "contact",
+    content: contactEntry.data.content.map(
+      (item): ResumeContactItem => ({
+        icon: item.icon,
+        label: item.label ?? item.description ?? item.icon,
+        href: item.href,
+        target: item.target,
+        rel: item.rel,
+      })
+    ),
+    visible: sectionConfig.visible,
+  };
+}
+
 /**
  * Résumé page view model
  * Aggregates and organizes resume content into main column and sidebar
@@ -151,111 +342,29 @@ export async function getResumeViewModel(): Promise<{
   sidebar: ResumeSection[];
   metadata: PageMetadata;
 }> {
-  // Fetch all resume content
   const allResumeContent = await getCollection("resume");
 
-  // Filter profile
-  const profileEntry = allResumeContent.find(
-    (entry): entry is ResumeCollectionEntry & { data: StandardEntryData } =>
-      entry.id.startsWith("profile/") && isStandardEntry(entry)
-  );
-  if (!profileEntry) throw new Error("Profile entry not found");
-  const { Content: ProfileContent } = await profileEntry.render();
-
-  // Process entry sections using helper
-  const [sortedEducation, sortedExperience, sortedProjects, sortedAwards] = await Promise.all([
-    processStandardEntries(allResumeContent, "education"),
-    processStandardEntries(allResumeContent, "experience"),
-    processStandardEntries(allResumeContent, "projects", { includeSubtitle: false }),
-    processStandardEntries(allResumeContent, "awards"),
+  const [layoutEntry, metadata] = await Promise.all([
+    getEntry("resume-layout", "default"),
+    getPageMetadata("resume"),
   ]);
+  const layoutSections = layoutEntry?.data.sections ?? DEFAULT_RESUME_LAYOUT;
 
-  // Fetch skills data
-  const skillsEntry = allResumeContent.find(
-    (entry): entry is ResumeCollectionEntry & { data: SkillsEntryData } =>
-      matchesSingleEntryId(entry.id, "skills") && isSkillsEntry(entry)
+  const resolvedSections = await Promise.all(
+    layoutSections.map((section) => buildSectionFromLayout(section, allResumeContent))
   );
-  if (!skillsEntry) {
-    throw new Error("Skills entry not found or invalid");
-  }
 
-  // Fetch contact data
-  const contactEntry = allResumeContent.find(
-    (entry): entry is ResumeCollectionEntry & { data: ContactEntryData } =>
-      matchesSingleEntryId(entry.id, "contact") && isContactEntry(entry)
-  );
-  if (!contactEntry) {
-    throw new Error("Contact entry not found or invalid");
-  }
+  const mainColumn: ResumeSection[] = [];
+  const sidebar: ResumeSection[] = [];
 
-  // Build mainColumn and sidebar structure
-  const mainColumn: ResumeSection[] = [
-    {
-      id: "profile",
-      title: profileEntry.data.title,
-      type: "text",
-      Content: ProfileContent,
-    },
-    {
-      id: "education",
-      title: "Education",
-      type: "entries",
-      variant: "education",
-      content: sortedEducation,
-    },
-    {
-      id: "awards",
-      title: "Honors & Awards",
-      type: "entries",
-      variant: "awards",
-      content: sortedAwards,
-    },
-    {
-      id: "experience",
-      title: "Experience",
-      type: "entries",
-      variant: "experience",
-      content: sortedExperience,
-    },
-    {
-      id: "projects",
-      title: "Projects",
-      type: "entries",
-      variant: "projects",
-      content: sortedProjects,
-    },
-  ];
-
-  const sidebar: ResumeSection[] = [
-    {
-      id: "skills",
-      title: skillsEntry.data.title,
-      type: "skills",
-      content: skillsEntry.data.content.map(
-        (category): GridSkillCategory => ({
-          name: category.category,
-          items: category.items,
-        })
-      ),
-    },
-    {
-      id: "contact",
-      title: contactEntry.data.title,
-      type: "contact",
-      content: contactEntry.data.content.map(
-        (item): ResumeContactItem => ({
-          icon: item.icon,
-          label: item.label ?? item.description ?? item.icon,
-          href: item.href,
-          target: item.target,
-          rel: item.rel,
-        })
-      ),
-    },
-  ];
-
-  // Fetch metadata from centralized page-metadata collection
-  const metadata = await getPageMetadata("resume");
+  layoutSections.forEach((sectionConfig, index) => {
+    const section = resolvedSections[index];
+    if (sectionConfig.column === "main") {
+      mainColumn.push(section);
+      return;
+    }
+    sidebar.push(section);
+  });
 
   return {
     mainColumn,

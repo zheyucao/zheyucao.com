@@ -1,5 +1,5 @@
 ---
-// Content for text-content sections (Meet me, Connect, custom content)
+// Generic content for homepage text-content sections
 import Button from "../../common/Button.astro";
 import ContactIcons from "../../contact/ContactIcons.astro";
 import type { AstroComponentFactory } from "astro/runtime/server/index.js";
@@ -8,7 +8,7 @@ import type { ContactItem } from "../../../viewmodels/contactViewModel";
 interface Props {
   data: {
     title: string;
-    cta: {
+    cta?: {
       text: string;
       href: string;
     };
@@ -36,7 +36,11 @@ const { title, cta, Content, socialItems } = data;
     ) : null
   }
 
-  <div class="btn-group">
-    <Button class="button" href={cta.href} text={cta.text} wrapperClass="meet-me-cta-button" />
-  </div>
+  {
+    cta?.href && cta?.text ? (
+      <div class="btn-group">
+        <Button class="button" href={cta.href} text={cta.text} wrapperClass="text-content-cta-button" />
+      </div>
+    ) : null
+  }
 </div>

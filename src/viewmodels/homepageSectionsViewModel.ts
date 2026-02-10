@@ -25,7 +25,7 @@ export type TextContentSection = {
   contactIcons?: ContactItem[];
 };
 
-export type CollectionShowcaseSection = {
+type BaseShowcaseSection = {
   type: "showcase";
   order: number;
   title?: string;
@@ -34,13 +34,23 @@ export type CollectionShowcaseSection = {
     href: string;
   };
   fallback?: string;
-  componentType: "cards" | "list";
-  items: Array<
-    CollectionEntry<"projects"> | (CollectionEntry<"timeline"> & { Content: AstroComponentFactory })
-  >;
 };
 
-export type HomepageSection = HeroSection | TextContentSection | CollectionShowcaseSection;
+export type ProjectShowcaseSection = BaseShowcaseSection & {
+  componentType: "cards";
+  items: CollectionEntry<"projects">[];
+};
+
+export type TimelineShowcaseSection = BaseShowcaseSection & {
+  componentType: "list";
+  items: Array<CollectionEntry<"timeline"> & { Content: AstroComponentFactory }>;
+};
+
+export type HomepageSection =
+  | HeroSection
+  | TextContentSection
+  | ProjectShowcaseSection
+  | TimelineShowcaseSection;
 
 /**
  * Get all homepage sections, processed and ready for rendering
@@ -135,7 +145,7 @@ export async function getHomepageSectionsViewModel(): Promise<HomepageSection[]>
       }
 
       if (type === "showcase") {
-        const { sourceCollection, filter, sortBy, sortOrder, limit, componentType } = section.data;
+          const { sourceCollection, filter, sortBy, sortOrder, limit, componentType } = section.data;
 
         // Handle projects collection
         if (sourceCollection === "projects") {
@@ -150,7 +160,12 @@ export async function getHomepageSectionsViewModel(): Promise<HomepageSection[]>
             });
           }
 
-          // Apply sorting
+          if (componentType !== "cards") {
+            throw new Error(
+              `Invalid homepage section config '${section.id}': projects sourceCollection requires componentType: "cards"`
+            );
+          }
+
           if (sortBy === "order") {
             projectItems = sortByOrder(projectItems, {
               getOrder: (item) => item.data.order,
@@ -170,20 +185,27 @@ export async function getHomepageSectionsViewModel(): Promise<HomepageSection[]>
             projectItems = projectItems.slice(0, limit);
           }
 
-          return {
+          const result: ProjectShowcaseSection = {
             type: "showcase" as const,
             order: section.data.order,
             title: section.data.title,
             cta: section.data.cta,
             fallback: section.data.fallback,
-            componentType,
+            componentType: "cards",
             items: projectItems,
           };
+          return result;
         }
 
         // Handle timeline collection
         if (sourceCollection === "timeline") {
           let timelineItems = [...allTimelineEntries];
+
+          if (componentType !== "list") {
+            throw new Error(
+              `Invalid homepage section config '${section.id}': timeline sourceCollection requires componentType: "list"`
+            );
+          }
 
           // Apply filters
           if (filter) {
@@ -227,15 +249,16 @@ export async function getHomepageSectionsViewModel(): Promise<HomepageSection[]>
             })
           );
 
-          return {
+          const result: TimelineShowcaseSection = {
             type: "showcase" as const,
             order: section.data.order,
             title: section.data.title,
             cta: section.data.cta,
             fallback: section.data.fallback,
-            componentType,
+            componentType: "list",
             items: renderedItems,
           };
+          return result;
         }
 
         throw new Error(`Unknown source collection: ${sourceCollection}`);

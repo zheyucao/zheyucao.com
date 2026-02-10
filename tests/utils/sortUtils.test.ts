@@ -21,10 +21,10 @@ describe("sortUtils", () => {
       expect(result.map((i) => i.order)).toEqual([1, 2, -1]);
     });
 
-    it("should sort negative orders descending (so -1 is last)", () => {
+    it("should sort negative orders descending (so -1 is first among negatives)", () => {
       const items = [{ order: -1 }, { order: -3 }, { order: -2 }];
       const result = sortByOrder(items);
-      // Negative orders are sorted descending, so -1 (closest to 0) comes last
+      // Negative orders are sorted descending, so -1 (closest to 0) comes first
       expect(result.map((i) => i.order)).toEqual([-1, -2, -3]);
     });
 
