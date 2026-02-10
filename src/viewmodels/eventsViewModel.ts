@@ -4,12 +4,6 @@ import { sortByOrder } from "../lib/utils/sortUtils";
 import { formatDateRange } from "../lib/utils/dateUtils";
 
 /**
- * Helper to parse dates robustly
- * Handles "Present", "YYYY-MM", "YYYY", etc.
- */
-// Local parseDate removed in favor of shared utility from ../lib/utils/dateUtils
-
-/**
  * Events page view model
  * Fetches and prepares events for the events page
  */

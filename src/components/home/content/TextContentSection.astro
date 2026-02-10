@@ -6,19 +6,16 @@ import type { AstroComponentFactory } from "astro/runtime/server/index.js";
 import type { ContactItem } from "../../../viewmodels/contactViewModel";
 
 interface Props {
-  data: {
-    title: string;
-    cta?: {
-      text: string;
-      href: string;
-    };
-    Content: AstroComponentFactory;
-    socialItems?: ContactItem[];
+  title: string;
+  cta?: {
+    text: string;
+    href: string;
   };
+  Content: AstroComponentFactory;
+  socialItems?: ContactItem[];
 }
 
-const { data } = Astro.props;
-const { title, cta, Content, socialItems } = data;
+const { title, cta, Content, socialItems } = Astro.props;
 ---
 
 <h2 slot="title" class="section-title scroll-target-title">{title}</h2>

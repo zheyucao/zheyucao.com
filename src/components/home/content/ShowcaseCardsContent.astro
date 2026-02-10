@@ -5,21 +5,15 @@ import Button from "../../common/Button.astro";
 import type { CollectionEntry } from "astro:content";
 
 interface Props {
-  data: {
-    section: {
-      title: string;
-      cta?: {
-        text: string;
-        href: string;
-      };
-    };
-    projects: CollectionEntry<"projects">[];
+  title: string;
+  cta?: {
+    text: string;
+    href: string;
   };
+  projects: CollectionEntry<"projects">[];
 }
 
-const { data } = Astro.props;
-const { section, projects } = data;
-const { title, cta } = section;
+const { title, cta, projects } = Astro.props;
 const featuredProjects = projects;
 const isDoubleColumn = featuredProjects.length % 2 === 0;
 ---

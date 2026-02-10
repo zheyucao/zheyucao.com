@@ -108,13 +108,6 @@ const { categories, initialEvents: initialFilteredEvents, metadata, filterAll } 
     text-align: right;
     margin: 0.5rem 0 0;
   }
-
-  .timeline-container {
-    padding: 0;
-    margin: 0;
-    /* No specific layout needed here, handled by list items */
-  }
-
   /* Category Tabs Styling */
   .category-tabs {
     gap: 0.5rem 0rem;
@@ -144,36 +137,14 @@ const { categories, initialEvents: initialFilteredEvents, metadata, filterAll } 
     font-weight: 600;
   }
 
-  #sort-toggle {
-    font-family: inherit;
-    font-size: 0.9rem;
-    padding: 0.4em 0.9em;
-    border-radius: 6px;
-    border: 1px solid var(--button-border-hover-color);
-    background-color: var(--button-hover-bg);
-    color: var(--button-hover-text);
-    font-weight: 500;
-    cursor: pointer;
-    transition: all 0.2s ease;
-  }
-  #sort-toggle:hover {
-    border-color: var(--button-border-color);
-    background-color: transparent;
-    color: var(--text-muted);
-  }
-
   .timeline-container {
-    /* Add transition for smoother effect when class is removed */
-    transition: opacity 0.3s ease-out;
-    /* padding/margin already exist */
     padding: 0;
     margin: 0;
+    transition: opacity 0.3s ease-out;
   }
 
   .timeline-container.is-updating {
     opacity: 0;
-    /* You could use animation instead if preferred */
-    /* animation: fadeOut 0.3s ease-out forwards; */
   }
 
   /* Consider users who prefer reduced motion */

@@ -19,46 +19,34 @@ const { section } = Astro.props;
   ) : section.type === "text" ? (
     <SectionWrapper>
       <TextContentSection
-        data={{
-          title: section.title || "",
-          cta: section.cta,
-          Content: section.Content,
-        }}
+        title={section.title || ""}
+        cta={section.cta}
+        Content={section.Content}
       />
     </SectionWrapper>
   ) : section.type === "contact" ? (
     <SectionWrapper>
       <TextContentSection
-        data={{
-          title: section.title || "",
-          cta: section.cta,
-          Content: section.Content,
-          socialItems: section.contactIcons,
-        }}
+        title={section.title || ""}
+        cta={section.cta}
+        Content={section.Content}
+        socialItems={section.contactIcons}
       />
     </SectionWrapper>
   ) : section.type === "showcase" ? (
     <SectionWrapper>
       {section.componentType === "cards" ? (
         <ShowcaseCardsContent
-          data={{
-            section: {
-              title: section.title || "",
-              cta: section.cta,
-            },
-            projects: section.items,
-          }}
+          title={section.title || ""}
+          cta={section.cta}
+          projects={section.items}
         />
       ) : (
         <ShowcaseListContent
-          data={{
-            section: {
-              title: section.title || "",
-              cta: section.cta,
-              fallback: section.fallback || "No items available.",
-            },
-            events: section.items,
-          }}
+          title={section.title || ""}
+          cta={section.cta}
+          fallback={section.fallback || "No items available."}
+          events={section.items}
         />
       )}
     </SectionWrapper>

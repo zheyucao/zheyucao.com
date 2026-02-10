@@ -7,22 +7,16 @@ import type { CollectionEntry } from "astro:content";
 import type { AstroComponentFactory } from "astro/runtime/server/index.js";
 
 interface Props {
-  data: {
-    section: {
-      title: string;
-      cta?: {
-        text: string;
-        href: string;
-      };
-      fallback: string;
-    };
-    events: Array<CollectionEntry<"timeline"> & { Content: AstroComponentFactory }>;
+  title: string;
+  cta?: {
+    text: string;
+    href: string;
   };
+  fallback: string;
+  events: Array<CollectionEntry<"timeline"> & { Content: AstroComponentFactory }>;
 }
 
-const { data } = Astro.props;
-const { section, events } = data;
-const { title, cta, fallback } = section;
+const { title, cta, fallback, events } = Astro.props;
 const highlightsToShow = events;
 ---
 
