@@ -175,7 +175,8 @@ code {
   padding: 0.2em 0.4em;
   border-radius: 3px;
   font-family: var(--font-family-mono, monospace);
-  font-size: 0.9em;
+  font-size: 0.78em;
+  line-height: 1.2;
 }
 
 pre {
@@ -184,6 +185,8 @@ pre {
   border-radius: 5px;
   overflow-x: auto;
   margin: 1em 0;
+  font-size: 0.95rem;
+  line-height: 1.55;
 }
 
 pre code {
