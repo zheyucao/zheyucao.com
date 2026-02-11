@@ -11,7 +11,7 @@
 - **src/viewmodels/**: 视图模型，从内容集合读取并整理页面需要的数据。
 - **src/config.ts**: 全站元数据与导航配置。
 - **src/styles/**: 全局与特定样式文件。
-- **src/content/resume-layout/default.json**: 控制简历分区顺序、主/侧栏位置、数据源映射。
+- **src/content/document-layout/default.json**: 控制简历分区顺序、主/侧栏位置、数据源映射。
 - **public/**: 静态资源（图片、favicon）。
 
 ## 功能
@@ -34,7 +34,7 @@
 
 - **首页分区**: 在 `src/content/homepage-sections/` 中新增或编辑分区文件，通过 frontmatter 控制顺序与显隐。
 - **项目/时间线/联系/简历内容**: 直接编辑 `src/content/` 对应集合目录。
-- **简历布局**: 在 `src/content/resume-layout/default.json` 中调整分区顺序、主侧栏归属与数据来源。
+- **简历布局**: 在 `src/content/document-layout/default.json` 中调整分区顺序、主侧栏归属与数据来源。
 - **页面元信息与按钮**: 编辑 `src/content/page-metadata/*.mdx`（`actions[].variant` 支持 `default`、`primary`、`subtle`）。
 - **导航与站点信息**: 在 `src/config.ts` 修改。
 - **新增页面**: 新建 `src/pages/<slug>.astro`，并在 `src/config.ts` 中加入导航，按需新增 `src/content/page-metadata/<slug>.mdx`。

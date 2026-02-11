@@ -1,3 +1,10 @@
+navigation:
+  "/": "Home"
+  "/timeline": "Timeline"
+  "/projects": "Projects"
+  "/resume": "Resume"
+  "/contact": "Contact"
+
 footer:
   linksHeading: "Links"
   connectHeading: "Connect"

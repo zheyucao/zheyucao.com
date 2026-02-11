@@ -2,11 +2,12 @@
 import Layout from "../layouts/Layout.astro";
 import SectionRenderer from "../components/home/SectionRenderer.astro";
 import { getHomepageSectionsViewModel } from "../viewmodels/homepageSectionsViewModel";
+import { getPageMetadata } from "../lib/viewmodels/baseViewModel";
 
-const sections = await getHomepageSectionsViewModel();
+const [sections, metadata] = await Promise.all([getHomepageSectionsViewModel(), getPageMetadata("index")]);
 ---
 
-<Layout title="Homepage">
+<Layout title={metadata.title} description={metadata.description} seo={metadata.seo}>
   <div class="homepage-content">
     {sections.map((section) => <SectionRenderer section={section} />)}
   </div>

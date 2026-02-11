@@ -203,6 +203,37 @@ describe("homepageSectionsViewModel", () => {
     expect(result.contactIcons).toHaveLength(2);
   });
 
+  it("contact section includes items on home by default when showOnHome is omitted", async () => {
+    mockCollections({
+      sections: [
+        createSectionEntry("connect-defaults", {
+          type: "contact",
+          order: 1,
+        }),
+      ],
+      contact: [
+        {
+          id: "primary",
+          data: {
+            type: "list",
+            items: [
+              { icon: "ri:mail-line", href: "mailto:hi@example.com" },
+              { icon: "ri:github-line", href: "https://github.com/example", showOnHome: false },
+            ],
+          },
+        },
+      ],
+    });
+
+    const [result] = await getHomepageSectionsViewModel();
+
+    expect(result.type).toBe("contact");
+    if (result.type !== "contact") {
+      throw new Error("Unexpected section type");
+    }
+    expect(result.contactIcons?.map((item) => item.icon)).toEqual(["ri:mail-line"]);
+  });
+
   it("builds project showcase with filters, ordering and limits", async () => {
     mockCollections({
       sections: [

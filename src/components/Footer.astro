@@ -10,6 +10,7 @@ const { navigation } = siteConfig;
 const locale = resolveLocaleFromPath(Astro.url.pathname);
 const uiStrings = await getUiStrings(locale);
 const { footer: footerStrings } = uiStrings;
+const navigationLabels = uiStrings.navigation || {};
 
 const footerData = await getEntry("footer", "info");
 if (!footerData) {
@@ -50,7 +51,7 @@ const contactFooterItems = await getContactFooterItems();
                 class="footer-link"
                 data-astro-prefetch
               >
-                {item.name}
+                {navigationLabels[item.href] || item.name}
               </a>
             </li>
           ))

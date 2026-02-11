@@ -1,15 +1,6 @@
 ---
 import { Icon } from "astro-icon/components";
-
-interface ContactIconItem {
-  icon: string;
-  label?: string; // display label
-  content?: string; // underlying value (e.g., number/handle) for copy/display
-  href?: string;
-  target?: string;
-  rel?: string;
-  description?: string;
-}
+import type { ContactItem as ContactIconItem } from "../../lib/types/contact";
 
 interface Props {
   items?: ContactIconItem[];
@@ -34,11 +25,7 @@ const { items = [] } = Astro.props;
           <Icon name={item.icon} size={22} aria-hidden="true" />
         </a>
       ) : (
-        <span
-          class="contact-icon inline-flex items-center bg-none border-none p-0 cursor-pointer"
-          role="img"
-          aria-label={primaryLabel}
-        >
+        <span class="contact-icon inline-flex items-center bg-none border-none p-0" role="img" aria-label={primaryLabel}>
           <Icon name={item.icon} size={22} aria-hidden="true" />
         </span>
       );

@@ -1,12 +1,12 @@
-// Fixed duration matching the CSS transition (300ms)
-const TRANSITION_DURATION = 300;
+// Match the CSS timings for each phase.
+const SWIPE_OUT_DURATION = 220;
+const SWIPE_IN_DURATION = 700;
 
 export class EventFilterController {
   private container: HTMLElement;
   private currentFilter: string = "all";
   private categoryTabs: NodeListOf<HTMLElement>;
   private reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
-  private isWebKitBrowser = this.detectWebKitBrowser();
   private boundCategoryClick: (e: Event) => void;
   private transitionTimeoutId: number | null = null;
   private animationFrameId: number | null = null;
@@ -57,40 +57,64 @@ export class EventFilterController {
   }
 
   private runFilterAnimation() {
-    if (this.reduceMotion.matches || this.isWebKitBrowser) {
+    if (this.reduceMotion.matches) {
       this.animationRunId += 1;
       this.clearPendingAnimation();
       this.applyFilter();
-      this.container.classList.remove("is-updating");
+      this.container.classList.remove("is-swiping-out", "is-swiping-in", "is-swiping-in-active");
       return;
     }
 
     this.clearPendingAnimation();
     const runId = ++this.animationRunId;
-    this.container.classList.add("is-updating");
+    this.container.classList.remove("is-swiping-in", "is-swiping-in-active", "is-swiping-out");
 
-    const finish = () => {
+    const finishSwipe = () => {
+      if (runId !== this.animationRunId) {
+        return;
+      }
+      this.clearPendingAnimation();
+      this.container.classList.remove("is-swiping-in", "is-swiping-in-active", "is-swiping-out");
+    };
+
+    const startSwipeIn = () => {
       if (runId !== this.animationRunId) {
         return;
       }
       this.clearPendingAnimation();
       this.applyFilter();
-      this.container.classList.remove("is-updating");
+      this.container.classList.remove("is-swiping-out", "is-swiping-in-active");
+      this.container.classList.add("is-swiping-in");
+
+      // Force layout so swipe-in starts from the right before transitioning to rest.
+      void this.container.offsetWidth;
+
+      // Use in-phase duration with a tiny buffer as fallback.
+      this.transitionTimeoutId = window.setTimeout(finishSwipe, SWIPE_IN_DURATION + 24);
+
+      this.transitionEndHandler = (event: TransitionEvent) => {
+        if (event.target !== this.container || event.propertyName !== "transform") {
+          return;
+        }
+        finishSwipe();
+      };
+      this.container.addEventListener("transitionend", this.transitionEndHandler);
+      this.container.classList.add("is-swiping-in-active");
+      this.container.classList.remove("is-swiping-in");
     };
 
-    // Let the opacity transition start before applying the new filter
+    this.container.classList.add("is-swiping-out");
     this.animationFrameId = requestAnimationFrame(() => {
       if (runId !== this.animationRunId) {
         return;
       }
-      // Use fixed duration + small buffer
-      this.transitionTimeoutId = window.setTimeout(finish, TRANSITION_DURATION + 50);
-
+      // Use out-phase duration with a tiny buffer as fallback.
+      this.transitionTimeoutId = window.setTimeout(startSwipeIn, SWIPE_OUT_DURATION + 12);
       this.transitionEndHandler = (event: TransitionEvent) => {
-        if (event.target !== this.container || event.propertyName !== "opacity") {
+        if (event.target !== this.container || event.propertyName !== "transform") {
           return;
         }
-        finish();
+        startSwipeIn();
       };
       this.container.addEventListener("transitionend", this.transitionEndHandler);
     });
@@ -117,7 +141,7 @@ export class EventFilterController {
     const events = Array.from(this.container.querySelectorAll<HTMLElement>(".timeline-event"));
     let lastVisibleEvent: HTMLElement | null = null;
 
-    events.forEach((el) => {
+    for (const el of events) {
       const category = el.dataset.category;
       el.classList.remove("is-last-visible");
       const connector = el.querySelector<HTMLElement>(".timeline-connector");
@@ -131,7 +155,7 @@ export class EventFilterController {
       } else {
         el.style.display = "none";
       }
-    });
+    }
 
     if (lastVisibleEvent) {
       lastVisibleEvent.classList.add("is-last-visible");
@@ -148,13 +172,6 @@ export class EventFilterController {
     this.categoryTabs.forEach((tab) => {
       tab.removeEventListener("click", this.boundCategoryClick);
     });
-    this.container.classList.remove("is-updating");
-  }
-
-  private detectWebKitBrowser() {
-    const userAgent = navigator.userAgent;
-    const isSafariFamily = /Safari\//i.test(userAgent);
-    const isExcludedEngine = /Chrome|Chromium|Edg|OPR|CriOS|FxiOS/i.test(userAgent);
-    return isSafariFamily && !isExcludedEngine;
+    this.container.classList.remove("is-swiping-out", "is-swiping-in", "is-swiping-in-active");
   }
 }

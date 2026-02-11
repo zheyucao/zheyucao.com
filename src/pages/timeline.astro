@@ -35,7 +35,7 @@ const { categories, initialEvents: initialFilteredEvents, metadata, filterAll } 
     </div>
   </div>
   <ul
-    class="timeline-container p-0 m-0 transition-opacity duration-300 ease-out motion-reduce:transition-none motion-reduce:animate-none motion-reduce:opacity-100"
+    class="timeline-container p-0 m-0"
     id="timeline-container"
   >
     {
@@ -94,7 +94,40 @@ const { categories, initialEvents: initialFilteredEvents, metadata, filterAll } 
 </script>
 
 <style>
-  .timeline-container.is-updating {
+  .timeline-container {
+    overflow-x: hidden;
+    transform: translateX(0);
+    opacity: 1;
+    transition:
+      transform 220ms cubic-bezier(0.4, 0, 1, 1),
+      opacity 220ms cubic-bezier(0.4, 0, 1, 1);
+    will-change: transform, opacity;
+  }
+
+  .timeline-container.is-swiping-out {
+    transform: translateX(-24px);
     opacity: 0;
+  }
+
+  .timeline-container.is-swiping-in {
+    transform: translateX(48px);
+    opacity: 0;
+    transition: none;
+  }
+
+  .timeline-container.is-swiping-in-active {
+    transform: translateX(0);
+    opacity: 1;
+    transition:
+      transform 700ms cubic-bezier(0.22, 1, 0.36, 1),
+      opacity 700ms cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .timeline-container {
+      transition: none !important;
+      transform: none !important;
+      opacity: 1 !important;
+    }
   }
 </style>

@@ -51,7 +51,7 @@ const timeline = defineCollection({
     startDate: yearOrYearMonthDate, // YYYY or YYYY-MM format
     endDate: yearOrYearMonthOrPresentDate.optional(), // YYYY, YYYY-MM, or "present"
     title: z.string(),
-    category: z.enum(["Experiences", "Honors"]),
+    category: z.string().min(1), // Free-form category label (e.g. "Experiences", "Honors")
     isHighlight: z.boolean().default(false),
     highlightSummary: z.string().optional(),
   }),
@@ -135,7 +135,7 @@ const contact = defineCollection({
           target: z.string().optional(),
           rel: z.string().optional(),
           description: z.string().optional(),
-          showOnHome: z.boolean().optional(),
+          showOnHome: z.boolean().optional(), // Defaults to true unless explicitly false
           showOnFooter: z.boolean().optional(),
         })
       ),
@@ -164,6 +164,7 @@ const page_metadata = defineCollection({
 const ui_strings = defineCollection({
   type: "data",
   schema: z.object({
+    navigation: z.record(z.string()).optional(),
     footer: z.object({
       linksHeading: z.string(),
       connectHeading: z.string(),

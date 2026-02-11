@@ -62,7 +62,7 @@ export const HOMEPAGE_SECTION_REGISTRY: Record<HomepageSectionType, SectionRegis
       for (const entry of context.contactEntries) {
         if (entry.data.type !== "list") continue;
         for (const item of entry.data.items) {
-          if (item.showOnHome === true) {
+          if (item.showOnHome !== false) {
             contactIcons.push(item);
           }
         }

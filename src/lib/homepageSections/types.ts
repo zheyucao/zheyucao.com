@@ -1,5 +1,6 @@
 import type { CollectionEntry } from "astro:content";
 import type { AstroComponentFactory } from "astro/runtime/server/index.js";
+import type { ContactItem } from "../types/contact";
 
 export type HomepageSectionEntry = CollectionEntry<"homepage-sections">;
 export type ContactEntry = CollectionEntry<"contact">;
@@ -8,17 +9,7 @@ export type TimelineEntry = CollectionEntry<"timeline">;
 
 export type ShowcaseFilterValue = string | number | boolean | null;
 
-export interface HomepageContactIconItem {
-  icon: string;
-  content?: string;
-  label?: string;
-  href?: string;
-  target?: string;
-  rel?: string;
-  description?: string;
-  showOnHome?: boolean;
-  showOnFooter?: boolean;
-}
+export type HomepageContactIconItem = ContactItem;
 
 export type HeroSection = {
   type: "hero";
