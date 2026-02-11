@@ -52,7 +52,7 @@ const { projects, metadata } = await getMasonryViewModel();
 
           if (prefersReducedMotion()) {
             pageWrapperElement.scrollTo({ top: finalScrollPosition, behavior: "auto" });
-            window.history.replaceState({}, "", window.location.pathname);
+            window.history.replaceState(window.history.state, "", window.location.pathname);
             return;
           }
 
@@ -61,7 +61,7 @@ const { projects, metadata } = await getMasonryViewModel();
             scrollTo: { y: finalScrollPosition },
             ease: "power4.out",
             onComplete: () => {
-              window.history.replaceState({}, "", window.location.pathname);
+              window.history.replaceState(window.history.state, "", window.location.pathname);
             },
           });
         }

@@ -73,10 +73,25 @@ const showScrollIndicator =
       import { initTheme } from "../lib/layout/theme";
       import { setupIntersectionObserver } from "../lib/layout/intersectionObserver";
       import { setupSectionAnimations, cleanupScrollTriggers } from "../lib/layout/gsapAnimations";
+      import {
+        setupScrollRestoration,
+        saveScrollPosition,
+        restoreScrollPosition,
+      } from "../lib/layout/scrollRestoration";
 
       const defaultTheme = (
         document.documentElement.dataset.defaultTheme || "system"
       ) as "light" | "dark" | "system";
+
+      onPageLifecycle("layout-scroll-restoration", {
+        onLoad: () => {
+          setupScrollRestoration();
+          restoreScrollPosition();
+        },
+        onSwap: () => {
+          saveScrollPosition();
+        },
+      });
 
       onPageLifecycle("layout-core", {
         onLoad: () => {
