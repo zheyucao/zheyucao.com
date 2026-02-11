@@ -35,7 +35,7 @@ const { categories, initialEvents: initialFilteredEvents, metadata, filterAll } 
     </div>
   </div>
   <ul
-    class="timeline-container p-0 m-0 transition-opacity duration-300 ease-out motion-reduce:transition-none motion-reduce:animate-none motion-reduce:opacity-100 [&.is-updating]:opacity-0"
+    class="timeline-container p-0 m-0 transition-opacity duration-300 ease-out motion-reduce:transition-none motion-reduce:animate-none motion-reduce:opacity-100"
     id="timeline-container"
   >
     {
@@ -92,3 +92,9 @@ const { categories, initialEvents: initialFilteredEvents, metadata, filterAll } 
     document.addEventListener("astro:before-swap", cleanupTimeline);
   }
 </script>
+
+<style>
+  .timeline-container.is-updating {
+    opacity: 0;
+  }
+</style>

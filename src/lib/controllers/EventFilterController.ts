@@ -6,9 +6,12 @@ export class EventFilterController {
   private currentFilter: string = "all";
   private categoryTabs: NodeListOf<HTMLElement>;
   private reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+  private isWebKitBrowser = this.detectWebKitBrowser();
   private boundCategoryClick: (e: Event) => void;
   private transitionTimeoutId: number | null = null;
+  private animationFrameId: number | null = null;
   private transitionEndHandler: ((event: TransitionEvent) => void) | null = null;
+  private animationRunId = 0;
 
   constructor(containerId: string, categoryTabsSelector: string) {
     const container = document.querySelector(containerId);
@@ -54,23 +57,32 @@ export class EventFilterController {
   }
 
   private runFilterAnimation() {
-    if (this.reduceMotion.matches) {
+    if (this.reduceMotion.matches || this.isWebKitBrowser) {
+      this.animationRunId += 1;
       this.clearPendingAnimation();
       this.applyFilter();
+      this.container.classList.remove("is-updating");
       return;
     }
 
     this.clearPendingAnimation();
+    const runId = ++this.animationRunId;
     this.container.classList.add("is-updating");
 
     const finish = () => {
+      if (runId !== this.animationRunId) {
+        return;
+      }
       this.clearPendingAnimation();
       this.applyFilter();
       this.container.classList.remove("is-updating");
     };
 
     // Let the opacity transition start before applying the new filter
-    requestAnimationFrame(() => {
+    this.animationFrameId = requestAnimationFrame(() => {
+      if (runId !== this.animationRunId) {
+        return;
+      }
       // Use fixed duration + small buffer
       this.transitionTimeoutId = window.setTimeout(finish, TRANSITION_DURATION + 50);
 
@@ -85,6 +97,11 @@ export class EventFilterController {
   }
 
   private clearPendingAnimation() {
+    if (this.animationFrameId !== null) {
+      cancelAnimationFrame(this.animationFrameId);
+      this.animationFrameId = null;
+    }
+
     if (this.transitionTimeoutId !== null) {
       clearTimeout(this.transitionTimeoutId);
       this.transitionTimeoutId = null;
@@ -113,10 +130,18 @@ export class EventFilterController {
   }
 
   public destroy() {
+    this.animationRunId += 1;
     this.clearPendingAnimation();
     this.categoryTabs.forEach((tab) => {
       tab.removeEventListener("click", this.boundCategoryClick);
     });
     this.container.classList.remove("is-updating");
+  }
+
+  private detectWebKitBrowser() {
+    const userAgent = navigator.userAgent;
+    const isSafariFamily = /Safari\//i.test(userAgent);
+    const isExcludedEngine = /Chrome|Chromium|Edg|OPR|CriOS|FxiOS/i.test(userAgent);
+    return isSafariFamily && !isExcludedEngine;
   }
 }

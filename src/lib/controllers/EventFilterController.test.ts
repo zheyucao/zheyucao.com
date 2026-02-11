@@ -1,8 +1,9 @@
-import { describe, it, expect, beforeEach } from "vitest";
+import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
 import { EventFilterController } from "./EventFilterController";
 
 describe("EventFilterController", () => {
   let categoryTab1: HTMLElement;
+  let categoryTab2: HTMLElement;
   let categoryTabAll: HTMLElement;
 
   beforeEach(() => {
@@ -27,6 +28,11 @@ describe("EventFilterController", () => {
     const tabs = document.querySelectorAll(".category-tab");
     categoryTabAll = tabs[0] as HTMLElement;
     categoryTab1 = tabs[1] as HTMLElement; // Cat1
+    categoryTab2 = tabs[2] as HTMLElement; // Cat2
+  });
+
+  afterEach(() => {
+    vi.restoreAllMocks();
   });
 
   it("should initialize and show all events by default", () => {
@@ -75,5 +81,38 @@ describe("EventFilterController", () => {
     expect(event1.style.display).toBe("");
     expect(event2.style.display).toBe("");
     expect(event3.style.display).toBe("");
+  });
+
+  it("should cancel a queued frame from a previous switch when switching rapidly", () => {
+    window.matchMedia = vi.fn(() => ({
+      matches: false,
+      media: "(prefers-reduced-motion: reduce)",
+      onchange: null,
+      addListener: () => {},
+      removeListener: () => {},
+      addEventListener: () => {},
+      removeEventListener: () => {},
+      dispatchEvent: () => false,
+    }));
+
+    const frameCallbacks: FrameRequestCallback[] = [];
+    const requestAnimationFrameSpy = vi
+      .spyOn(window, "requestAnimationFrame")
+      .mockImplementation((cb: FrameRequestCallback) => {
+        frameCallbacks.push(cb);
+        return frameCallbacks.length;
+      });
+    const cancelAnimationFrameSpy = vi
+      .spyOn(window, "cancelAnimationFrame")
+      .mockImplementation(() => {});
+
+    new EventFilterController("#timeline-container", ".category-tab");
+
+    categoryTab1.click();
+    categoryTab2.click();
+
+    expect(requestAnimationFrameSpy).toHaveBeenCalledTimes(2);
+    expect(cancelAnimationFrameSpy).toHaveBeenCalledTimes(1);
+    expect(cancelAnimationFrameSpy).toHaveBeenCalledWith(1);
   });
 });
