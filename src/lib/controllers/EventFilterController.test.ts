@@ -11,9 +11,11 @@ describe("EventFilterController", () => {
     document.body.innerHTML = `
       <div id="timeline-container">
         <div class="timeline-event" data-category="Cat1" id="event1">
+          <div class="timeline-connector" id="connector1"></div>
           <div class="timeline-title">Event 1</div>
         </div>
         <div class="timeline-event" data-category="Cat2" id="event2">
+          <div class="timeline-connector" id="connector2"></div>
           <div class="timeline-title">Event 2</div>
         </div>
         <div class="timeline-event" data-category="Cat1" id="event3">
@@ -81,6 +83,26 @@ describe("EventFilterController", () => {
     expect(event1.style.display).toBe("");
     expect(event2.style.display).toBe("");
     expect(event3.style.display).toBe("");
+  });
+
+  it("should mark only the last visible event after filtering", () => {
+    new EventFilterController("#timeline-container", ".category-tab");
+
+    categoryTab2.click();
+
+    const event1 = document.getElementById("event1")!;
+    const event2 = document.getElementById("event2")!;
+    const event3 = document.getElementById("event3")!;
+
+    expect(event1.classList.contains("is-last-visible")).toBe(false);
+    expect(event2.classList.contains("is-last-visible")).toBe(true);
+    expect(event3.classList.contains("is-last-visible")).toBe(false);
+
+    const connector1 = document.getElementById("connector1") as HTMLElement;
+    const connector2 = document.getElementById("connector2") as HTMLElement;
+
+    expect(connector1.style.display).toBe("");
+    expect(connector2.style.display).toBe("none");
   });
 
   it("should cancel a queued frame from a previous switch when switching rapidly", () => {

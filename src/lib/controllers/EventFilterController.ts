@@ -114,19 +114,32 @@ export class EventFilterController {
   }
 
   private applyFilter() {
-    const events = this.container.querySelectorAll(".timeline-event");
+    const events = Array.from(this.container.querySelectorAll<HTMLElement>(".timeline-event"));
+    let lastVisibleEvent: HTMLElement | null = null;
 
-    events.forEach((event) => {
-      const el = event as HTMLElement;
+    events.forEach((el) => {
       const category = el.dataset.category;
+      el.classList.remove("is-last-visible");
+      const connector = el.querySelector<HTMLElement>(".timeline-connector");
+      if (connector) {
+        connector.style.display = "";
+      }
 
       if (this.currentFilter === "all" || category === this.currentFilter) {
         el.style.display = "";
-        // Optional: Add animation class here if desired
+        lastVisibleEvent = el;
       } else {
         el.style.display = "none";
       }
     });
+
+    if (lastVisibleEvent) {
+      lastVisibleEvent.classList.add("is-last-visible");
+      const lastConnector = lastVisibleEvent.querySelector<HTMLElement>(".timeline-connector");
+      if (lastConnector) {
+        lastConnector.style.display = "none";
+      }
+    }
   }
 
   public destroy() {
