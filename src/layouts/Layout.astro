@@ -7,6 +7,7 @@ import { siteConfig } from "../config";
 import type { SEOMetadata } from "../lib/viewmodels/baseViewModel";
 import { resolveLocaleFromPath } from "../lib/i18n/locale";
 import "../styles/global.css";
+import HeadScripts from "../components/HeadScripts.astro";
 
 // Fontsource Variable Imports
 import "@fontsource-variable/inter";
@@ -62,40 +63,11 @@ const showScrollIndicator =
     <meta name="twitter:title" content={seoMetadata.ogTitle ?? pageTitle} />
     <meta name="twitter:description" content={seoMetadata.ogDescription ?? pageDescription} />
     {seoMetadata.ogImage && <meta name="twitter:image" content={seoMetadata.ogImage} />}
-    <script is:inline>
-      // Safari view transitions can flicker; force fallback swap there.
-      const ua = navigator.userAgent;
-      const isSafari = /Safari\//.test(ua) && !/Chrome\//.test(ua);
-      if (isSafari) {
-        try {
-          // @ts-expect-error Override to disable View Transitions, which have flicker issues in these browsers.
-          document.startViewTransition = undefined;
-        } catch {
-          /* ignore */
-        }
-      }
-    </script>
+    {seoMetadata.ogImage && <meta name="twitter:image" content={seoMetadata.ogImage} />}
+    
+    <HeadScripts defaultTheme={defaultTheme} />
+
     <ClientRouter fallback="swap" />
-    <script is:inline>
-      // Apply a class for reduced motion as early as possible and keep it in sync
-      const motionQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
-      const updateMotionClass = () =>
-        document.documentElement.classList.toggle("reduce-motion", motionQuery.matches);
-      updateMotionClass();
-      motionQuery.addEventListener("change", updateMotionClass);
-    </script>
-    <!-- START Insert Theme Detection Script Here -->
-    <script is:inline define:vars={{ defaultTheme }}>
-      // Immediate theme application to prevent flash
-      if (defaultTheme === "dark") {
-        document.documentElement.classList.add("dark");
-      } else if (
-        defaultTheme === "system" &&
-        window.matchMedia("(prefers-color-scheme: dark)").matches
-      ) {
-        document.documentElement.classList.add("dark");
-      }
-    </script>
     <!-- Layout Core Scripts (Theme, Scroll Reveal, GSAP) -->
     <script>
       import { onPageLifecycle } from "../lib/utils/pageLifecycle";

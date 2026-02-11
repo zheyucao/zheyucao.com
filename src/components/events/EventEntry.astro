@@ -16,22 +16,43 @@ interface Props {
 const { date, dateRange, title, description, Content, category, isLast = false } = Astro.props;
 ---
 
-<li class:list={["timeline-event", { "is-last": isLast }]} data-category={category}>
-  <div class="timeline-marker"></div>
+<li
+  class="timeline-event relative pl-12 pb-10 list-none mb-0"
+  data-category={category}
+  class:list={[{ "is-last": isLast }]}
+>
+  {/* Vertical Line */}
+  {
+    !isLast && (
+      <div class="absolute left-[11px] top-2 -bottom-2 w-[2px] bg-divider -translate-x-1/2" />
+    )
+  }
+
+  {/* Dot Marker */}
+  <div
+    class="absolute left-[11px] top-2 w-2 h-2 rounded-full bg-[var(--timeline-marker-bg-color)] -translate-x-1/2 z-1"
+  >
+  </div>
+
   <div class="timeline-content">
-    <div class="timeline-header">
-      <span class="timeline-date">{dateRange || date}</span>
-      <h3 class="timeline-title">{title}</h3>
-      <!-- {category && <span class="timeline-category">{category}</span>} -->
+    <div class="mb-2">
+      <span class="block font-sans text-[0.9rem] text-text-muted mb-1"
+        >{dateRange || date}</span
+      >
+      <h3 class="text-[1.3rem] font-normal m-0 text-[var(--heading-color)] leading-tight mb-[0.4rem]">
+        {title}
+      </h3>
     </div>
-    {Content ? (
-      <div class="timeline-description">
-        <Content />
-      </div>
-    ) : description ? (
-      <div class="timeline-description">
-        <RichText content={description} />
-      </div>
-    ) : null}
+    {
+      Content ? (
+        <div class="text-[1.2rem] leading-relaxed [&_p]:mb-[0.8rem] [&_p:last-child]:mb-0 [&_ul]:pl-[1.2rem] [&_ol]:pl-[1.2rem] [&_li]:mb-[0.4rem]">
+          <Content />
+        </div>
+      ) : description ? (
+        <div class="text-[1.2rem] leading-relaxed [&_p]:mb-[0.8rem] [&_p:last-child]:mb-0 [&_ul]:pl-[1.2rem] [&_ol]:pl-[1.2rem] [&_li]:mb-[0.4rem]">
+          <RichText content={description} />
+        </div>
+      ) : null
+    }
   </div>
 </li>

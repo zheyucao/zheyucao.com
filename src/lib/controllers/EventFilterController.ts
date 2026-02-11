@@ -1,3 +1,6 @@
+// Fixed duration matching the CSS transition (300ms)
+const TRANSITION_DURATION = 300;
+
 export class EventFilterController {
   private container: HTMLElement;
   private currentFilter: string = "all";
@@ -68,7 +71,8 @@ export class EventFilterController {
 
     // Let the opacity transition start before applying the new filter
     requestAnimationFrame(() => {
-      const durationMs = this.getTransitionDurationMs(this.container);
+      // Use fixed duration + small buffer
+      this.transitionTimeoutId = window.setTimeout(finish, TRANSITION_DURATION + 50);
 
       this.transitionEndHandler = (event: TransitionEvent) => {
         if (event.target !== this.container || event.propertyName !== "opacity") {
@@ -77,9 +81,6 @@ export class EventFilterController {
         finish();
       };
       this.container.addEventListener("transitionend", this.transitionEndHandler);
-
-      // Fallback in case transitionend doesn't fire.
-      this.transitionTimeoutId = window.setTimeout(finish, Math.max(durationMs, 0) + 50);
     });
   }
 
@@ -93,27 +94,6 @@ export class EventFilterController {
       this.container.removeEventListener("transitionend", this.transitionEndHandler);
       this.transitionEndHandler = null;
     }
-  }
-
-  private getTransitionDurationMs(element: HTMLElement): number {
-    const computed = window.getComputedStyle(element);
-    const durations = computed.transitionDuration.split(",").map((value) => value.trim());
-    const delays = computed.transitionDelay.split(",").map((value) => value.trim());
-
-    const parseMs = (token: string): number => {
-      if (token.endsWith("ms")) {
-        return Number.parseFloat(token);
-      }
-      if (token.endsWith("s")) {
-        return Number.parseFloat(token) * 1000;
-      }
-      return 0;
-    };
-
-    return durations.reduce((max, duration, index) => {
-      const delay = delays[index] ?? delays[delays.length - 1] ?? "0s";
-      return Math.max(max, parseMs(duration) + parseMs(delay));
-    }, 0);
   }
 
   private applyFilter() {

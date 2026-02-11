@@ -2,7 +2,6 @@
 import SubPageLayout from "../layouts/SubPageLayout.astro";
 import EventEntry from "../components/events/EventEntry.astro";
 import { getEventsViewModel } from "../viewmodels/eventsViewModel";
-import "../styles/events.css";
 import PageActions from "../components/common/PageActions.astro";
 import { resolveLocaleFromPath } from "../lib/i18n/locale";
 
@@ -13,21 +12,32 @@ const { categories, initialEvents: initialFilteredEvents, metadata, filterAll } 
 
 <SubPageLayout title={metadata.title} description={metadata.description} seo={metadata.seo}>
   <PageActions slot="actions" actions={metadata.actions} />
-  <div class="timeline-controls">
-    <div class="control-group category-tabs">
-      <button type="button" class="category-tab" data-category="all" aria-pressed="true"
-        >{filterAll}</button
+  <div class="mb-12 flex flex-wrap gap-6 items-center">
+    <!-- Category Tabs -->
+    <div class="flex flex-wrap gap-x-3 gap-y-2 items-center font-sans">
+      <button
+        type="button"
+        class="category-tab font-inherit text-[1rem] px-4 pb-[0.8em] pt-[0.5em] border-none border-b-3 border-transparent bg-transparent text-text-muted cursor-pointer transition-all duration-200 -mb-[1px] hover:border-button-border hover:text-text aria-pressed:border-button-border-hover aria-pressed:text-text aria-pressed:font-semibold"
+        data-category="all"
+        aria-pressed="true">{filterAll}</button
       >
       {
         categories.map((cat) => (
-          <button type="button" class="category-tab" data-category={cat}>
+          <button
+            type="button"
+            class="category-tab font-inherit text-[1rem] px-4 pb-[0.8em] pt-[0.5em] border-none border-b-3 border-transparent bg-transparent text-text-muted cursor-pointer transition-all duration-200 -mb-[1px] hover:border-button-border hover:text-text aria-pressed:border-button-border-hover aria-pressed:text-text aria-pressed:font-semibold"
+            data-category={cat}
+          >
             {cat}
           </button>
         ))
       }
     </div>
   </div>
-  <ul class="timeline-container mt-8" id="timeline-container">
+  <ul
+    class="timeline-container p-0 m-0 transition-opacity duration-300 ease-out motion-reduce:transition-none motion-reduce:animate-none motion-reduce:opacity-100 [&.is-updating]:opacity-0"
+    id="timeline-container"
+  >
     {
       initialFilteredEvents.map((event, index) => (
         <EventEntry
@@ -82,80 +92,3 @@ const { categories, initialEvents: initialFilteredEvents, metadata, filterAll } 
     document.addEventListener("astro:before-swap", cleanupTimeline);
   }
 </script>
-
-<style>
-  .timeline-controls {
-    margin-bottom: 3rem;
-    display: flex;
-    flex-wrap: wrap;
-    gap: 1.5rem;
-    align-items: center;
-  }
-  .control-group {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.8rem;
-    align-items: center;
-  }
-  .control-group label {
-    font-weight: 500;
-    margin-right: 0.5rem;
-    color: var(--text-muted);
-  }
-
-  .controls-note {
-    font-size: 0.85rem;
-    color: var(--text-muted);
-    width: 100%;
-    text-align: right;
-    margin: 0.5rem 0 0;
-  }
-  /* Category Tabs Styling */
-  .category-tabs {
-    gap: 0.5rem 0rem;
-    font-family: var(--font-family-sans);
-  }
-  .category-tab {
-    font-family: inherit;
-    font-size: 1rem;
-    padding: 0.5em 1em 0.8em;
-    border: none;
-    border-bottom-width: 3px;
-    border-bottom-style: solid;
-    border-bottom-color: transparent;
-    background-color: transparent;
-    color: var(--text-muted);
-    cursor: pointer;
-    transition: all 0.2s ease;
-    margin-bottom: -1px;
-  }
-  .category-tab:hover {
-    border-bottom-color: var(--button-border-color);
-    color: var(--text-color);
-  }
-  .category-tab[aria-pressed="true"] {
-    border-bottom-color: var(--button-border-hover-color);
-    color: var(--text-color);
-    font-weight: 600;
-  }
-
-  .timeline-container {
-    padding: 0;
-    margin: 0;
-    transition: opacity 0.3s ease-out;
-  }
-
-  .timeline-container.is-updating {
-    opacity: 0;
-  }
-
-  /* Consider users who prefer reduced motion */
-  @media (prefers-reduced-motion: reduce) {
-    .timeline-container,
-    .timeline-container.is-updating {
-      transition: none;
-      animation: none;
-      opacity: 1; /* Ensure it's always visible */
-    }
-  }
-</style>
