@@ -11,13 +11,13 @@ interface Props {
 const { title, content, Content } = Astro.props;
 ---
 
-<section class="resume-section scroll-reveal-animate">
+<section class="document-section scroll-reveal-animate">
   <h2>{title}</h2>
   {Content ? <Content /> : content ? <RichText content={content} /> : null}
 </section>
 
 <style>
-  .resume-section {
+  .document-section {
     margin-bottom: 4rem;
   }
   h2 {

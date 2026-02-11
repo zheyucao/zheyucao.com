@@ -68,7 +68,7 @@ const actionSchema = z.object({
   text: z.string(),
   href: z.string(),
   variant: z.enum(["default", "primary", "subtle"]).optional(),
-  download: z.string().optional(),
+  download: z.union([z.string(), z.boolean()]).optional(),
   icon: z.string().optional(),
   iconPosition: z.enum(["left", "right"]).optional(),
   target: z.string().optional(),

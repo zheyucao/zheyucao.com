@@ -1,6 +1,7 @@
 ---
 // src/components/home/ShowcaseCard.astro
 import RichText from "../common/RichText.astro";
+import { resolveLocalizedHref } from "../../lib/i18n/locale";
 
 interface Props {
   title: string;
@@ -16,7 +17,10 @@ const {
   isDoubleColumn = false,
 } = Astro.props;
 
-const projectUrl = `/projects?scrollTo=${encodeURIComponent(slug)}`;
+const projectUrl = resolveLocalizedHref(
+  `/projects?scrollTo=${encodeURIComponent(slug)}`,
+  Astro.url.pathname
+);
 ---
 
 <a

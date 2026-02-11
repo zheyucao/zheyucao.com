@@ -3,7 +3,7 @@
 import Button from "../../common/Button.astro";
 import ContactIcons from "../../contact/ContactIcons.astro";
 import type { AstroComponentFactory } from "astro/runtime/server/index.js";
-import type { ContactItem } from "../../../viewmodels/contactViewModel";
+import type { HomepageContactIconItem } from "../../../lib/homepageSections/types";
 
 interface Props {
   title: string;
@@ -12,7 +12,7 @@ interface Props {
     href: string;
   };
   Content: AstroComponentFactory;
-  socialItems?: ContactItem[];
+  socialItems?: HomepageContactIconItem[];
 }
 
 const { title, cta, Content, socialItems } = Astro.props;

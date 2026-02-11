@@ -19,7 +19,7 @@ interface Props {
 const { title, entries, variant = "default" } = Astro.props;
 ---
 
-<section class="resume-section scroll-reveal-animate mb-12" data-variant={variant}>
+<section class="document-section scroll-reveal-animate mb-12" data-variant={variant}>
   <h2 class="section-heading">{title}</h2>
   {
     entries.map((entry, index) => (

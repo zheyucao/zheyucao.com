@@ -35,8 +35,8 @@ export const applyCollectionQuery = <T>(
     }
   }
 
-  if (options.limit) {
-    result = result.slice(0, options.limit);
+  if (options.limit !== undefined) {
+    result = result.slice(0, Math.max(0, options.limit));
   }
 
   return result;

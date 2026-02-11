@@ -2,6 +2,7 @@
 // src/components/common/Button.astro
 import type { HTMLAttributes } from "astro/types";
 import { Icon } from "astro-icon/components";
+import { resolveLocalizedHref } from "../../lib/i18n/locale";
 
 type ButtonVariant = "default" | "primary" | "subtle";
 
@@ -33,11 +34,12 @@ const downloadAttr = download === "" ? true : download;
 const iconName = typeof icon === "string" && icon.includes(":") ? icon : undefined;
 const iconText = typeof icon === "string" && !iconName ? icon : null;
 const variantClass = `button-link--${variant}`;
+const resolvedHref = resolveLocalizedHref(href, Astro.url.pathname);
 ---
 
 <div class:list={["mb-6 text-left", wrapperClass, { "!mb-0": noMargin }]}>
   <a
-    href={href}
+    href={resolvedHref}
     download={downloadAttr}
     class:list={[
       "button-link inline-flex items-center justify-center px-[1.2em] py-[0.6em] rounded-lg font-sans text-[0.9rem] leading-[1.4]",

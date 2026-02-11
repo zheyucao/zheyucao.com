@@ -13,7 +13,7 @@ const { projects, metadata } = await getMasonryViewModel();
     {
       projects.map((project) => (
         <MasonryCard
-          id={project.id}
+          id={project.slug}
           title={project.data.title}
           imageSrc={project.data.imageSrc}
           imageAlt={project.data.imageAlt}

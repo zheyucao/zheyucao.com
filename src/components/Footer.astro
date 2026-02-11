@@ -2,7 +2,7 @@
 // Component: src/components/Footer.astro
 import { siteConfig } from "../config";
 import { getEntry } from "astro:content";
-import { resolveLocaleFromPath } from "../lib/i18n/locale";
+import { resolveLocaleFromPath, resolveLocalizedHref } from "../lib/i18n/locale";
 import { getUiStrings } from "../lib/i18n/uiStrings";
 
 const currentYear = new Date().getFullYear();
@@ -45,7 +45,11 @@ const contactFooterItems = await getContactFooterItems();
         {
           navigation.items.map((item) => (
             <li class="mb-[0.5em]">
-              <a href={item.href} class="footer-link" data-astro-prefetch>
+              <a
+                href={resolveLocalizedHref(item.href, Astro.url.pathname)}
+                class="footer-link"
+                data-astro-prefetch
+              >
                 {item.name}
               </a>
             </li>
@@ -64,7 +68,7 @@ const contactFooterItems = await getContactFooterItems();
               <li class="mb-[0.5em]">
                 <a
                   class="footer-link"
-                  href={item.href}
+                  href={resolveLocalizedHref(item.href || "", Astro.url.pathname)}
                   target={item.target}
                   rel={item.rel}
                   aria-label={item.label || item.content || item.href}
@@ -124,16 +128,17 @@ const contactFooterItems = await getContactFooterItems();
       const linkHref = link.getAttribute("href");
       const linkParentLi = link.closest("li");
       if (!linkHref || !linkParentLi) return;
-      const normalizedHref = "/" + linkHref.replace(/^\/+|\/+$/g, "");
+      const strippedHref = stripLocalePrefix(linkHref);
+      const normalizedHref = "/" + strippedHref.replace(/^\/+|\/+$/g, "");
 
       linkParentLi.classList.remove("active");
 
-      if (linkHref === rootPath && (currentPath === rootPath || currentPath === "/index.html")) {
+      if (normalizedHref === rootPath && (currentPath === rootPath || currentPath === "/index.html")) {
         linkParentLi.classList.add("active");
       } else if (
-        linkHref !== rootPath &&
-        linkHref.startsWith("/") &&
-        !linkHref.includes("#") &&
+        normalizedHref !== rootPath &&
+        strippedHref.startsWith("/") &&
+        !strippedHref.includes("#") &&
         normalizedHref === normalizedPath
       ) {
         linkParentLi.classList.add("active");

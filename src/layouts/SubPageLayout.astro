@@ -2,6 +2,7 @@
 import Layout from "./Layout.astro";
 import { Icon } from "astro-icon/components";
 import type { SEOMetadata } from "../lib/viewmodels/baseViewModel";
+import { resolveLocalizedHref } from "../lib/i18n/locale";
 
 interface Props {
   title: string;
@@ -10,6 +11,7 @@ interface Props {
 }
 
 const { title, description, seo } = Astro.props;
+const homeHref = resolveLocalizedHref("/", Astro.url.pathname);
 ---
 
 <Layout title={title} description={description} seo={seo} showIndicatorOverride={false}>
@@ -19,7 +21,7 @@ const { title, description, seo } = Astro.props;
         <div
           class="back-link-wrapper no-margin page-load-initial-state flex items-center justify-center h-[2.4rem] w-[2.4rem] min-w-[2.4rem] shrink-0 rounded-lg"
         >
-          <a href="/" class="back-link flex items-center justify-center w-full h-full">
+          <a href={homeHref} class="back-link flex items-center justify-center w-full h-full">
             <Icon name="ri:arrow-left-line" class="back-link-icon" size={16} />
           </a>
         </div>

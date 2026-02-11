@@ -96,6 +96,12 @@ describe("homepageSectionsViewModel matrix scenarios", () => {
       expected: ["Project A"],
     },
     {
+      sortBy: "date",
+      sortOrder: "asc",
+      limit: 0,
+      expected: [],
+    },
+    {
       sortBy: undefined,
       sortOrder: undefined,
       limit: undefined,
@@ -173,6 +179,12 @@ describe("homepageSectionsViewModel matrix scenarios", () => {
       sortOrder: "asc",
       limit: 2,
       expected: ["Event A", "Event B"],
+    },
+    {
+      sortBy: "date",
+      sortOrder: "asc",
+      limit: 0,
+      expected: [],
     },
     {
       sortBy: undefined,

@@ -1,10 +1,10 @@
 import { formatDateRange } from "../utils/dateUtils";
-import type { ContactItem } from "../../viewmodels/contactViewModel";
 import { applyCollectionQuery } from "./query";
 import { contactSchema, heroSchema, showcaseSchema, textSchema } from "./schemas";
 import type {
   HomepageSection,
   HomepageSectionBuildContext,
+  HomepageContactIconItem,
   HomepageSectionEntry,
   HomepageSectionRendererKey,
   HomepageSectionType,
@@ -57,7 +57,7 @@ export const HOMEPAGE_SECTION_REGISTRY: Record<HomepageSectionType, SectionRegis
     schema: contactSchema,
     build: async (section, context) => {
       const rendered = await section.render();
-      const contactIcons: ContactItem[] = [];
+      const contactIcons: HomepageContactIconItem[] = [];
 
       for (const entry of context.contactEntries) {
         if (entry.data.type !== "list") continue;

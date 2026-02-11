@@ -14,6 +14,11 @@ export interface SiteConfig {
   i18n: {
     defaultLocale: string;
     locales: string[];
+    routing?: {
+      mode?: "auto" | "explicit";
+      locale?: string;
+      prefixDefaultLocale?: boolean;
+    };
   };
 }
 
@@ -39,5 +44,10 @@ export const siteConfig: SiteConfig = {
   i18n: {
     defaultLocale: "en",
     locales: ["en", "zh"],
+    routing: {
+      mode: "auto",
+      locale: "en",
+      prefixDefaultLocale: false,
+    },
   },
 };
