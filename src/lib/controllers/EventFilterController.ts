@@ -1,3 +1,5 @@
+import { ScrollTrigger } from "../animations/gsapPlugins";
+
 // Match the CSS timings for each phase.
 const SWIPE_OUT_DURATION = 220;
 const SWIPE_IN_DURATION = 700;
@@ -164,6 +166,16 @@ export class EventFilterController {
         lastConnector.style.display = "none";
       }
     }
+
+    this.refreshScrollTriggers();
+  }
+
+  private refreshScrollTriggers() {
+    // Filtering updates timeline height. Refresh ScrollTrigger on next frame
+    // so footer/section triggers re-measure against the new layout.
+    requestAnimationFrame(() => {
+      ScrollTrigger.refresh();
+    });
   }
 
   public destroy() {
